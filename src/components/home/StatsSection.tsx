@@ -13,22 +13,12 @@ const stats = [
 
 export function StatsSection() {
   const { t, language } = useLanguage();
-
   return (
     <section className="border-y border-primary-100 bg-white">
       <div className="container-page grid grid-cols-2 gap-6 py-12 lg:grid-cols-4">
         {stats.map((s, i) => (
-          <motion.div
-            key={s.key}
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: i * 0.08 }}
-            className="text-center"
-          >
-            <p className="font-display text-3xl font-semibold text-primary-900 sm:text-4xl">
-              {formatNumber(s.value, language === "ta" ? "ta-IN" : "en-IN")}+
-            </p>
+          <motion.div key={s.key} initial={{ opacity: 0, y: 12 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: i * 0.08 }} className="text-center">
+            <p className="font-display text-3xl font-semibold text-primary-900 sm:text-4xl">{formatNumber(s.value, language === "ta" ? "ta-IN" : "en-IN")}+</p>
             <p className="mt-1 text-xs font-medium uppercase tracking-wider text-muted">{t(s.key)}</p>
           </motion.div>
         ))}

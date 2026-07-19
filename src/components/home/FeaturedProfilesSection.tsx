@@ -8,13 +8,7 @@ import { Section, SectionHeader } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 
 interface FeaturedProfile {
-  name: string;
-  age: number;
-  location: string;
-  profession: string;
-  image: string;
-  verified: boolean;
-  premium: boolean;
+  name: string; age: number; location: string; profession: string; image: string; verified: boolean; premium: boolean;
 }
 
 const profiles: FeaturedProfile[] = [
@@ -26,39 +20,18 @@ const profiles: FeaturedProfile[] = [
 
 export function FeaturedProfilesSection() {
   const { t } = useLanguage();
-
   return (
     <Section className="bg-gradient-to-b from-background to-primary-50/30">
-      <SectionHeader
-        eyebrow={t("home.featured.eyebrow")}
-        title={t("home.featured.title")}
-        subtitle={t("home.featured.subtitle")}
-      />
+      <SectionHeader eyebrow={t("home.featured.eyebrow")} title={t("home.featured.title")} subtitle={t("home.featured.subtitle")} />
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {profiles.map((p, i) => (
           <Reveal key={p.name} delay={i * 0.08}>
             <article className="group overflow-hidden rounded-2xl bg-card shadow-card transition hover:-translate-y-1 hover:shadow-glow">
               <div className="relative aspect-[3/4] overflow-hidden">
-                <Image
-                  src={p.image}
-                  alt={p.name}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  className="object-cover transition duration-500 group-hover:scale-105"
-                />
+                <Image src={p.image} alt={p.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover transition duration-500 group-hover:scale-105" />
                 <div className="absolute left-3 top-3 flex gap-1.5">
-                  {p.verified && (
-                    <span className="badge-verified">
-                      <BadgeCheck className="h-3 w-3" />
-                      {t("home.featured.verified")}
-                    </span>
-                  )}
-                  {p.premium && (
-                    <span className="badge-secondary">
-                      <Crown className="h-3 w-3" />
-                      {t("home.featured.premium")}
-                    </span>
-                  )}
+                  {p.verified && <span className="badge-verified"><BadgeCheck className="h-3 w-3" />{t("home.featured.verified")}</span>}
+                  {p.premium && <span className="badge-secondary"><Crown className="h-3 w-3" />{t("home.featured.premium")}</span>}
                 </div>
               </div>
               <div className="p-4">
@@ -74,10 +47,7 @@ export function FeaturedProfilesSection() {
         ))}
       </div>
       <div className="mt-10 text-center">
-        <Link href="/search" className="btn-outline">
-          {t("home.featured.viewAll")}
-          <ArrowRight className="h-4 w-4" />
-        </Link>
+        <Link href="/search" className="btn-outline">{t("home.featured.viewAll")}<ArrowRight className="h-4 w-4" /></Link>
       </div>
     </Section>
   );

@@ -14,21 +14,14 @@ const features = [
 
 export function WhySection() {
   const { t } = useLanguage();
-
   return (
     <Section>
-      <SectionHeader
-        eyebrow={t("home.why.eyebrow")}
-        title={t("home.why.title")}
-        subtitle={t("home.why.subtitle")}
-      />
+      <SectionHeader eyebrow={t("home.why.eyebrow")} title={t("home.why.title")} subtitle={t("home.why.subtitle")} />
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {features.map((f, i) => (
           <Reveal key={f.titleKey} delay={i * 0.08}>
             <div className="card h-full transition hover:-translate-y-1 hover:shadow-glow">
-              <span className={`flex h-12 w-12 items-center justify-center rounded-xl ${f.tint}`}>
-                <f.icon className="h-6 w-6" />
-              </span>
+              <span className={`flex h-12 w-12 items-center justify-center rounded-xl ${f.tint}`}><f.icon className="h-6 w-6" /></span>
               <h3 className="mt-5 font-display text-lg font-semibold text-primary-900">{t(f.titleKey)}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">{t(f.descKey)}</p>
             </div>

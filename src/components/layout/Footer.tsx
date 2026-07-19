@@ -55,14 +55,7 @@ export function Footer() {
               <p className="eyebrow">{t("footer.followUs")}</p>
               <div className="mt-3 flex gap-2">
                 {socials.map((s) => (
-                  <a
-                    key={s.label}
-                    href={s.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={s.label}
-                    className="flex h-10 w-10 items-center justify-center rounded-full border border-primary-100 bg-white text-primary-800 transition hover:border-secondary hover:text-secondary-700"
-                  >
+                  <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" aria-label={s.label} className="flex h-10 w-10 items-center justify-center rounded-full border border-primary-100 bg-white text-primary-800 transition hover:border-secondary hover:text-secondary-700">
                     <s.icon className="h-4 w-4" />
                   </a>
                 ))}
@@ -74,11 +67,7 @@ export function Footer() {
             <p className="font-display text-base font-semibold text-primary-900">{t("footer.quickLinks")}</p>
             <ul className="mt-4 space-y-2.5">
               {quickLinks.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="link-quiet text-sm">
-                    {t(l.key)}
-                  </Link>
-                </li>
+                <li key={l.href}><Link href={l.href} className="link-quiet text-sm">{t(l.key)}</Link></li>
               ))}
             </ul>
           </div>
@@ -87,11 +76,7 @@ export function Footer() {
             <p className="font-display text-base font-semibold text-primary-900">{t("footer.support")}</p>
             <ul className="mt-4 space-y-2.5">
               {supportLinks.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="link-quiet text-sm">
-                    {t(l.key)}
-                  </Link>
-                </li>
+                <li key={l.href}><Link href={l.href} className="link-quiet text-sm">{t(l.key)}</Link></li>
               ))}
             </ul>
           </div>
@@ -100,11 +85,7 @@ export function Footer() {
             <p className="font-display text-base font-semibold text-primary-900">{t("footer.legal")}</p>
             <ul className="mt-4 space-y-2.5">
               {legalLinks.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="link-quiet text-sm">
-                    {t(l.key)}
-                  </Link>
-                </li>
+                <li key={l.href}><Link href={l.href} className="link-quiet text-sm">{t(l.key)}</Link></li>
               ))}
             </ul>
           </div>

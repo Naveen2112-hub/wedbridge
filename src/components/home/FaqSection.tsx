@@ -7,10 +7,7 @@ import { Section, SectionHeader } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 import { cn } from "@/lib/cn";
 
-interface FaqItem {
-  q: string;
-  a: string;
-}
+interface FaqItem { q: string; a: string; }
 
 const faqs: FaqItem[] = [
   { q: "How are profiles verified on WedBridge?", a: "Every profile undergoes ID verification and biodata OCR review by our team before being marked as verified." },
@@ -23,33 +20,21 @@ const faqs: FaqItem[] = [
 export function FaqSection() {
   const { t } = useLanguage();
   const [open, setOpen] = useState<number | null>(0);
-
   return (
     <Section className="bg-gradient-to-b from-background to-primary-50/30">
-      <SectionHeader
-        eyebrow={t("home.faq.eyebrow")}
-        title={t("home.faq.title")}
-        subtitle={t("home.faq.subtitle")}
-      />
+      <SectionHeader eyebrow={t("home.faq.eyebrow")} title={t("home.faq.title")} subtitle={t("home.faq.subtitle")} />
       <div className="mx-auto mt-12 max-w-3xl space-y-3">
         {faqs.map((f, i) => {
           const isOpen = open === i;
           return (
             <Reveal key={f.q} delay={i * 0.05}>
               <div className="overflow-hidden rounded-2xl border border-primary-100 bg-card">
-                <button
-                  type="button"
-                  onClick={() => setOpen(isOpen ? null : i)}
-                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
-                  aria-expanded={isOpen}
-                >
+                <button type="button" onClick={() => setOpen(isOpen ? null : i)} className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left" aria-expanded={isOpen}>
                   <span className="font-display text-base font-semibold text-primary-900">{f.q}</span>
                   <ChevronDown className={cn("h-5 w-5 flex-none text-secondary-600 transition", isOpen && "rotate-180")} />
                 </button>
                 <div className={cn("grid transition-all duration-300", isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0")}>
-                  <div className="overflow-hidden">
-                    <p className="px-5 pb-5 text-sm leading-relaxed text-muted">{f.a}</p>
-                  </div>
+                  <div className="overflow-hidden"><p className="px-5 pb-5 text-sm leading-relaxed text-muted">{f.a}</p></div>
                 </div>
               </div>
             </Reveal>

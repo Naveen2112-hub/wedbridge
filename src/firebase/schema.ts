@@ -16,9 +16,18 @@ export type CollectionName = (typeof collections)[keyof typeof collections];
 
 export type UserRole = "user" | "admin";
 
-export type Gender = "male" | "female";
+export type Gender = "male" | "female" | "other";
 
 export type ProfileStatus = "incomplete" | "pending" | "approved" | "rejected";
+
+export type ContactVisibility = "everyone" | "after_accept" | "premium_only";
+
+export type Language = "en" | "ta";
+
+export const languages: { code: Language; label: string; nativeLabel: string }[] = [
+  { code: "en", label: "English", nativeLabel: "English" },
+  { code: "ta", label: "Tamil", nativeLabel: "தமிழ்" },
+];
 
 export interface BaseDocument {
   id: string;
@@ -28,10 +37,14 @@ export interface BaseDocument {
 
 export interface UserDocument extends BaseDocument {
   uid: string;
-  email: string;
   role: UserRole;
-  displayName?: string;
+  name: string;
+  email: string;
+  phone?: string;
+  gender?: Gender;
+  profileCompleted: boolean;
   photoURL?: string;
+  contactVisibility?: ContactVisibility;
   language: Language;
 }
 
@@ -39,10 +52,15 @@ export interface ProfileDocument extends BaseDocument {
   uid: string;
   fullName: string;
   gender: Gender;
-  age: number;
-  height?: string;
+  dateOfBirth?: string;
   religion?: string;
   caste?: string;
+  district?: string;
+  phone?: string;
+  email?: string;
+  photoURL?: string;
+  age?: number;
+  height?: string;
   motherTongue?: string;
   profession?: string;
   education?: string;
@@ -56,6 +74,7 @@ export interface ProfileDocument extends BaseDocument {
   status: ProfileStatus;
   isPremium: boolean;
   contactVisible: boolean;
+  contactVisibility: ContactVisibility;
   preferences?: {
     ageRange?: [number, number];
     religion?: string;
@@ -64,9 +83,11 @@ export interface ProfileDocument extends BaseDocument {
   };
 }
 
-export type Language = "en" | "ta";
-
-export const languages: { code: Language; label: string; nativeLabel: string }[] = [
-  { code: "en", label: "English", nativeLabel: "English" },
-  { code: "ta", label: "Tamil", nativeLabel: "தமிழ்" },
-];
+export const FREE_PLAN_LIMITS = {
+  interestRequestsPerDay: 20,
+  contactDetailViewsPerDay: 5,
+  aiRecommendations: "unlimited" as const,
+  registration: "unlimited" as const,
+  login: "unlimited" as const,
+  profileViews: "unlimited" as const,
+};

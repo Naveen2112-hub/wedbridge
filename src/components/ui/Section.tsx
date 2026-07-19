@@ -11,13 +11,7 @@ interface SectionHeaderProps {
 
 export function SectionHeader({ eyebrow, title, subtitle, align = "center", className }: SectionHeaderProps) {
   return (
-    <div
-      className={cn(
-        "max-w-2xl",
-        align === "center" ? "mx-auto text-center" : "text-left",
-        className,
-      )}
-    >
+    <div className={cn("max-w-2xl", align === "center" ? "mx-auto text-center" : "text-left", className)}>
       {eyebrow && (
         <p className="eyebrow">
           <span className="h-px w-6 bg-secondary" />

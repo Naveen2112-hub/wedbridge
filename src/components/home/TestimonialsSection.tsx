@@ -5,11 +5,7 @@ import { Section, SectionHeader } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 
-interface Testimonial {
-  name: string;
-  role: string;
-  quote: string;
-}
+interface Testimonial { name: string; role: string; quote: string; }
 
 const testimonials: Testimonial[] = [
   { name: "Lakshmi N.", role: "Parent of bride", quote: "WedBridge gave us confidence. Every profile felt genuine and family-approved." },
@@ -19,13 +15,9 @@ const testimonials: Testimonial[] = [
 
 export function TestimonialsSection() {
   const { t } = useLanguage();
-
   return (
     <Section>
-      <SectionHeader
-        eyebrow={t("home.testimonials.eyebrow")}
-        title={t("home.testimonials.title")}
-      />
+      <SectionHeader eyebrow={t("home.testimonials.eyebrow")} title={t("home.testimonials.title")} />
       <div className="mt-12 grid gap-6 lg:grid-cols-3">
         {testimonials.map((tm, i) => (
           <Reveal key={tm.name} delay={i * 0.08}>

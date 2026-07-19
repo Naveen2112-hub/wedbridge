@@ -12,7 +12,6 @@ interface LanguageContextValue {
 }
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
-
 const STORAGE_KEY = "wedbridge:lang";
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
@@ -20,9 +19,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const stored = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : null;
-    if (stored === "en" || stored === "ta") {
-      setLanguageState(stored);
-    }
+    if (stored === "en" || stored === "ta") setLanguageState(stored);
   }, []);
 
   const setLanguage = useCallback((lang: Language) => {
@@ -34,9 +31,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (typeof document !== "undefined") {
-      document.documentElement.lang = language;
-    }
+    if (typeof document !== "undefined") document.documentElement.lang = language;
   }, [language]);
 
   const t = useCallback((key: TranslationKey) => translate(language, key), [language]);

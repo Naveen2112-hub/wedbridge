@@ -23,22 +23,13 @@ export function LanguageSwitcher() {
         <ChevronDown className={cn("h-3.5 w-3.5 transition", open && "rotate-180")} />
       </button>
       {open && (
-        <ul
-          className="absolute right-0 mt-2 w-40 overflow-hidden rounded-xl border border-primary-100 bg-white py-1 shadow-card"
-          role="listbox"
-        >
+        <ul className="absolute right-0 mt-2 w-40 overflow-hidden rounded-xl border border-primary-100 bg-white py-1 shadow-card" role="listbox">
           {languages.map((l) => (
             <li key={l.code}>
               <button
                 type="button"
-                onClick={() => {
-                  setLanguage(l.code);
-                  setOpen(false);
-                }}
-                className={cn(
-                  "flex w-full items-center justify-between px-3 py-2 text-sm transition hover:bg-primary-50",
-                  language === l.code ? "text-primary-900" : "text-ink/70",
-                )}
+                onClick={() => { setLanguage(l.code); setOpen(false); }}
+                className={cn("flex w-full items-center justify-between px-3 py-2 text-sm transition hover:bg-primary-50", language === l.code ? "text-primary-900" : "text-ink/70")}
                 role="option"
                 aria-selected={language === l.code}
               >
