@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useState } from "react";
 import Cropper from "react-easy-crop";
-import { Upload, Loader2, Check, X } from "lucide-react";
+import { Upload, Loader as Loader2, Check, X } from "lucide-react";
 import { compressImage, dataURLtoBlob, uploadProfilePhoto, MAX_PHOTO_BYTES } from "@/lib/profile/profileService";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { cn } from "@/lib/cn";

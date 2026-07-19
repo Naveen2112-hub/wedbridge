@@ -1,5 +1,5 @@
 "use client";
-import { CheckCircle2, AlertCircle } from "lucide-react";
+import { CircleCheck as CheckCircle2, CircleAlert as AlertCircle } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import type { ProfileDocument } from "@/firebase/schema";

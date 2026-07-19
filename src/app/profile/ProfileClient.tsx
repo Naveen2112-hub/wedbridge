@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Loader2, Pencil, ShieldCheck, Eye, EyeOff, UserX, AlertCircle } from "lucide-react";
+import { Loader as Loader2, Pencil, ShieldCheck, Eye, EyeOff, UserX, CircleAlert as AlertCircle } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { AuthGuard } from "@/components/auth/AuthGuard";

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Heart, Sparkles, HeartHandshake, Bell, Crown, Search, ArrowRight, AlertCircle, Eye, TrendingUp } from "lucide-react";
+import { Heart, Sparkles, HeartHandshake, Bell, Crown, Search, ArrowRight, CircleAlert as AlertCircle, Eye, TrendingUp } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { ProtectedLayout } from "@/components/layout/ProtectedLayout";

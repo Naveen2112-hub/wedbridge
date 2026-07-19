@@ -1,6 +1,6 @@
 "use client";
 import { useCallback, useState } from "react";
-import { FileText, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { FileText, Loader as Loader2, CircleCheck as CheckCircle2, CircleAlert as AlertCircle } from "lucide-react";
 import { runOCR } from "@/lib/profile/ocr";
 import type { PartialProfile } from "@/lib/profile/ocrTypes";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";

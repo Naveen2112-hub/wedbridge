@@ -2,7 +2,7 @@
 import { useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthProvider";
-import { Loader2 } from "lucide-react";
+import { Loader as Loader2 } from "lucide-react";
 export function AuthGuard({ children }: { children: ReactNode }) {
   const { user, loading, configured } = useAuth();
   const router = useRouter();

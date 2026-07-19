@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, AlertCircle, CheckCircle2, User, Phone, MapPin, Calendar, Shield, Users, GraduationCap, Briefcase, IndianRupee, HeartHandshake, Ruler, BookOpen, Leaf, Cigarette, Wine, Star, Sparkles } from "lucide-react";
+import { Loader as Loader2, CircleAlert as AlertCircle, CircleCheck as CheckCircle2, User, Phone, MapPin, Calendar, Shield, Users, GraduationCap, Briefcase, IndianRupee, HeartHandshake, Ruler, BookOpen, Leaf, Cigarette, Wine, Star, Sparkles } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { AuthGuard } from "@/components/auth/AuthGuard";
