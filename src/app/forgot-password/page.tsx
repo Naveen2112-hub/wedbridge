@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Heart, Mail, AlertCircle, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Heart, Mail, CircleAlert as AlertCircle, ArrowLeft, CircleCheck as CheckCircle2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { forgotSchema, type ForgotValues, mapAuthError } from "@/lib/auth/validations";

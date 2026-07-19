@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader as Loader2 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 interface SubmitButtonProps { children: ReactNode; loading?: boolean; disabled?: boolean; className?: string; }

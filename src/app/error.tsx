@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { AlertCircle } from "lucide-react";
+import { CircleAlert as AlertCircle } from "lucide-react";
 
 export default function Error({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
