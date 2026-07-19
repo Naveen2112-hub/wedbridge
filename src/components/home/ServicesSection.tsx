@@ -1,19 +1,16 @@
 "use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Flower2, UtensilsCrossed, Camera, Music } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
-
 const services = [
   { icon: Flower2, titleKey: "home.services.decor.title" as const, descKey: "home.services.decor.desc" as const, image: "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg" },
   { icon: UtensilsCrossed, titleKey: "home.services.cater.title" as const, descKey: "home.services.cater.desc" as const, image: "https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg" },
   { icon: Camera, titleKey: "home.services.photo.title" as const, descKey: "home.services.photo.desc" as const, image: "https://images.pexels.com/photos/1444442/pexels-photo-1444442.jpeg" },
   { icon: Music, titleKey: "home.services.music.title" as const, descKey: "home.services.music.desc" as const, image: "https://images.pexels.com/photos/164743/pexels-photo-164743.jpeg" },
 ];
-
 export function ServicesSection() {
   const { t } = useLanguage();
   return (

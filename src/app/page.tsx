@@ -10,21 +10,6 @@ import { SuccessStoriesSection } from "@/components/home/SuccessStoriesSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { FaqSection } from "@/components/home/FaqSection";
 import { DownloadSection } from "@/components/home/DownloadSection";
-
 export default function HomePage() {
-  return (
-    <PublicLayout>
-      <HeroSection />
-      <StatsSection />
-      <WhySection />
-      <FeaturedProfilesSection />
-      <AISection />
-      <ServicesSection />
-      <MembershipSection />
-      <SuccessStoriesSection />
-      <TestimonialsSection />
-      <FaqSection />
-      <DownloadSection />
-    </PublicLayout>
-  );
+  return (<PublicLayout><HeroSection /><StatsSection /><WhySection /><FeaturedProfilesSection /><AISection /><ServicesSection /><MembershipSection /><SuccessStoriesSection /><TestimonialsSection /><FaqSection /><DownloadSection /></PublicLayout>);
 }
