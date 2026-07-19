@@ -1,21 +1,10 @@
 "use client";
 import { Quote } from "lucide-react";
-import { Section, SectionHeader } from "@/components/ui/Section";
-import { Reveal } from "@/components/ui/Reveal";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
-const testimonials = [
-  { name: "Lakshmi N.", role: "Parent of bride", quote: "WedBridge gave us confidence. Every profile felt genuine and family-approved." },
-  { name: "Suresh K.", role: "Premium member", quote: "The AI matches were remarkably aligned with our expectations. Worth every rupee." },
-  { name: "Anitha R.", role: "Bride, Coimbatore", quote: "We planned the entire wedding through the vendor marketplace. Beautiful experience." },
-];
+import { Section } from "@/components/ui/Section";
+import { Reveal } from "@/components/ui/Reveal";
+const testimonials = [{ name: "Lakshmi, Chennai", text: "My daughter found the perfect match. The verification process gave us confidence." }, { name: "Suresh, Coimbatore", text: "The AI suggestions were surprisingly accurate. Highly recommend." }, { name: "Revathi, Madurai", text: "Privacy-first approach made my family comfortable with the platform." }];
 export function TestimonialsSection() {
   const { t } = useLanguage();
-  return (
-    <Section>
-      <SectionHeader eyebrow={t("home.testimonials.eyebrow")} title={t("home.testimonials.title")} />
-      <div className="mt-12 grid gap-6 lg:grid-cols-3">
-        {testimonials.map((tm, i) => (<Reveal key={tm.name} delay={i * 0.08}><figure className="card h-full"><Quote className="h-8 w-8 text-secondary-400" /><blockquote className="mt-4 text-sm leading-relaxed text-ink/80">“{tm.quote}”</blockquote><figcaption className="mt-5 border-t border-primary-50 pt-4"><p className="font-display text-base font-semibold text-primary-900">{tm.name}</p><p className="text-xs text-muted">{tm.role}</p></figcaption></figure></Reveal>))}
-      </div>
-    </Section>
-  );
+  return (<Section><div className="mx-auto max-w-2xl text-center"><h2 className="heading-lg">{t("home.testimonials.title")}</h2><p className="text-lead mt-3">{t("home.testimonials.subtitle")}</p></div><div className="mt-12 grid gap-6 md:grid-cols-3">{testimonials.map((tm, i) => (<Reveal key={tm.name} delay={i * 0.1}><div className="h-full rounded-2xl bg-card p-6 shadow-soft"><Quote className="h-6 w-6 text-secondary-500" /><p className="mt-3 text-sm text-ink/80">{tm.text}</p><p className="mt-4 font-display text-sm font-semibold text-primary-900">{tm.name}</p></div></Reveal>))}</div></Section>);
 }

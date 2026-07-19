@@ -3,9 +3,11 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, sendPasswordResetEmail, updateProfile, onAuthStateChanged, type User } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db, isFirebaseConfigured } from "@/firebase/config";
-import { collections, type UserRole, type Language, type Gender, type ContactVisibility } from "@/firebase/schema";
+import { collections, type UserRole, type Language, type ContactVisibility } from "@/firebase/schema";
 
 export interface CompleteProfileInput { name: string; gender: Gender; dateOfBirth: string; religion: string; caste: string; district: string; phone: string; email?: string; photoURL?: string; contactVisibility: ContactVisibility; }
+import type { Gender } from "@/firebase/schema";
+
 interface AuthContextValue {
   user: User | null; role: UserRole | null; profileCompleted: boolean; loading: boolean; configured: boolean;
   registerWithEmail: (name: string, email: string, password: string) => Promise<User>;
@@ -14,6 +16,7 @@ interface AuthContextValue {
   resetPassword: (email: string) => Promise<void>;
   logout: () => Promise<void>;
   completeProfile: (data: CompleteProfileInput) => Promise<void>;
+  setProfileCompleted: (v: boolean) => void;
 }
 const AuthContext = createContext<AuthContextValue | null>(null);
 const googleProvider = new GoogleAuthProvider();
@@ -21,7 +24,7 @@ const googleProvider = new GoogleAuthProvider();
 function readLanguage(): Language { if (typeof window === "undefined") return "en"; return window.localStorage.getItem("wedbridge:lang") === "ta" ? "ta" : "en"; }
 
 async function ensureUserDoc(user: User, defaults: Partial<Record<string, unknown>> = {}): Promise<{ role: UserRole; profileCompleted: boolean }> {
-  if (!db) throw new Error("Firestore not configured");
+  if (!db) throw new Error("auth.error.notConfigured");
   const ref = doc(db, collections.users, user.uid);
   const snap = await getDoc(ref);
   if (!snap.exists()) {
@@ -82,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfileCompleted(true);
   }, []);
 
-  const value = useMemo<AuthContextValue>(() => ({ user, role, profileCompleted, loading, configured, registerWithEmail, loginWithEmail, loginWithGoogle, resetPassword, logout, completeProfile }), [user, role, profileCompleted, loading, configured, registerWithEmail, loginWithEmail, loginWithGoogle, resetPassword, logout, completeProfile]);
+  const value = useMemo<AuthContextValue>(() => ({ user, role, profileCompleted, loading, configured, registerWithEmail, loginWithEmail, loginWithGoogle, resetPassword, logout, completeProfile, setProfileCompleted }), [user, role, profileCompleted, loading, configured, registerWithEmail, loginWithEmail, loginWithGoogle, resetPassword, logout, completeProfile]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

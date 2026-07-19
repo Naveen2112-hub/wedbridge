@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Loader as Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 interface GoogleButtonProps { onClick: () => void; loading?: boolean; label: string; }
 export function GoogleButton({ onClick, loading, label }: GoogleButtonProps) {
   const [hover, setHover] = useState(false);

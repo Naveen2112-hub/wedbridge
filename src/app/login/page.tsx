@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Heart, Mail, Lock, CircleAlert as AlertCircle } from "lucide-react";
+import { Heart, Mail, Lock, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { loginSchema, type LoginValues, mapAuthError } from "@/lib/auth/validations";
@@ -22,17 +22,10 @@ export default function LoginPage() {
   const [authError, setAuthError] = useState<string | null>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginValues>({ resolver: zodResolver(loginSchema), defaultValues: { email: "", password: "" } });
-  const routeAfterAuth = (role: string | null) => router.push(role === "admin" ? "/admin/dashboard" : "/dashboard");
-  const onSubmit = async (values: LoginValues) => {
-    setAuthError(null);
-    try { const user = await loginWithEmail(values.email, values.password); if (!db) { routeAfterAuth("user"); return; } const snap = await getDoc(doc(db, collections.users, user.uid)); const role = (snap.data()?.role as UserRole) ?? "user"; routeAfterAuth(role); }
-    catch (err) { setAuthError(mapAuthError(err)); }
-  };
-  const onGoogle = async () => {
-    setAuthError(null); setGoogleLoading(true);
-    try { const user = await loginWithGoogle(); if (!db) { routeAfterAuth("user"); return; } const snap = await getDoc(doc(db, collections.users, user.uid)); const role = (snap.data()?.role as UserRole) ?? "user"; routeAfterAuth(role); }
-    catch (err) { setAuthError(mapAuthError(err)); } finally { setGoogleLoading(false); }
-  };
+  const routeAfterAuth = (role: string | null, completed: boolean) => { if (role === "admin") router.push("/admin/dashboard"); else if (!completed) router.push("/complete-profile"); else router.push("/dashboard"); };
+  const readMeta = async (uid: string) => { if (!db) return { role: "user" as UserRole, completed: false }; const snap = await getDoc(doc(db, collections.users, uid)); const d = snap.data(); return { role: (d?.role as UserRole) ?? "user", completed: Boolean(d?.profileCompleted) }; };
+  const onSubmit = async (values: LoginValues) => { setAuthError(null); try { const user = await loginWithEmail(values.email, values.password); const meta = await readMeta(user.uid); routeAfterAuth(meta.role, meta.completed); } catch (err) { setAuthError(mapAuthError(err)); } };
+  const onGoogle = async () => { setAuthError(null); setGoogleLoading(true); try { const user = await loginWithGoogle(); const meta = await readMeta(user.uid); routeAfterAuth(meta.role, meta.completed); } catch (err) { setAuthError(mapAuthError(err)); } finally { setGoogleLoading(false); } };
   return (
     <AuthShell><GlassCard>
       <div className="mb-8 text-center"><span className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-primary-800"><Heart className="h-6 w-6" fill="currentColor" /></span><h1 className="heading-md mt-4">{t("auth.login.title")}</h1><p className="text-lead mt-2">{t("auth.login.subtitle")}</p></div>

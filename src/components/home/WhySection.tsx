@@ -1,22 +1,10 @@
 "use client";
-import { ShieldCheck, Sparkles, EyeOff, Store } from "lucide-react";
+import { ShieldCheck, Sparkles, Lock, Headset } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
-import { Section, SectionHeader } from "@/components/ui/Section";
+import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
-const features = [
-  { icon: ShieldCheck, titleKey: "home.why.verified.title" as const, descKey: "home.why.verified.desc" as const, tint: "bg-primary-50 text-primary-800" },
-  { icon: Sparkles, titleKey: "home.why.ai.title" as const, descKey: "home.why.ai.desc" as const, tint: "bg-secondary-100 text-secondary-800" },
-  { icon: EyeOff, titleKey: "home.why.privacy.title" as const, descKey: "home.why.privacy.desc" as const, tint: "bg-accent-100 text-accent-800" },
-  { icon: Store, titleKey: "home.why.services.title" as const, descKey: "home.why.services.desc" as const, tint: "bg-primary-50 text-primary-800" },
-];
+const items = [{ key: "verified", icon: ShieldCheck }, { key: "ai", icon: Sparkles }, { key: "privacy", icon: Lock }, { key: "support", icon: Headset }] as const;
 export function WhySection() {
   const { t } = useLanguage();
-  return (
-    <Section>
-      <SectionHeader eyebrow={t("home.why.eyebrow")} title={t("home.why.title")} subtitle={t("home.why.subtitle")} />
-      <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {features.map((f, i) => (<Reveal key={f.titleKey} delay={i * 0.08}><div className="card h-full transition hover:-translate-y-1 hover:shadow-glow"><span className={`flex h-12 w-12 items-center justify-center rounded-xl ${f.tint}`}><f.icon className="h-6 w-6" /></span><h3 className="mt-5 font-display text-lg font-semibold text-primary-900">{t(f.titleKey)}</h3><p className="mt-2 text-sm leading-relaxed text-muted">{t(f.descKey)}</p></div></Reveal>))}
-      </div>
-    </Section>
-  );
+  return (<Section id="why"><div className="mx-auto max-w-2xl text-center"><h2 className="heading-lg">{t("home.why.title")}</h2><p className="text-lead mt-3">{t("home.why.subtitle")}</p></div><div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{items.map((it, i) => (<Reveal key={it.key} delay={i * 0.08}><div className="h-full rounded-2xl bg-card p-6 shadow-soft transition hover:shadow-card"><span className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-primary-800"><it.icon className="h-6 w-6" /></span><h3 className="mt-4 font-display text-lg font-semibold text-primary-900">{t(`home.why.items.${it.key}.title` as never)}</h3><p className="mt-2 text-sm text-muted">{t(`home.why.items.${it.key}.desc` as never)}</p></div></Reveal>))}</div></Section>);
 }

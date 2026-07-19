@@ -1,24 +1,47 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: ["./src/app/**/*.{ts,tsx}", "./src/components/**/*.{ts,tsx}", "./src/lib/**/*.{ts,tsx}"],
+  content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        primary: { 50: "#fdf2f4", 100: "#fbe3e7", 200: "#f7c9d1", 300: "#f0a3b2", 400: "#e46e87", 500: "#d44a6a", 600: "#be3553", 700: "#9d2440", 800: "#7A1022", 900: "#5e0a1a", 950: "#3a0410", DEFAULT: "#7A1022" },
-        secondary: { 50: "#fdfaf0", 100: "#faf0d6", 200: "#f5e0a8", 300: "#efca6f", 400: "#e7b443", 500: "#d9a02c", 600: "#C9A227", 700: "#a87d1f", 800: "#8a6520", 900: "#73531f", 950: "#432d0e", DEFAULT: "#C9A227" },
-        accent: { 50: "#fef0f6", 100: "#fde0ec", 200: "#fbc7dd", 300: "#f79ec8", 400: "#f266a8", 500: "#E91E63", 600: "#d41857", 700: "#b31447", 800: "#93133d", 900: "#7a1438", 950: "#4d071d", DEFAULT: "#E91E63" },
-        background: "#FFF8F5", card: "#FFFFFF", ink: "#1f1410", muted: "#6b5b54",
+        primary: {
+          50: "#FBF3F4", 100: "#F7E6E8", 200: "#EFCCD0", 300: "#E0A3A9", 400: "#C9656E",
+          500: "#A6323D", 600: "#7A1022", 700: "#660D1C", 800: "#520A16", 900: "#3D070F", 950: "#2A050A",
+        },
+        secondary: {
+          50: "#FBF7EA", 100: "#F6EFC5", 200: "#EDDFA0", 300: "#E0CB6F", 400: "#D4B842",
+          500: "#C9A227", 600: "#A8821C", 700: "#856018", 800: "#5F4413", 900: "#3D2C0E",
+        },
+        accent: {
+          50: "#FDE7F1", 100: "#FBC8DF", 200: "#F793C0", 300: "#F25BA0", 400: "#ED3484",
+          500: "#E91E63", 600: "#C2185B", 700: "#9A1249", 800: "#720D37", 900: "#4A0823",
+        },
+        ink: "#1A1416",
+        muted: "#6B5E62",
+        background: "#FFFDF7",
+        card: "#FFFFFF",
       },
-      fontFamily: { sans: ["var(--font-sans)", "system-ui", "sans-serif"], display: ["var(--font-display)", "Georgia", "serif"] },
-      borderRadius: { xl: "0.875rem", "2xl": "1.25rem", "3xl": "1.75rem" },
-      boxShadow: { soft: "0 4px 24px -8px rgba(122, 16, 34, 0.12)", card: "0 8px 32px -12px rgba(122, 16, 34, 0.18)", glow: "0 0 0 4px rgba(201, 162, 39, 0.18)" },
-      backgroundImage: { "hero-pattern": "radial-gradient(circle at 20% 20%, rgba(201,162,39,0.18), transparent 40%), radial-gradient(circle at 80% 0%, rgba(122,16,34,0.12), transparent 45%)" },
-      keyframes: { "fade-up": { "0%": { opacity: "0", transform: "translateY(16px)" }, "100%": { opacity: "1", transform: "translateY(0)" } }, shimmer: { "0%": { backgroundPosition: "-200% 0" }, "100%": { backgroundPosition: "200% 0" } } },
-      animation: { "fade-up": "fade-up 0.6s ease-out both", shimmer: "shimmer 2.5s linear infinite" },
+      fontFamily: {
+        sans: ["var(--font-inter)", "system-ui", "sans-serif"],
+        display: ["var(--font-playfair)", "Georgia", "serif"],
+      },
+      boxShadow: {
+        soft: "0 4px 20px -8px rgba(122, 16, 34, 0.12)",
+        card: "0 10px 40px -12px rgba(122, 16, 34, 0.18)",
+        glow: "0 0 24px -4px rgba(201, 162, 39, 0.45)",
+      },
+      backgroundImage: {
+        "hero-texture": "radial-gradient(circle at 20% 20%, rgba(201,162,39,0.10), transparent 40%), radial-gradient(circle at 80% 80%, rgba(122,16,34,0.08), transparent 45%)",
+        "grain-texture": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='40' height='40' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E\")",
+      },
+      keyframes: {
+        "fade-up": { from: { opacity: "0", transform: "translateY(12px)" }, to: { opacity: "1", transform: "translateY(0)" } },
+        shimmer: { "0%": { backgroundPosition: "-200% 0" }, "100%": { backgroundPosition: "200% 0" } },
+      },
+      animation: { "fade-up": "fade-up 0.6s ease-out", shimmer: "shimmer 2s linear infinite" },
     },
   },
   plugins: [],
 };
-
 export default config;

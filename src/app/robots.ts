@@ -1,5 +1,2 @@
 import type { MetadataRoute } from "next";
-export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  return { rules: { userAgent: "*", allow: "/", disallow: ["/admin/", "/login", "/register", "/dashboard", "/profile", "/settings"] }, sitemap: `${baseUrl}/sitemap.xml` };
-}
+export default function Robots(): MetadataRoute.Robots { return { rules: { userAgent: "*", allow: "/" }, sitemap: "https://wedbridge.app/sitemap.xml" }; }

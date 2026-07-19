@@ -1,21 +1,31 @@
 "use client";
-
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { type Language, languages } from "@/firebase/schema";
-import { translate, type TranslationKey } from "@/lib/i18n/dictionaries";
+import { dictionaries, type Dictionary } from "./dictionaries";
 
-interface LanguageContextValue { language: Language; setLanguage: (lang: Language) => void; t: (key: TranslationKey) => string; languages: typeof languages; }
-const LanguageContext = createContext<LanguageContextValue | null>(null);
-const STORAGE_KEY = "wedbridge:lang";
+type Lang = "en" | "ta";
+interface LangCtx { lang: Lang; setLang: (l: Lang) => void; t: (path: string) => string; }
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>("en");
-  useEffect(() => { const stored = typeof window !== "undefined" ? window.localStorage.getItem(STORAGE_KEY) : null; if (stored === "en" || stored === "ta") setLanguageState(stored); }, []);
-  const setLanguage = useCallback((lang: Language) => { setLanguageState(lang); if (typeof window !== "undefined") { window.localStorage.setItem(STORAGE_KEY, lang); document.documentElement.lang = lang; } }, []);
-  useEffect(() => { if (typeof document !== "undefined") document.documentElement.lang = language; }, [language]);
-  const t = useCallback((key: TranslationKey) => translate(language, key), [language]);
-  const value = useMemo<LanguageContextValue>(() => ({ language, setLanguage, t, languages }), [language, setLanguage, t]);
-  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
+function readPath(dict: Dictionary, path: string): string {
+  const parts = path.split(".");
+  let cur: unknown = dict;
+  for (const p of parts) {
+    if (cur && typeof cur === "object" && p in (cur as Record<string, unknown>)) cur = (cur as Record<string, unknown>)[p];
+    else return path;
+  }
+  return typeof cur === "string" ? cur : path;
 }
 
-export function useLanguage(): LanguageContextValue { const ctx = useContext(LanguageContext); if (!ctx) throw new Error("useLanguage must be used within a LanguageProvider"); return ctx; }
+const fallbackT = (path: string) => readPath(dictionaries.en as Dictionary, path);
+const defaultValue: LangCtx = { lang: "en", setLang: () => {}, t: fallbackT };
+const Ctx = createContext<LangCtx>(defaultValue);
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [lang, setLangState] = useState<Lang>("en");
+  useEffect(() => { const saved = typeof window !== "undefined" ? window.localStorage.getItem("wedbridge:lang") : null; if (saved === "ta" || saved === "en") setLangState(saved); }, []);
+  const setLang = useCallback((l: Lang) => { setLangState(l); if (typeof window !== "undefined") window.localStorage.setItem("wedbridge:lang", l); }, []);
+  const t = useCallback((path: string) => readPath(dictionaries[lang] as Dictionary, path), [lang]);
+  const value = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t]);
+  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+}
+
+export function useLanguage(): LangCtx { return useContext(Ctx); }
