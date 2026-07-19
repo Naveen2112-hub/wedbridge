@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Shield, Mail, Lock, AlertCircle } from "lucide-react";
+import { Shield, Mail, Lock, CircleAlert as AlertCircle } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { loginSchema, type LoginValues, mapAuthError } from "@/lib/auth/validations";
