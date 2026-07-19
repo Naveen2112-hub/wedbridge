@@ -6,11 +6,5 @@ import { ProtectedPage } from "@/components/auth/ProtectedPage";
 
 export default function FavouritesPage() {
   const { t } = useLanguage();
-  return (
-    <ProtectedPage
-      title={t("nav.favourites")}
-      description="Profiles you've saved for later."
-      icon={Star}
-    />
-  );
+  return (<ProtectedPage title={t("nav.favourites")} description="Profiles you've saved for later." icon={Star} />);
 }

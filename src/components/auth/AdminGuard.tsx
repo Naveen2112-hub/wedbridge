@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthProvider";
-import { Loader as Loader2, ShieldAlert } from "lucide-react";
+import { Loader2, ShieldAlert } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 
 export function AdminGuard({ children }: { children: ReactNode }) {
@@ -15,35 +15,15 @@ export function AdminGuard({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (loading) return;
     if (!configured) return;
-    if (!user) {
-      router.replace("/admin/login");
-      return;
-    }
+    if (!user) { router.replace("/admin/login"); return; }
     if (role !== "admin") {
       setDenied(true);
-      (async () => {
-        await logout();
-        setTimeout(() => router.replace("/admin/login"), 1500);
-      })();
+      (async () => { await logout(); setTimeout(() => router.replace("/admin/login"), 1500); })();
     }
   }, [user, role, loading, configured, router, logout]);
 
-  if (!configured) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-grain">
-        <p className="text-sm text-muted">Firebase is not configured.</p>
-      </div>
-    );
-  }
-
-  if (loading || (!user && !denied)) {
-    return (
-      <div className="flex min-h-[60vh] items-center justify-center bg-grain">
-        <Loader2 className="h-8 w-8 animate-spin text-primary-800" />
-      </div>
-    );
-  }
-
+  if (!configured) return (<div className="flex min-h-[60vh] items-center justify-center bg-grain"><p className="text-sm text-muted">Firebase is not configured.</p></div>);
+  if (loading || (!user && !denied)) return (<div className="flex min-h-[60vh] items-center justify-center bg-grain"><Loader2 className="h-8 w-8 animate-spin text-primary-800" /></div>);
   if (denied || role !== "admin") {
     return (
       <div className="flex min-h-[60vh] items-center justify-center bg-grain">
@@ -55,6 +35,5 @@ export function AdminGuard({ children }: { children: ReactNode }) {
       </div>
     );
   }
-
   return <>{children}</>;
 }

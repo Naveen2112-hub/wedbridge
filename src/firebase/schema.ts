@@ -41,7 +41,7 @@ export interface UserDocument extends BaseDocument {
   name: string;
   email: string;
   phone?: string;
-  gender?: Gender;
+  gender?: Gender | null;
   profileCompleted: boolean;
   photoURL?: string;
   contactVisibility?: ContactVisibility;

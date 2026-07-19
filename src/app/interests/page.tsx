@@ -6,11 +6,5 @@ import { ProtectedPage } from "@/components/auth/ProtectedPage";
 
 export default function InterestsPage() {
   const { t } = useLanguage();
-  return (
-    <ProtectedPage
-      title={t("nav.interests")}
-      description="Interest requests you've sent and received."
-      icon={HeartHandshake}
-    />
-  );
+  return (<ProtectedPage title={t("nav.interests")} description="Interest requests you've sent and received." icon={HeartHandshake} />);
 }

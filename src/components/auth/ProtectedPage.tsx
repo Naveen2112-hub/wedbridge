@@ -6,12 +6,7 @@ import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
 
-interface ProtectedPageProps {
-  title: string;
-  description: string;
-  icon: LucideIcon;
-  action?: { label: string; href: string };
-}
+interface ProtectedPageProps { title: string; description: string; icon: LucideIcon; action?: { label: string; href: string }; }
 
 export function ProtectedPage({ title, description, icon: Icon, action }: ProtectedPageProps) {
   const { t } = useLanguage();
@@ -23,11 +18,7 @@ export function ProtectedPage({ title, description, icon: Icon, action }: Protec
             <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-50 text-primary-800"><Icon className="h-7 w-7" /></span>
             <h1 className="heading-md mt-5">{title}</h1>
             <p className="text-lead mt-2 max-w-xl">{description}</p>
-            {action && (
-              <Link href={action.href} className="btn-primary mt-8">
-                {action.label} <ArrowRight className="h-4 w-4" />
-              </Link>
-            )}
+            {action && (<Link href={action.href} className="btn-primary mt-8">{action.label} <ArrowRight className="h-4 w-4" /></Link>)}
           </div>
           <p className="mt-6 text-center text-xs text-muted">{t("footer.madeWith")}</p>
         </div>

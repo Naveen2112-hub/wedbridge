@@ -7,9 +7,7 @@ import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 
-interface Story { couple: string; city: string; quote: string; image: string; }
-
-const stories: Story[] = [
+const stories = [
   { couple: "Priya & Karthik", city: "Chennai", quote: "We matched within two weeks. WedBridge understood our values perfectly.", image: "https://images.pexels.com/photos/1024993/pexels-photo-1024993.jpeg" },
   { couple: "Divya & Arjun", city: "Madurai", quote: "The AI suggestions felt personal. Our families connected instantly.", image: "https://images.pexels.com/photos/1456626/pexels-photo-1456626.jpeg" },
   { couple: "Meera & Vignesh", city: "Coimbatore", quote: "From match to wedding, every step was effortless and elegant.", image: "https://images.pexels.com/photos/1024984/pexels-photo-1024984.jpeg" },
@@ -37,9 +35,7 @@ export function SuccessStoriesSection() {
           </Reveal>
         ))}
       </div>
-      <div className="mt-10 text-center">
-        <Link href="/success-stories" className="btn-outline">{t("home.success.cta")}<ArrowRight className="h-4 w-4" /></Link>
-      </div>
+      <div className="mt-10 text-center"><Link href="/success-stories" className="btn-outline">{t("home.success.cta")}<ArrowRight className="h-4 w-4" /></Link></div>
     </Section>
   );
 }

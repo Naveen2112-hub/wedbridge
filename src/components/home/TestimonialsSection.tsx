@@ -5,9 +5,7 @@ import { Section, SectionHeader } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 
-interface Testimonial { name: string; role: string; quote: string; }
-
-const testimonials: Testimonial[] = [
+const testimonials = [
   { name: "Lakshmi N.", role: "Parent of bride", quote: "WedBridge gave us confidence. Every profile felt genuine and family-approved." },
   { name: "Suresh K.", role: "Premium member", quote: "The AI matches were remarkably aligned with our expectations. Worth every rupee." },
   { name: "Anitha R.", role: "Bride, Coimbatore", quote: "We planned the entire wedding through the vendor marketplace. Beautiful experience." },

@@ -36,10 +36,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const t = useCallback((key: TranslationKey) => translate(language, key), [language]);
 
-  const value = useMemo<LanguageContextValue>(
-    () => ({ language, setLanguage, t, languages }),
-    [language, setLanguage, t],
-  );
+  const value = useMemo<LanguageContextValue>(() => ({ language, setLanguage, t, languages }), [language, setLanguage, t]);
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 }

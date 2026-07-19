@@ -39,27 +39,19 @@ export function Navbar() {
     <header className={cn("sticky top-0 z-50 transition-all duration-300", scrolled ? "bg-background/90 backdrop-blur-md shadow-soft" : "bg-transparent")}>
       <nav className="container-page flex h-16 items-center justify-between lg:h-20">
         <Link href="/" className="flex items-center gap-2.5" aria-label="WedBridge home">
-          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white shadow-soft">
-            <Heart className="h-5 w-5" fill="currentColor" />
-          </span>
-          <span className="font-display text-xl font-semibold text-primary-900">
-            Wed<span className="text-secondary-600">Bridge</span>
-          </span>
+          <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-white shadow-soft"><Heart className="h-5 w-5" fill="currentColor" /></span>
+          <span className="font-display text-xl font-semibold text-primary-900">Wed<span className="text-secondary-600">Bridge</span></span>
         </Link>
-
         <ul className="hidden items-center gap-1 lg:flex">
           {publicNav.map((item) => {
             const active = pathname === item.href;
             return (
               <li key={item.href}>
-                <Link href={item.href} className={cn("rounded-full px-3.5 py-2 text-sm font-medium transition", active ? "bg-primary-50 text-primary-900" : "text-ink/70 hover:text-primary-900")}>
-                  {t(item.key)}
-                </Link>
+                <Link href={item.href} className={cn("rounded-full px-3.5 py-2 text-sm font-medium transition", active ? "bg-primary-50 text-primary-900" : "text-ink/70 hover:text-primary-900")}>{t(item.key)}</Link>
               </li>
             );
           })}
         </ul>
-
         <div className="hidden items-center gap-2 lg:flex">
           <LanguageSwitcher />
           {user ? (
@@ -74,19 +66,15 @@ export function Navbar() {
             </>
           )}
         </div>
-
         <button type="button" className="inline-flex items-center justify-center rounded-full p-2 text-primary-900 lg:hidden" onClick={() => setOpen((v) => !v)} aria-label="Toggle menu" aria-expanded={open}>
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </nav>
-
       {open && (
         <div className="border-t border-primary-100 bg-background/95 backdrop-blur-md lg:hidden">
           <div className="container-page flex flex-col gap-1 py-4">
             {publicNav.map((item) => (
-              <Link key={item.href} href={item.href} className="rounded-xl px-3 py-2.5 text-sm font-medium text-ink/80 hover:bg-primary-50 hover:text-primary-900">
-                {t(item.key)}
-              </Link>
+              <Link key={item.href} href={item.href} className="rounded-xl px-3 py-2.5 text-sm font-medium text-ink/80 hover:bg-primary-50 hover:text-primary-900">{t(item.key)}</Link>
             ))}
             <div className="mt-2 flex items-center gap-2">
               <LanguageSwitcher />

@@ -13,23 +13,14 @@ const stats = [
 ];
 
 export default function AdminDashboardPage() {
-  return (
-    <AdminGuard>
-      <AdminLayout>
-        <AdminDashboardContent />
-      </AdminLayout>
-    </AdminGuard>
-  );
+  return (<AdminGuard><AdminLayout><AdminDashboardContent /></AdminLayout></AdminGuard>);
 }
 
 function AdminDashboardContent() {
   const { t } = useLanguage();
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="heading-md">{t("admin.dashboard.title")}</h1>
-        <p className="text-lead mt-2">{t("admin.overview")}</p>
-      </div>
+      <div><h1 className="heading-md">{t("admin.dashboard.title")}</h1><p className="text-lead mt-2">{t("admin.overview")}</p></div>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((s) => (
           <div key={s.key} className="rounded-2xl bg-card p-6 shadow-card">
@@ -39,10 +30,7 @@ function AdminDashboardContent() {
           </div>
         ))}
       </div>
-      <div className="rounded-2xl bg-card p-6 shadow-card">
-        <h2 className="font-display text-lg font-semibold text-primary-900">{t("admin.overview")}</h2>
-        <p className="mt-2 text-sm text-muted">Manage users, profiles, vendors, and memberships from the sidebar.</p>
-      </div>
+      <div className="rounded-2xl bg-card p-6 shadow-card"><h2 className="font-display text-lg font-semibold text-primary-900">{t("admin.overview")}</h2><p className="mt-2 text-sm text-muted">Manage users, profiles, vendors, and memberships from the sidebar.</p></div>
     </div>
   );
 }

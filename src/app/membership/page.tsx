@@ -6,11 +6,5 @@ import { ProtectedPage } from "@/components/auth/ProtectedPage";
 
 export default function MembershipPage() {
   const { t } = useLanguage();
-  return (
-    <ProtectedPage
-      title={t("nav.membership")}
-      description="Manage your subscription and unlock premium features."
-      icon={Crown}
-    />
-  );
+  return (<ProtectedPage title={t("nav.membership")} description="Manage your subscription and unlock premium features." icon={Crown} />);
 }

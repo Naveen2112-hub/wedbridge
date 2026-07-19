@@ -6,12 +6,5 @@ import { ProtectedPage } from "@/components/auth/ProtectedPage";
 
 export default function AiMatchesPage() {
   const { t } = useLanguage();
-  return (
-    <ProtectedPage
-      title={t("nav.aiMatches")}
-      description="AI-powered compatibility matches tailored to your preferences."
-      icon={Sparkles}
-      action={{ label: "Browse all", href: "/search" }}
-    />
-  );
+  return (<ProtectedPage title={t("nav.aiMatches")} description="AI-powered compatibility matches tailored to your preferences." icon={Sparkles} action={{ label: "Browse all", href: "/search" }} />);
 }

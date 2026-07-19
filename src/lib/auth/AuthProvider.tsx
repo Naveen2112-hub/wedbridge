@@ -2,14 +2,8 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
-  signOut,
-  sendPasswordResetEmail,
-  updateProfile,
-  onAuthStateChanged,
+  createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup,
+  GoogleAuthProvider, signOut, sendPasswordResetEmail, updateProfile, onAuthStateChanged,
   type User,
 } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -44,7 +38,6 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-
 const googleProvider = new GoogleAuthProvider();
 
 function readLanguage(): Language {
@@ -58,19 +51,11 @@ async function ensureUserDoc(user: User, defaults: Partial<Record<string, unknow
   const snap = await getDoc(ref);
   if (!snap.exists()) {
     const payload = {
-      uid: user.uid,
-      role: "user" as UserRole,
-      name: user.displayName ?? defaults.name ?? "",
-      email: user.email ?? "",
-      phone: user.phoneNumber ?? "",
-      gender: null,
-      profileCompleted: false,
-      photoURL: user.photoURL ?? "",
-      contactVisibility: "after_accept" as ContactVisibility,
-      language: readLanguage(),
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-      ...defaults,
+      uid: user.uid, role: "user" as UserRole, name: user.displayName ?? defaults.name ?? "",
+      email: user.email ?? "", phone: user.phoneNumber ?? "", gender: null,
+      profileCompleted: false, photoURL: user.photoURL ?? "",
+      contactVisibility: "after_accept" as ContactVisibility, language: readLanguage(),
+      createdAt: serverTimestamp(), updatedAt: serverTimestamp(), ...defaults,
     };
     await setDoc(ref, payload);
     return { role: "user", profileCompleted: false };
@@ -87,20 +72,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const configured = isFirebaseConfigured();
 
   useEffect(() => {
-    if (!configured || !auth) {
-      setLoading(false);
-      return;
-    }
+    if (!configured || !auth) { setLoading(false); return; }
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u && db) {
         const meta = await ensureUserDoc(u);
         setRole(meta.role);
         setProfileCompleted(meta.profileCompleted);
-      } else {
-        setRole(null);
-        setProfileCompleted(false);
-      }
+      } else { setRole(null); setProfileCompleted(false); }
       setLoading(false);
     });
     return () => unsub();
@@ -111,9 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(cred.user, { displayName: name });
     await ensureUserDoc(cred.user, { name });
-    setUser(cred.user);
-    setRole("user");
-    setProfileCompleted(false);
+    setUser(cred.user); setRole("user"); setProfileCompleted(false);
     return cred.user;
   }, []);
 
@@ -121,9 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!auth || !db) throw new Error("auth.error.notConfigured");
     const cred = await signInWithEmailAndPassword(auth, email, password);
     const meta = await ensureUserDoc(cred.user);
-    setUser(cred.user);
-    setRole(meta.role);
-    setProfileCompleted(meta.profileCompleted);
+    setUser(cred.user); setRole(meta.role); setProfileCompleted(meta.profileCompleted);
     return cred.user;
   }, []);
 
@@ -131,9 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!auth || !db) throw new Error("auth.error.notConfigured");
     const cred = await signInWithPopup(auth, googleProvider);
     const meta = await ensureUserDoc(cred.user, { name: cred.user.displayName ?? "" });
-    setUser(cred.user);
-    setRole(meta.role);
-    setProfileCompleted(meta.profileCompleted);
+    setUser(cred.user); setRole(meta.role); setProfileCompleted(meta.profileCompleted);
     return cred.user;
   }, []);
 
@@ -145,32 +118,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(async () => {
     if (!auth) return;
     await signOut(auth);
-    setUser(null);
-    setRole(null);
-    setProfileCompleted(false);
+    setUser(null); setRole(null); setProfileCompleted(false);
   }, []);
 
   const completeProfile = useCallback(async (data: CompleteProfileInput) => {
     if (!auth || !db || !auth.currentUser) throw new Error("auth.error.notConfigured");
     const ref = doc(db, collections.users, auth.currentUser.uid);
-    await setDoc(
-      ref,
-      {
-        name: data.name,
-        gender: data.gender,
-        dateOfBirth: data.dateOfBirth,
-        religion: data.religion,
-        caste: data.caste,
-        district: data.district,
-        phone: data.phone,
-        email: data.email ?? auth.currentUser.email ?? "",
-        photoURL: data.photoURL ?? auth.currentUser.photoURL ?? "",
-        contactVisibility: data.contactVisibility,
-        profileCompleted: true,
-        updatedAt: serverTimestamp(),
-      },
-      { merge: true },
-    );
+    await setDoc(ref, {
+      name: data.name, gender: data.gender, dateOfBirth: data.dateOfBirth,
+      religion: data.religion, caste: data.caste, district: data.district,
+      phone: data.phone, email: data.email ?? auth.currentUser.email ?? "",
+      photoURL: data.photoURL ?? auth.currentUser.photoURL ?? "",
+      contactVisibility: data.contactVisibility, profileCompleted: true,
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
     setProfileCompleted(true);
   }, []);
 

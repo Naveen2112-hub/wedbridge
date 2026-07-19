@@ -6,11 +6,5 @@ import { ProtectedPage } from "@/components/auth/ProtectedPage";
 
 export default function SettingsPage() {
   const { t } = useLanguage();
-  return (
-    <ProtectedPage
-      title={t("nav.settings")}
-      description="Account settings, language, and privacy preferences."
-      icon={Settings}
-    />
-  );
+  return (<ProtectedPage title={t("nav.settings")} description="Account settings, language, and privacy preferences." icon={Settings} />);
 }

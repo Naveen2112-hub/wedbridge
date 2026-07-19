@@ -7,11 +7,7 @@ import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { Section, SectionHeader } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 
-interface FeaturedProfile {
-  name: string; age: number; location: string; profession: string; image: string; verified: boolean; premium: boolean;
-}
-
-const profiles: FeaturedProfile[] = [
+const profiles = [
   { name: "Priya R.", age: 27, location: "Chennai", profession: "Software Engineer", image: "https://images.pexels.com/photos/1858175/pexels-photo-1858175.jpeg", verified: true, premium: true },
   { name: "Karthik S.", age: 29, location: "Bengaluru", profession: "Doctor", image: "https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg", verified: true, premium: false },
   { name: "Divya M.", age: 25, location: "Coimbatore", profession: "Architect", image: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg", verified: true, premium: true },
@@ -35,10 +31,7 @@ export function FeaturedProfilesSection() {
                 </div>
               </div>
               <div className="p-4">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-display text-lg font-semibold text-primary-900">{p.name}</h3>
-                  <span className="text-sm text-muted">{p.age} yrs</span>
-                </div>
+                <div className="flex items-center justify-between"><h3 className="font-display text-lg font-semibold text-primary-900">{p.name}</h3><span className="text-sm text-muted">{p.age} yrs</span></div>
                 <p className="mt-1 text-sm text-muted">{p.profession}</p>
                 <p className="text-xs text-muted/80">{p.location}</p>
               </div>
@@ -46,9 +39,7 @@ export function FeaturedProfilesSection() {
           </Reveal>
         ))}
       </div>
-      <div className="mt-10 text-center">
-        <Link href="/search" className="btn-outline">{t("home.featured.viewAll")}<ArrowRight className="h-4 w-4" /></Link>
-      </div>
+      <div className="mt-10 text-center"><Link href="/search" className="btn-outline">{t("home.featured.viewAll")}<ArrowRight className="h-4 w-4" /></Link></div>
     </Section>
   );
 }

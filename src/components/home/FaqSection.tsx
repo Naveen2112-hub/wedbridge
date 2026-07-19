@@ -7,9 +7,7 @@ import { Section, SectionHeader } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
 import { cn } from "@/lib/cn";
 
-interface FaqItem { q: string; a: string; }
-
-const faqs: FaqItem[] = [
+const faqs = [
   { q: "How are profiles verified on WedBridge?", a: "Every profile undergoes ID verification and biodata OCR review by our team before being marked as verified." },
   { q: "Is my contact information private?", a: "Yes. You control who sees your contact details. Only Premium and Elite members can unlock direct contact access." },
   { q: "How does AI matchmaking work?", a: "Our engine scores compatibility across cultural values, education, profession, lifestyle, and family preferences to surface the best matches." },

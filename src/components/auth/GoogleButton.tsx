@@ -1,25 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Loader as Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
-interface GoogleButtonProps {
-  onClick: () => void;
-  loading?: boolean;
-  label: string;
-}
+interface GoogleButtonProps { onClick: () => void; loading?: boolean; label: string; }
 
 export function GoogleButton({ onClick, loading, label }: GoogleButtonProps) {
   const [hover, setHover] = useState(false);
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={loading}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      className="btn w-full border border-primary-100 bg-white text-primary-900 transition-all duration-300 hover:border-secondary hover:shadow-soft"
-    >
+    <button type="button" onClick={onClick} disabled={loading} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}
+      className="btn w-full border border-primary-100 bg-white text-primary-900 transition-all duration-300 hover:border-secondary hover:shadow-soft">
       {loading ? (
         <Loader2 className="h-4 w-4 animate-spin" />
       ) : (

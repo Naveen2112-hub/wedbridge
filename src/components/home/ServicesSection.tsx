@@ -34,9 +34,7 @@ export function ServicesSection() {
           </Reveal>
         ))}
       </div>
-      <div className="mt-10 text-center">
-        <Link href="/wedding-services" className="btn-outline">{t("home.services.cta")}<ArrowRight className="h-4 w-4" /></Link>
-      </div>
+      <div className="mt-10 text-center"><Link href="/wedding-services" className="btn-outline">{t("home.services.cta")}<ArrowRight className="h-4 w-4" /></Link></div>
     </Section>
   );
 }
