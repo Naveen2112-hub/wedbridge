@@ -50,15 +50,15 @@ body { font-family: var(--font-inter); background-color: #FFFDF7; color: #1A1416
 /* ========== Typography ========== */
 @layer components {
   .heading-xl {
-    @apply text-4xl font-bold tracking-tight text-ink sm:text-5xl lg:text-6xl;
+    @apply text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl lg:text-6xl;
     font-family: var(--font-playfair);
   }
   .heading-lg {
-    @apply text-3xl font-bold tracking-tight text-ink sm:text-4xl;
+    @apply text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl;
     font-family: var(--font-playfair);
   }
   .heading-md {
-    @apply text-2xl font-bold tracking-tight text-ink sm:text-3xl;
+    @apply text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl;
     font-family: var(--font-playfair);
   }
   .heading-sm {
