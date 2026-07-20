@@ -1,4 +1,4 @@
-import { collection, doc, addDoc, getDoc, getDocs, query, where, updateDoc, deleteDoc, serverTimestamp, orderBy, limit, startAfter, type DocumentData, type QueryDocumentSnapshot } from "firebase/firestore";
+import { collection, doc, addDoc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, where, serverTimestamp, orderBy, limit, startAfter, type DocumentData, type QueryDocumentSnapshot } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "firebase/storage";
 import { db, storage } from "@/firebase/config";
 import { collections, type ProfileDocument } from "@/firebase/schema";
@@ -85,7 +85,7 @@ export async function compressImage(file: File, maxDim = 1024, quality = 0.8): P
 
 export async function saveProfile(uid: string, data: Partial<ProfileDocument>): Promise<void> {
   if (!db) return;
-  try { await updateDoc(doc(db, collections.profiles, uid), { ...data, updatedAt: serverTimestamp() }); } catch { /* ignore */ }
+  try { await setDoc(doc(db, collections.profiles, uid), { ...data, uid, userId: uid, updatedAt: serverTimestamp() }, { merge: true }); } catch { /* ignore */ }
 }
 
 export function calculateCompletion(profile: Partial<ProfileDocument>): { percentage: number; filled: number; total: number; missing: string[] } {

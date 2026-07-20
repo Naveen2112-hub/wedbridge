@@ -59,8 +59,8 @@ function filtersToQueryConstraints(filters: SearchFilters, sort: SortOption): Qu
   if (f.annualIncome) constraints.push(where("annualIncome", "==", f.annualIncome));
   if (f.height) constraints.push(where("height", "==", f.height));
   if (f.verified) constraints.push(where("verificationStatus", "==", "verified"));
-  if (f.premium) constraints.push(where("membership", "in", ["premium", "elite"]));
-  if (f.onlineNow) constraints.push(where("online", "==", true));
+  if (f.premium) constraints.push(where("membership", "in", ["premium", "gold"]));
+  if (f.onlineNow) {/* online status is determined by lastActiveAt, filtered client-side */}
   if (f.familyType && f.familyType !== "any") constraints.push(where("familyType", "==", f.familyType));
   if (f.food && f.food !== "any") constraints.push(where("foodPreference", "==", f.food));
   if (f.smoking && f.smoking !== "any") constraints.push(where("smoking", "==", f.smoking));
@@ -149,7 +149,7 @@ export function calculateCompatibility(a: ProfileDocument, b: ProfileDocument): 
 export async function getRelatedProfiles(profile: ProfileDocument, max = 4): Promise<ProfileDocument[]> {
   if (!db) return [];
   try {
-    const q = query(collection(db, collections.profiles), where("gender", "!=", profile.gender ?? ""), limit(20));
+    const q = query(collection(db, collections.profiles), where("status", "==", "approved"), limit(20));
     const snap = await getDocs(q);
     const all: ProfileDocument[] = [];
     snap.forEach((d) => { if (d.id !== profile.uid) all.push({ uid: d.id, ...(d.data() as Omit<ProfileDocument, "uid">) }); });

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, Eye, Send, ShieldCheck, Loader as Loader2, Star, HeartHandshake } from "lucide-react";
 import { ProfileDocument } from "@/firebase/schema";
-import { getProfile } from "@/lib/profile/profileService";
+import { getProfile, getProfileByUserId } from "@/lib/profile/profileService";
 import { getRelatedProfiles, recordProfileView, addRecentlyViewed } from "@/lib/search/searchService";
 import { ProfileView } from "@/components/profile/ProfileView";
 import { RelatedProfiles } from "@/components/search/RelatedProfiles";
@@ -66,7 +66,7 @@ export default function ProfileDetailsClient() {
     if (!user?.uid || !profile) return;
     setBusy(true); setLimitError(false);
     try {
-      const me = await getProfile(user.uid);
+      const me = await getProfileByUserId(user.uid);
       await sendInterest(user.uid, me?.name ?? "Member", id!, me?.membership);
       setInterestStatus("pending");
     } catch (e) {
@@ -80,7 +80,7 @@ export default function ProfileDetailsClient() {
       if (fav) { await removeFavourite(user.uid, id!); setFav(false); }
       else {
         await addFavourite(user.uid, id!); setFav(true);
-        await createNotification(id!, { title: "Profile Favourited", message: "Someone added you to their favourites.", type: "profile_viewed" });
+        await createNotification(profile.userId ?? id!, { title: "Profile Favourited", message: "Someone added you to their favourites.", type: "profile_viewed" });
       }
     } finally { setBusy(false); }
   };

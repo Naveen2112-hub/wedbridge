@@ -22,7 +22,7 @@ export function ProfileEditForm() {
   const [form, setForm] = useState({
     name: "", gender: "male" as "male" | "female", dob: "", religion: "Hindu", caste: "", motherTongue: "Tamil",
     education: "", occupation: "", income: "", phone: "", city: "", district: "", state: "Tamil Nadu",
-    height: "", weight: "", maritalStatus: "Never Married", familyType: "Nuclear", bio: "",
+    height: "", weight: "", maritalStatus: "never_married", familyType: "nuclear", bio: "",
   });
 
   useEffect(() => {
@@ -82,8 +82,8 @@ export function ProfileEditForm() {
           <Field label="Phone" value={form.phone} onChange={(v) => set("phone", v)} />
           <Field label="City" value={form.city} onChange={(v) => set("city", v)} />
           <div><label className="label">District</label><select className="input" value={form.district} onChange={(e) => set("district", e.target.value)}><option value="">Select</option>{districts.map((d) => <option key={d}>{d}</option>)}</select></div>
-          <div><label className="label">Marital Status</label><select className="input" value={form.maritalStatus} onChange={(e) => set("maritalStatus", e.target.value)}><option>Never Married</option><option>Divorced</option><option>Widowed</option></select></div>
-          <div><label className="label">Family Type</label><select className="input" value={form.familyType} onChange={(e) => set("familyType", e.target.value)}><option>Nuclear</option><option>Joint</option></select></div>
+          <div><label className="label">Marital Status</label><select className="input" value={form.maritalStatus} onChange={(e) => set("maritalStatus", e.target.value)}><option value="never_married">Never Married</option><option value="divorced">Divorced</option><option value="widowed">Widowed</option><option value="awaiting_divorce">Awaiting Divorce</option></select></div>
+          <div><label className="label">Family Type</label><select className="input" value={form.familyType} onChange={(e) => set("familyType", e.target.value)}><option value="nuclear">Nuclear</option><option value="joint">Joint</option></select></div>
         </div>
         <div><label className="label">About Yourself</label><textarea className="input" rows={4} value={form.bio} onChange={(e) => set("bio", e.target.value)} placeholder="Tell us about yourself…" maxLength={500} /></div>
         <button type="submit" disabled={loading} className="btn-primary w-full">{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Save className="h-4 w-4" />{profileId ? "Update Profile" : "Create Profile"}</>}</button>

@@ -43,7 +43,7 @@ export async function createOrder(input: CreateOrderInput): Promise<CreateOrderR
   const amountInPaise = Math.round(input.amount * 100);
   const orderId = `order_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
   const ref = await addDoc(collection(database, collections.payments), {
-    uid: input.uid, orderId, gateway: "razorpay" as PaymentGateway, amount: amountInPaise, currency, plan: input.plan, status: "pending" as PaymentStatus, notes: input.notes ?? {}, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+    uid: input.uid, userId: input.uid, orderId, gateway: "razorpay" as PaymentGateway, amount: amountInPaise, currency, plan: input.plan, status: "pending" as PaymentStatus, notes: input.notes ?? {}, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
   } as Omit<PaymentDocument, "id">);
   void cfg;
   return { orderId, paymentId: ref.id, amount: amountInPaise, currency, gateway: "razorpay", status: "pending" };

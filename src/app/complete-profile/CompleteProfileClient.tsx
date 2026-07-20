@@ -43,7 +43,7 @@ export default function CompleteProfilePage() {
     try {
       const payload = { ...values, photoURL };
       await completeProfile({ name: values.name, gender: values.gender, dateOfBirth: values.dateOfBirth, religion: values.religion, caste: values.caste, district: values.district, phone: values.phone, email: values.email || undefined, photoURL, contactVisibility: values.contactVisibility });
-      await saveProfile(user.uid, { ...payload, profileVisibility: "visible", accountStatus: "active", verificationStatus: "unverified" } as never);
+      await saveProfile(user.uid, { ...payload, dob: values.dateOfBirth, profileVisibility: "visible", accountStatus: "active", verificationStatus: "unverified" } as never);
       setProfileCompleted(true);
       router.push("/dashboard");
     } catch (err) { setAuthError(mapAuthError(err)); }

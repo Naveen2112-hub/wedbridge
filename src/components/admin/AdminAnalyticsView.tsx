@@ -17,7 +17,7 @@ export function AdminAnalyticsView() {
     { icon: FileText, label: "Male Profiles", value: String(data.maleProfiles) },
     { icon: FileText, label: "Female Profiles", value: String(data.femaleProfiles) },
     { icon: BadgeCheck, label: "Verified Profiles", value: String(data.verifiedProfiles) },
-    { icon: TrendingUp, label: "Verification Rate", value: `${data.totalUsers > 0 ? ((data.verifiedProfiles / data.totalUsers) * 100).toFixed(1) : 0}%` },
+    { icon: TrendingUp, label: "Verification Rate", value: `${(data.maleProfiles + data.femaleProfiles) > 0 ? ((data.verifiedProfiles / (data.maleProfiles + data.femaleProfiles)) * 100).toFixed(1) : 0}%` },
     { icon: Store, label: "Wedding Vendors", value: String(data.weddingVendors) },
     { icon: IndianRupee, label: "Monthly Revenue", value: formatCurrency(data.monthlyRevenue) },
     { icon: CreditCard, label: "Interests Sent", value: String(data.interestsSent) },

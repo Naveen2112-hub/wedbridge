@@ -43,7 +43,7 @@ export async function markNotificationRead(id: string): Promise<void> {
 export async function markAllNotificationsRead(userId: string): Promise<void> {
   if (!db) return;
   try {
-    const snap = await getDocs(query(collection(db, collections.notifications), where("userId", "==", userId), where("read", "==", false)));
+    const snap = await getDocs(query(collection(db, collections.notifications), where("userId", "in", [userId, "all", "premium", "free", "vendors"]), where("read", "==", false)));
     await Promise.all(snap.docs.map((d) => updateDoc(d.ref, { read: true })));
   } catch { /* ignore */ }
 }

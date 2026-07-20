@@ -1,6 +1,6 @@
 import { collection, query, where, getDocs, orderBy, limit, doc, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/firebase/config";
-import { collections, type VendorPackageDocument, type VendorGalleryDocument, type VendorReviewDocument } from "@/firebase/schema";
+import { collections, type VendorPackageDocument, type VendorGalleryDocument } from "@/firebase/schema";
 import { sanitizeText } from "@/lib/utils";
 
 export async function getPackages(vendorId: string): Promise<VendorPackageDocument[]> {
@@ -19,11 +19,4 @@ export async function addGalleryImage(vendorId: string, imageURL: string, captio
   if (!db) return;
   try { await addDoc(collection(db, collections.vendorGallery), { vendorId, imageURL, caption: caption ? sanitizeText(caption) : "", createdAt: serverTimestamp() } as Omit<VendorGalleryDocument, "id">); } catch { /* ignore */ }
 }
-export async function getReviews(vendorId: string): Promise<VendorReviewDocument[]> {
-  if (!db) return [];
-  try { const snap = await getDocs(query(collection(db, collections.vendorReviews), where("vendorId", "==", vendorId), orderBy("createdAt", "desc"))); return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<VendorReviewDocument, "id">) })); } catch { return []; }
-}
-export async function addReview(data: Omit<VendorReviewDocument, "id" | "createdAt">): Promise<void> {
-  if (!db) return;
-  try { await addDoc(collection(db, collections.vendorReviews), { ...data, review: sanitizeText(data.review), createdAt: serverTimestamp() } as Omit<VendorReviewDocument, "id">); } catch { /* ignore */ }
-}
+

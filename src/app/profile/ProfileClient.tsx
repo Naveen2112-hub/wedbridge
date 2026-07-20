@@ -8,11 +8,8 @@ import { AuthGuard } from "@/components/auth/AuthGuard";
 import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
 import { ProfileView } from "@/components/profile/ProfileView";
 import { CompletionCard } from "@/components/profile/CompletionCard";
-import { getProfile, saveProfile } from "@/lib/profile/profileService";
+import { getProfileByUserId, saveProfile } from "@/lib/profile/profileService";
 import type { ProfileDocument } from "@/firebase/schema";
-import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "@/firebase/config";
-import { collections } from "@/firebase/schema";
 
 export default function ProfilePage() { return <AuthGuard><ProtectedLayout><ProfileContent /></ProtectedLayout></AuthGuard>; }
 
@@ -23,7 +20,7 @@ function ProfileContent() {
   const [loading, setLoading] = useState(true);
   const [action, setAction] = useState<string | null>(null);
 
-  useEffect(() => { (async () => { if (!user) return; const p = await getProfile(user.uid); setProfile(p); setLoading(false); })(); }, [user]);
+  useEffect(() => { (async () => { if (!user) return; const p = await getProfileByUserId(user.uid); setProfile(p); setLoading(false); })(); }, [user]);
 
   const toggleVisibility = async () => {
     if (!user || !profile) return;
@@ -38,9 +35,9 @@ function ProfileContent() {
     try { await saveProfile(user.uid, { accountStatus: next }); setProfile({ ...profile, accountStatus: next }); } finally { setAction(null); }
   };
   const submitVerification = async () => {
-    if (!user || !profile || !db) return;
+    if (!user || !profile) return;
     setAction("verify");
-    try { await updateDoc(doc(db, collections.profiles, user.uid), { verificationStatus: "pending", updatedAt: serverTimestamp() }); setProfile({ ...profile, verificationStatus: "pending" }); } finally { setAction(null); }
+    try { await saveProfile(user.uid, { verificationStatus: "pending" as const }); setProfile({ ...profile, verificationStatus: "pending" }); } finally { setAction(null); }
   };
 
   if (loading) return <div className="flex min-h-[40vh] items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary-800" /></div>;

@@ -46,11 +46,19 @@ export async function sendInterest(senderId: string, senderName: string, receive
       const count = await getTodaySentCount(senderId);
       if (count >= FREE_DAILY_INTEREST_LIMIT) throw new InterestLimitError();
     }
+    let notifyUid = receiverId;
+    try {
+      const profileSnap = await getDocs(query(collection(database, collections.profiles), where("__name__", "==", receiverId), limit(1)));
+      if (!profileSnap.empty) {
+        const profileData = profileSnap.docs[0].data() as { userId?: string };
+        if (profileData.userId) notifyUid = profileData.userId;
+      }
+    } catch { /* use receiverId as fallback */ }
     const now = serverTimestamp();
     const ref = await addDoc(collection(database, collections.interests), {
-      senderId, fromUserId: senderId, fromUserName: senderName, receiverId, toUserId: receiverId, status: "pending" as InterestStatus, createdAt: now, updatedAt: now,
+      senderId, fromUserId: senderId, fromUserName: senderName, receiverId, toUserId: notifyUid, status: "pending" as InterestStatus, createdAt: now, updatedAt: now,
     } as Omit<InterestDocument, "id">);
-    await createNotification(receiverId, {
+    await createNotification(notifyUid, {
       title: "New Interest Received",
       message: `${senderName} sent you an interest request.`,
       type: "interest_received",
@@ -124,7 +132,7 @@ export async function listInterests(uid: string, direction: InterestDirection, m
     for (const d of snap.docs) {
       const data = d.data() as Omit<InterestDocument, "id">;
       const otherUid = direction === "sent" ? data.receiverId : data.senderId;
-      const pSnap = await getDocs(query(collection(database, collections.profiles), where("__name__", "==", otherUid), limit(1)));
+      const pSnap = await getDocs(query(collection(database, collections.profiles), where("userId", "==", otherUid), limit(1)));
       let profileName = "Member";
       let profilePhoto: string | undefined;
       if (!pSnap.empty) {

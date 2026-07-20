@@ -28,9 +28,9 @@ service cloud.firestore {
     }
     match /subscriptions/{id} {
       allow read: if isOwner(resource.data.uid) || isUserAdmin() || isAdmin();
-      allow create: if isUserAdmin() || isAdmin();
-      allow update: if isUserAdmin() || isAdmin();
-      allow delete: if isAdmin();
+      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
+      allow update: if isOwner(resource.data.uid) || isUserAdmin() || isAdmin();
+      allow delete: if isOwner(resource.data.uid) || isAdmin();
     }
     match /interests/{id} {
       allow read: if isOwner(resource.data.fromUserId) || isOwner(resource.data.toUserId) || isUserAdmin() || isAdmin();
@@ -40,7 +40,7 @@ service cloud.firestore {
     }
     match /notifications/{id} {
       allow read: if isOwner(resource.data.userId) || (resource.data.target != null && (resource.data.target == "all" || (resource.data.target == "premium" && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.membershipTier != "free") || (resource.data.target == "free" && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.membershipTier == "free") || (resource.data.target == "vendors" && exists(/databases/$(database)/documents/vendors/$(request.auth.uid))))) || isUserAdmin() || isAdmin();
-      allow create: if isUserAdmin() || isAdmin();
+      allow create: if isSignedIn();
       allow update, delete: if isUserAdmin() || isAdmin() || isOwner(resource.data.userId);
     }
     match /settings/{id} {
