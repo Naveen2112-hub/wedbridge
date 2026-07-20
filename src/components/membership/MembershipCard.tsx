@@ -34,7 +34,7 @@ export function MembershipCard() {
       <div className="mt-4 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <p className="font-display text-2xl font-bold text-primary-900">{plan.name}</p>
+            <p className="font-display text-2xl font-bold text-primary-900">{plan?.name ?? tier}</p>
             <PlanBadge tier={tier} />
           </div>
           {sub && days !== null ? (

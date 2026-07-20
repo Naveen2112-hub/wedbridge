@@ -9,7 +9,7 @@ import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { CompletionCard } from "@/components/profile/CompletionCard";
 import { MembershipCard } from "@/components/membership/MembershipCard";
-import { getProfile } from "@/lib/profile/profileService";
+import { getProfile, calculateCompletion } from "@/lib/profile/profileService";
 import { cn } from "@/lib/cn";
 import type { ProfileDocument } from "@/firebase/schema";
 
@@ -24,7 +24,7 @@ function DashboardContent() {
   const { t } = useLanguage();
   const [profile, setProfile] = useState<Partial<ProfileDocument> | null>(null);
   useEffect(() => { (async () => { if (user) setProfile(await getProfile(user.uid)); })(); }, [user]);
-  const completion = profile?.completionPercentage ?? (profileCompleted ? 100 : 40);
+  const completion = profile ? calculateCompletion(profile).percentage : (profileCompleted ? 100 : 40);
   const name = user?.displayName ?? (user?.email ? user.email.split("@")[0] : "");
   const viewAll = t("dashboard.viewAll");
   return (

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Loader as Loader2, Save, Upload, X } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -28,7 +29,7 @@ export function ProfileEditForm() {
     (async () => {
       if (!user) return;
       const p = await getProfileByUserId(user.uid);
-      if (p) { setProfileId(p.id); setPhotoURL(p.photoURL ?? ""); setForm((f) => ({ ...f, ...p, dob: p.dob as string })); }
+      if (p) { setProfileId(p.id ?? null); setPhotoURL(p.photoURL ?? ""); setForm((f) => ({ ...f, ...(p as Partial<typeof f>), dob: (p.dob as string) ?? "" })); }
     })();
   }, [user]);
 
@@ -51,7 +52,7 @@ export function ProfileEditForm() {
     if (sanitizeText(form.name).length < 2) { toast("Name is required", "error"); return; }
     if (form.phone && !validatePhone(form.phone)) { toast("Enter a valid 10-digit phone", "error"); return; }
     setLoading(true);
-    const data = { ...form, name: sanitizeText(form.name), bio: sanitizeText(form.bio), userId: user.uid, photoURL, photoURLs: [], createdBy: "user" as const };
+    const data = { ...form, name: sanitizeText(form.name), bio: sanitizeText(form.bio), userId: user.uid, uid: user.uid, dateOfBirth: form.dob, photoURL, photoURLs: [] as string[], createdBy: "user" as const, status: "pending" as const, featured: false };
     if (profileId) { await updateProfile(profileId, data); toast("Profile updated!", "success"); }
     else { const id = await createProfile(data); if (id) { setProfileId(id); toast("Profile created!", "success"); } else { toast("Failed to create profile", "error"); setLoading(false); return; } }
     setLoading(false);
@@ -63,7 +64,7 @@ export function ProfileEditForm() {
       <h1 className="heading-md">{profileId ? "Edit Profile" : "Create Profile"}</h1>
       <p className="text-lead mt-1 text-sm">Fill in your details to find the best matches.</p>
       <div className="mt-6 flex items-center gap-4">
-        <div className="h-20 w-20 overflow-hidden rounded-2xl bg-primary-100">{photoURL && <img src={photoURL} alt="Profile" className="h-full w-full object-cover" />}</div>
+        <div className="h-20 w-20 overflow-hidden rounded-2xl bg-primary-100">{photoURL && <Image src={photoURL} alt="Profile" fill className="h-full w-full object-cover" />}</div>
         <label className="btn-outline cursor-pointer text-sm">{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Upload className="h-4 w-4" />Upload Photo</>}<input type="file" accept="image/*" className="hidden" onChange={handlePhoto} /></label>
         {photoURL && <button type="button" onClick={() => setPhotoURL("")} className="btn-ghost text-sm"><X className="h-4 w-4" />Remove</button>}
       </div>

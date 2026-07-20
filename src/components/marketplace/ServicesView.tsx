@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, memo } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Search, Star, MapPin, BadgeCheck, Loader as Loader2 } from "lucide-react";
 import { VENDOR_CATEGORIES } from "@/firebase/schema";
@@ -45,7 +46,7 @@ export function ServicesView() {
 const VendorCard = memo(function VendorCard({ vendor }: { vendor: VendorDocument }) {
   return (
     <Link href={`/vendor/${vendor.id}`} className="card overflow-hidden transition hover:shadow-md">
-      <div className="h-32 overflow-hidden bg-primary-100">{vendor.coverURL && <img src={vendor.coverURL} alt={vendor.businessName} className="h-full w-full object-cover" loading="lazy" />}</div>
+      <div className="h-32 overflow-hidden bg-primary-100">{vendor.coverURL && <Image src={vendor.coverURL} alt={vendor.businessName} fill className="h-full w-full object-cover" loading="lazy" />}</div>
       <div className="p-4">
         <div className="flex items-center gap-2"><h3 className="font-display text-lg font-semibold text-primary-900">{vendor.businessName}</h3>{vendor.verificationStatus === "verified" && <BadgeCheck className="h-4 w-4 text-green-600" />}</div>
         <p className="text-xs text-muted">{VENDOR_CATEGORIES.find((c) => c.id === vendor.category)?.name ?? vendor.category}</p>

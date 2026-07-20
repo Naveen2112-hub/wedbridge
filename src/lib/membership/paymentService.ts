@@ -63,7 +63,7 @@ export async function verifyPayment(input: VerifyPaymentInput): Promise<boolean>
     if (snap.empty) return false;
     const payDoc = snap.docs[0];
     const data = payDoc.data() as PaymentDocument;
-    if (data.status !== "pending") return data.status === "paid";
+    if (data.status !== "pending") return data.status === "paid" || data.status === "verified";
     const expected = `${data.orderId}|${input.gatewayPaymentId}`;
     const isValid = Boolean(input.gatewaySignature && input.gatewayPaymentId && expected);
     const status: PaymentStatus = isValid ? "paid" : "failed";
@@ -154,7 +154,7 @@ export async function getRevenueStats(): Promise<RevenueStats> {
     const stats: RevenueStats = { totalRevenue: 0, totalPayments: snap.size, paidCount: 0, pendingCount: 0, failedCount: 0, refundedCount: 0, byPlan: {} };
     snap.forEach((d) => {
       const p = d.data() as PaymentDocument;
-      if (p.status === "paid") { stats.paidCount++; stats.totalRevenue += p.amount / 100; stats.byPlan[p.plan] = (stats.byPlan[p.plan] ?? 0) + p.amount / 100; }
+      if (p.status === "paid" || p.status === "verified") { stats.paidCount++; stats.totalRevenue += p.amount / 100; stats.byPlan[p.plan] = (stats.byPlan[p.plan] ?? 0) + p.amount / 100; }
       else if (p.status === "pending") stats.pendingCount++;
       else if (p.status === "failed") stats.failedCount++;
       else if (p.status === "refunded") stats.refundedCount++;

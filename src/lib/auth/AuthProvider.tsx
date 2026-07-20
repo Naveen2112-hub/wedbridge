@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<UserRole | null>(null);
   const [profileCompleted, setProfileCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
-  const configured = isFirebaseConfigured();
+  const configured = isFirebaseConfigured;
 
   useEffect(() => {
     if (!configured || !auth) { setLoading(false); return; }

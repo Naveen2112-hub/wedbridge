@@ -28,7 +28,7 @@ export function Navbar() {
         <div className="flex items-center gap-8">
           <Link href="/" className="flex items-center gap-2 font-display text-xl font-bold text-primary-800" aria-label="WedBridge home"><Heart className="h-6 w-6 text-primary-600" fill="currentColor" />WedBridge</Link>
           <div className="hidden items-center gap-6 md:flex">
-            {links.map((l) => <Link key={l.href} href={l.href} className={cn("text-sm font-medium transition", pathname === l.href || pathname.startsWith(l.href + "/") ? "text-primary-700" : "text-ink/70 hover:text-primary-700")}>{l.label}</Link>)}
+            {links.map((l) => <Link key={l.href} href={l.href} className={cn("text-sm font-medium transition", pathname === l.href || (pathname ?? "").startsWith(l.href + "/") ? "text-primary-700" : "text-ink/70 hover:text-primary-700")}>{l.label}</Link>)}
           </div>
         </div>
         <div className="hidden items-center gap-3 md:flex">

@@ -132,7 +132,7 @@ export async function listInterests(uid: string, direction: InterestDirection, m
         profileName = p.name ?? "Member";
         profilePhoto = p.photoURL;
       }
-      items.push({ id: d.id, ...data, profileUid: otherUid, profileName, profilePhoto });
+      items.push({ id: d.id, ...data, profileUid: otherUid ?? "", profileName, profilePhoto });
     }
     return items;
   } catch {

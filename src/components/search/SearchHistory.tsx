@@ -28,7 +28,7 @@ export function SearchHistory({ onPick }: { onPick?: (filters: Record<string, un
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
         {items.map((h) => (
-          <button key={h.id} type="button" onClick={() => onPick?.(h.filters)} className="rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-900 transition hover:bg-primary-100">{h.query}</button>
+          <button key={h.id} type="button" onClick={() => onPick?.(h.filters ?? {})} className="rounded-full bg-primary-50 px-3 py-1 text-xs font-medium text-primary-900 transition hover:bg-primary-100">{h.query}</button>
         ))}
       </div>
     </div>

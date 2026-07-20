@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, useCallback, memo } from "react";
+import Image from "next/image";
 import { Search, SlidersHorizontal, Loader as Loader2, MapPin, BadgeCheck, Crown, Star } from "lucide-react";
 import { searchProfiles, type SearchFilters, type SearchResult } from "@/lib/profile/profileService";
 import type { ProfileDocument } from "@/firebase/schema";
@@ -42,8 +43,8 @@ export function SearchView() {
 
   const handleInterest = async (p: ProfileDocument) => {
     if (!user) { toast("Please login to send interest", "error"); return; }
-    setSending(p.id);
-    const res = await sendInterest(user.uid, user.displayName ?? "User", p.userId, p.id);
+    setSending(p.id ?? null);
+    const res = await sendInterest(user.uid, user.displayName ?? "User", p.userId ?? "", p.id ?? "");
     setSending(null);
     if (res.ok) toast("Interest sent!", "success");
     else toast(res.error ?? "Failed to send interest", "error");
@@ -84,7 +85,7 @@ const ProfileCard = memo(function ProfileCard({ profile, sending, onInterest }: 
   return (
     <div className="card overflow-hidden transition hover:shadow-md">
       <div className="flex gap-4 p-4">
-        <div className="h-20 w-20 flex-none overflow-hidden rounded-xl bg-primary-100">{profile.photoURL && <img src={profile.photoURL} alt={profile.name} className="h-full w-full object-cover" loading="lazy" />}</div>
+        <div className="h-20 w-20 flex-none overflow-hidden rounded-xl bg-primary-100">{profile.photoURL && <Image src={profile.photoURL} alt={profile.name} fill className="h-full w-full object-cover" loading="lazy" />}</div>
         <div className="flex-1">
           <div className="flex items-center gap-1.5"><h3 className="font-display text-lg font-semibold text-primary-900">{profile.name}</h3>{profile.verified && <BadgeCheck className="h-4 w-4 text-green-600" />}{profile.premium && <Crown className="h-4 w-4 text-secondary-500" />}</div>
           <p className="text-xs text-muted">{profile.religion} · {profile.caste ?? "Any"}</p>

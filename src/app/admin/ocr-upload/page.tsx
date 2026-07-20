@@ -27,7 +27,7 @@ export default function OCRUploadPage() {
     if (!result) return;
     setSaving(true);
     const profile: Omit<ProfileDocument, "id" | "createdAt"> = {
-      userId: "admin", name: result.name, gender: "male", dob: result.dob, religion: result.religion, caste: result.caste, education: result.education, occupation: result.occupation, phone: result.phone, district: result.district, state: "Tamil Nadu", status: "pending", premium: false, verified: false, featured: false, createdBy: "admin",
+      uid: "admin", userId: "admin", name: result.name, gender: "male", dob: result.dob, dateOfBirth: result.dob, religion: result.religion, caste: result.caste, education: result.education, occupation: result.occupation, phone: result.phone, district: result.district, state: "Tamil Nadu", status: "pending", premium: false, verified: false, featured: false, createdBy: "admin",
     };
     await createProfile(profile, admin);
     setSaving(false); setSaved(true);

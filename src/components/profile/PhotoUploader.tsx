@@ -1,5 +1,6 @@
 "use client";
 import { useCallback, useState } from "react";
+import Image from "next/image";
 import Cropper from "react-easy-crop";
 import { Upload, Loader as Loader2, Check, X } from "lucide-react";
 import { compressImage, dataURLtoBlob, uploadProfilePhoto, MAX_PHOTO_BYTES } from "@/lib/profile/profileService";
@@ -36,8 +37,9 @@ export function PhotoUploader({ uid, value, onChange }: PhotoUploaderProps) {
       const blob = dataURLtoBlob(croppedDataURL);
       const compressed = await compressImage(new File([blob], "photo.jpg", { type: "image/jpeg" }), 1024, 0.82);
       setPhase("uploading");
-      const url = await uploadProfilePhoto(uid, compressed, "jpg");
-      onChange(url);
+      const file = new File([blob], "photo.jpg", { type: "image/jpeg" });
+      const url = await uploadProfilePhoto(uid, file);
+      if (url) onChange(url);
       setPhase("done");
       setImageSrc(null);
       setTimeout(() => setPhase("idle"), 1500);
@@ -50,7 +52,7 @@ export function PhotoUploader({ uid, value, onChange }: PhotoUploaderProps) {
     <div>
       <div className="flex items-center gap-4">
         <div className="relative h-20 w-20 flex-none overflow-hidden rounded-full bg-primary-50 ring-2 ring-secondary/30">
-          {value ? <img src={value} alt="Profile" className="h-full w-full object-cover" /> : <span className="flex h-full w-full items-center justify-center text-xs text-muted">No photo</span>}
+          {value ? <Image src={value} alt="Profile" fill className="h-full w-full object-cover" /> : <span className="flex h-full w-full items-center justify-center text-xs text-muted">No photo</span>}
         </div>
         <div>
           <label className="btn-outline cursor-pointer text-sm">
@@ -85,7 +87,7 @@ export function PhotoUploader({ uid, value, onChange }: PhotoUploaderProps) {
 }
 
 async function getCroppedImg(imageSrc: string, crop: { x: number; y: number; width: number; height: number }): Promise<string> {
-  const image = await new Promise<HTMLImageElement>((resolve, reject) => { const img = new Image(); img.onload = () => resolve(img); img.onerror = reject; img.src = imageSrc; });
+  const image = await new Promise<HTMLImageElement>((resolve, reject) => { const img = document.createElement("img"); img.onload = () => resolve(img); img.onerror = reject; img.src = imageSrc; });
   const canvas = document.createElement("canvas");
   const size = 512;
   canvas.width = size; canvas.height = size;

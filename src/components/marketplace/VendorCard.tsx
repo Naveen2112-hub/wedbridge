@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin, BadgeCheck, Star, IndianRupee, Briefcase } from "lucide-react";
 import type { VendorDocument } from "@/firebase/schema";
 import { getCategoryName } from "@/firebase/schema";
@@ -12,7 +13,7 @@ export function VendorCard({ vendor }: { vendor: VendorDocument }) {
       <Link href={`/vendor/${vendor.id}`} className="relative block aspect-[16/10] overflow-hidden bg-primary-100">
         {vendor.coverURL ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={vendor.coverURL} alt={vendor.businessName} loading="lazy" className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
+          <Image src={vendor.coverURL} alt={vendor.businessName} loading="lazy" className="h-full w-full object-cover transition duration-300 group-hover:scale-105" />
         ) : (
           <div className="flex h-full items-center justify-center text-primary-300"><Briefcase className="h-10 w-10" /></div>
         )}
@@ -23,7 +24,7 @@ export function VendorCard({ vendor }: { vendor: VendorDocument }) {
         <div className="flex items-start gap-3">
           {vendor.logoURL ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={vendor.logoURL} alt="" loading="lazy" className="h-12 w-12 flex-none rounded-xl object-cover ring-1 ring-primary-100" />
+            <Image src={vendor.logoURL} alt="" loading="lazy" className="h-12 w-12 flex-none rounded-xl object-cover ring-1 ring-primary-100" />
           ) : (
             <div className="flex h-12 w-12 flex-none items-center justify-center rounded-xl bg-primary-50 text-primary-400"><Briefcase className="h-6 w-6" /></div>
           )}

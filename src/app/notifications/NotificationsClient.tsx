@@ -12,7 +12,7 @@ import { cn } from "@/lib/cn";
 
 const PAGE_SIZE = 10;
 
-const typeIcon: Record<NotificationType, React.ComponentType<{ className?: string }>> = {
+const typeIcon: Partial<Record<NotificationType, React.ComponentType<{ className?: string }>>> = {
   interest_received: HeartHandshake, interest_accepted: CheckCheck, interest_rejected: XIcon, profile_viewed: Eye,
   premium_activated: Crown, new_ai_matches: Sparkles, new_message: MessageCircle, admin_announcement: Megaphone,
 };
@@ -64,7 +64,7 @@ export default function NotificationsClient() {
         ) : (
           <div className="space-y-3">
             {visible.map((n) => {
-              const Icon = typeIcon[n.type] ?? Bell;
+              const Icon = typeIcon[n.type ?? "system"] ?? Bell;
               const date = tsToDate(n.createdAt);
               return (
                 <div key={n.id} className={cn("flex items-start gap-3 rounded-2xl bg-card p-4 shadow-card transition", !n.read && "ring-1 ring-secondary-300")}>

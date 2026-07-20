@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { User, Loader as Loader2, BadgeCheck, Crown, Star, MapPin, Briefcase, GraduationCap, Phone, Calendar } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -7,18 +8,19 @@ import { getProfileByUserId } from "@/lib/profile/profileService";
 import type { ProfileDocument } from "@/firebase/schema";
 import { formatDate } from "@/lib/utils";
 
-export function ProfileView() {
+export function ProfileView({ profile: passedProfile }: { profile?: ProfileDocument } = {}) {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<ProfileDocument | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<ProfileDocument | null>(passedProfile ?? null);
+  const [loading, setLoading] = useState(!passedProfile);
 
   useEffect(() => {
+    if (passedProfile) { setProfile(passedProfile); setLoading(false); return; }
     (async () => {
       if (!user) { setLoading(false); return; }
       const p = await getProfileByUserId(user.uid);
       setProfile(p); setLoading(false);
     })();
-  }, [user]);
+  }, [user, passedProfile]);
 
   if (loading) return <div className="px-4 py-16"><div className="skeleton h-64 w-full rounded-2xl" /></div>;
   if (!profile) return (
@@ -31,7 +33,7 @@ export function ProfileView() {
         <div className="h-32 bg-gradient-to-r from-primary-500 to-primary-700" />
         <div className="px-6 pb-6">
           <div className="-mt-12 flex items-end gap-4">
-            <div className="h-24 w-24 overflow-hidden rounded-2xl border-4 border-white bg-primary-100">{profile.photoURL && <img src={profile.photoURL} alt={profile.name} className="h-full w-full object-cover" />}</div>
+            <div className="h-24 w-24 overflow-hidden rounded-2xl border-4 border-white bg-primary-100">{profile.photoURL && <Image src={profile.photoURL} alt={profile.name} fill className="h-full w-full object-cover" />}</div>
             <div className="flex-1 pb-2"><div className="flex items-center gap-2"><h1 className="heading-md">{profile.name}</h1>{profile.verified && <BadgeCheck className="h-5 w-5 text-green-600" />}{profile.premium && <Crown className="h-5 w-5 text-secondary-500" />}{profile.featured && <Star className="h-5 w-5 text-amber-500" />}</div><p className="text-sm text-muted">{profile.religion} · {profile.caste ?? ""}</p></div>
             <Link href="/profile/edit" className="btn-outline mb-2 text-sm">Edit Profile</Link>
           </div>

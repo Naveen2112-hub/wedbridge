@@ -70,7 +70,7 @@ export default function AdminMembershipsPage() {
                   {payments.length === 0 ? <tr><td colSpan={5} className="p-6 text-center text-muted">No payments yet.</td></tr> :
                   payments.map((p) => (
                     <tr key={p.id} className="border-b border-primary-50 last:border-0">
-                      <td className="p-3 font-mono text-xs">{p.orderId.slice(0, 16)}…</td>
+                      <td className="p-3 font-mono text-xs">{(p.orderId ?? p.razorpayOrderId ?? "").slice(0, 16)}…</td>
                       <td className="p-3"><span className={cn("badge", planStyles[p.plan])}>{p.plan}</span></td>
                       <td className="p-3">₹{(p.amount / 100).toLocaleString()}</td>
                       <td className="p-3"><span className={cn("badge", statusStyles[p.status])}>{p.status}</span></td>

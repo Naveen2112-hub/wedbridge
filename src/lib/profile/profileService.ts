@@ -48,6 +48,58 @@ export async function deleteProfilePhoto(photoURL: string): Promise<void> {
   try { await deleteObject(ref(storage, photoURL)); } catch { /* ignore */ }
 }
 
+export const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+
+export function dataURLtoBlob(dataURL: string): Blob {
+  const [meta, b64] = dataURL.split(",");
+  const mime = meta.match(/data:(.*?);base64/)?.[1] ?? "image/jpeg";
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+  return new Blob([arr], { type: mime });
+}
+
+export async function compressImage(file: File, maxDim = 1024, quality = 0.8): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > height && width > maxDim) { height = Math.round((height * maxDim) / width); width = maxDim; }
+        else if (height > maxDim) { width = Math.round((width * maxDim) / height); height = maxDim; }
+        const canvas = document.createElement("canvas");
+        canvas.width = width; canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { reject(new Error("Canvas not supported")); return; }
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.onerror = reject;
+      img.src = reader.result as string;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+export async function saveProfile(uid: string, data: Partial<ProfileDocument>): Promise<void> {
+  if (!db) return;
+  try { await updateDoc(doc(db, collections.profiles, uid), { ...data, updatedAt: serverTimestamp() }); } catch { /* ignore */ }
+}
+
+export function calculateCompletion(profile: Partial<ProfileDocument>): { percentage: number; filled: number; total: number; missing: string[] } {
+  const fields: (keyof ProfileDocument)[] = ["name", "gender", "dateOfBirth", "religion", "caste", "motherTongue", "education", "occupation", "district", "phone", "bio", "photoURL"];
+  const missing: string[] = [];
+  let filled = 0;
+  for (const f of fields) {
+    const v = profile[f];
+    if (v !== undefined && v !== null && v !== "") filled++;
+    else missing.push(f as string);
+  }
+  return { percentage: Math.round((filled / fields.length) * 100), filled, total: fields.length, missing };
+}
+
 export interface SearchFilters {
   gender?: "male" | "female"; religion?: string; caste?: string; city?: string; district?: string; state?: string;
   minAge?: number; maxAge?: number; minHeight?: number; maxHeight?: number; maritalStatus?: string; education?: string; occupation?: string; verifiedOnly?: boolean; premiumOnly?: boolean;

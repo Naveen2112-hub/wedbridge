@@ -1,0 +1,30 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
+    function isAdmin() { return isSignedIn() && request.auth.token.admin == true; }
+    function isUserAdmin() { return isSignedIn() && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == "admin"; }
+
+    match /profiles/{uid}/{fileName} {
+      allow read: if true;
+      allow write: if isOwner(uid) || isAdmin() || isUserAdmin();
+      allow delete: if isOwner(uid) || isAdmin() || isUserAdmin();
+    }
+    match /vendors/{vendorId}/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn() && (firestore.get(/databases/(default)/documents/vendors/$(vendorId)).data.ownerUid == request.auth.uid || isAdmin() || isUserAdmin());
+      allow delete: if isSignedIn() && (firestore.get(/databases/(default)/documents/vendors/$(vendorId)).data.ownerUid == request.auth.uid || isAdmin() || isUserAdmin());
+    }
+    match /ocr/{uid}/{fileName} {
+      allow read: if isOwner(uid) || isAdmin() || isUserAdmin();
+      allow write: if isOwner(uid) || isAdmin() || isUserAdmin();
+      allow delete: if isOwner(uid) || isAdmin() || isUserAdmin();
+    }
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin() || isUserAdmin();
+      allow delete: if isAdmin() || isUserAdmin();
+    }
+  }
+}

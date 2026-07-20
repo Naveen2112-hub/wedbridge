@@ -127,7 +127,7 @@ function ProfileEditContent() {
               <Field label={t("profile.horoscope")} icon={BookOpen}><select className="auth-input pl-10" {...register("horoscope")}><option value="">Select…</option><option value="yes">Yes</option><option value="no">No</option></select></Field>
               <Field label={t("profile.star")} icon={Star}><select className="auth-input pl-10" {...register("star")}><option value="">Select…</option>{STARS.map((r) => <option key={r} value={r}>{r}</option>)}</select></Field>
               <Field label={t("profile.rasi")} icon={Star}><select className="auth-input pl-10" {...register("rasi")}><option value="">Select…</option>{RASIS.map((r) => <option key={r} value={r}>{r}</option>)}</select></Field>
-              <Field label={t("profile.manglik")} icon={Star}><select className="auth-input pl-10" {...register("manglik")}><option value="">Select…</option><option value="yes">Yes</option><option value="no">No</option><option value="dont_know">Don't know</option></select></Field>
+              <Field label={t("profile.manglik")} icon={Star}><select className="auth-input pl-10" {...register("manglik")}><option value="">Select…</option><option value="yes">Yes</option><option value="no">No</option><option value="dont_know">Don&apos;t know</option></select></Field>
             </div>
           </Card>
 

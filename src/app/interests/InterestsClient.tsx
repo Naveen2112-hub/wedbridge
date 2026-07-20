@@ -41,7 +41,7 @@ export default function InterestsClient() {
   useEffect(() => { setPage(1); }, [tab]);
 
   const items: InterestWithProfile[] = useMemo(() => raw.map((d) => {
-    const otherUid = tab === "sent" ? d.receiverId : d.senderId;
+    const otherUid = (tab === "sent" ? d.receiverId : d.senderId) ?? "";
     return { ...d, profileUid: otherUid, profileName: "Member", profilePhoto: undefined };
   }), [raw, tab]);
 

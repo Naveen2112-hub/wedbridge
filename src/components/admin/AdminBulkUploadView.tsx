@@ -38,11 +38,11 @@ export function AdminBulkUploadView() {
     for (const row of preview) {
       if (row._duplicate) continue;
       await createProfile({
-        name: String(row.name ?? ""), gender: String(row.gender ?? "male") as "male" | "female", dob: String(row.dob ?? ""), religion: String(row.religion ?? "Hindu"),
+        name: String(row.name ?? ""), gender: String(row.gender ?? "male") as "male" | "female", dob: String(row.dob ?? ""), dateOfBirth: String(row.dob ?? ""), religion: String(row.religion ?? "Hindu"),
         caste: String(row.caste ?? ""), motherTongue: String(row.motherTongue ?? "Tamil"), education: String(row.education ?? ""), occupation: String(row.occupation ?? ""),
         income: String(row.income ?? ""), phone: String(row.phone ?? ""), city: String(row.city ?? ""), district: String(row.district ?? ""), state: "Tamil Nadu",
         height: String(row.height ?? ""), weight: String(row.weight ?? ""), maritalStatus: String(row.maritalStatus ?? "Never Married"), familyType: "Nuclear",
-        bio: String(row.bio ?? ""), userId: `bulk-${Date.now()}-${count}`, photoURL: "", photoURLs: [], status: "pending", premium: false, verified: false, featured: false, createdBy: "bulk",
+        bio: String(row.bio ?? ""), userId: `bulk-${Date.now()}-${count}`, uid: `bulk-${Date.now()}-${count}`, photoURL: "", photoURLs: [], status: "pending", premium: false, verified: false, featured: false, createdBy: "bulk",
       }, { uid: adminUser.uid, email: adminUser.email });
       count++; setDone(count);
     }

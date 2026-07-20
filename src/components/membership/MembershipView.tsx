@@ -14,7 +14,7 @@ export function MembershipView() {
   const handleSubscribe = async (plan: typeof PLANS[number]) => {
     if (!user) { toast("Please login to subscribe", "error"); return; }
     await startRazorpayPayment(
-      plan.id,
+      plan.id as "premium" | "gold",
       { uid: user.uid, email: user.email ?? "", displayName: user.displayName ?? "User" },
       () => toast(`${plan.name} membership activated!`, "success"),
       (msg) => toast(msg, "error"),

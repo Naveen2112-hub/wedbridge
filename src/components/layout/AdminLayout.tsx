@@ -20,8 +20,8 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const handleLogout = async () => { await logout(); router.push("/admin/login"); };
   return (
     <div className="flex min-h-screen bg-grain">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-primary-100 bg-primary-950 text-white lg:flex lg:flex-col"><SidebarContent pathname={pathname} t={t} onLogout={handleLogout} /></aside>
-      {open && (<aside className="fixed inset-y-0 left-0 z-50 w-64 border-r border-primary-100 bg-primary-950 text-white shadow-card lg:hidden"><SidebarContent pathname={pathname} t={t} onLogout={handleLogout} onClose={() => setOpen(false)} /></aside>)}
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-primary-100 bg-primary-950 text-white lg:flex lg:flex-col"><SidebarContent pathname={pathname ?? ""} t={t} onLogout={handleLogout} /></aside>
+      {open && (<aside className="fixed inset-y-0 left-0 z-50 w-64 border-r border-primary-100 bg-primary-950 text-white shadow-card lg:hidden"><SidebarContent pathname={pathname ?? ""} t={t} onLogout={handleLogout} onClose={() => setOpen(false)} /></aside>)}
       <div className="flex flex-1 flex-col lg:pl-64">
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-primary-100 bg-background/90 px-4 backdrop-blur-md lg:px-8">
           <button type="button" onClick={() => setOpen(true)} className="rounded-full p-2 text-primary-900 lg:hidden" aria-label="Open menu"><Menu className="h-5 w-5" /></button>

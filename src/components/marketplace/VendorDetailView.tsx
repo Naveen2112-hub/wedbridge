@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState, use } from "react";
+import Image from "next/image";
 import { Star, MapPin, BadgeCheck, Phone, Mail, Globe, Clock, Loader as Loader2, Calendar, Package, Image as ImageIcon, Heart } from "lucide-react";
 import { getVendor } from "@/lib/marketplace/vendorService";
 import { getPackages, getGallery, getReviews } from "@/lib/marketplace/packageService";
@@ -55,7 +56,7 @@ export function VendorDetailView({ idPromise }: { idPromise: Promise<{ id: strin
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="card overflow-hidden">
-        <div className="h-48 overflow-hidden bg-primary-100">{vendor.coverURL && <img src={vendor.coverURL} alt={vendor.businessName} className="h-full w-full object-cover" />}</div>
+        <div className="h-48 overflow-hidden bg-primary-100">{vendor.coverURL && <Image src={vendor.coverURL} alt={vendor.businessName} fill className="h-full w-full object-cover" />}</div>
         <div className="p-6">
           <div className="flex items-start justify-between">
             <div>
@@ -73,7 +74,7 @@ export function VendorDetailView({ idPromise }: { idPromise: Promise<{ id: strin
         <div className="lg:col-span-2">
           {tab === "about" && <div className="card p-6"><h2 className="heading-sm">About</h2><p className="mt-3 text-sm text-muted">{vendor.about || "No description available."}</p><div className="mt-4 space-y-2 text-sm">{vendor.phone && <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-primary-600" />{vendor.phone}</p>}{vendor.email && <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary-600" />{vendor.email}</p>}{vendor.website && <p className="flex items-center gap-2"><Globe className="h-4 w-4 text-primary-600" /><a href={vendor.website} target="_blank" rel="noopener noreferrer" className="text-primary-700 hover:underline">{vendor.website}</a></p>}{vendor.businessHours && <p className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary-600" />{vendor.businessHours.days}: {vendor.businessHours.hours}</p>}</div></div>}
           {tab === "packages" && <div className="space-y-3">{packages.length === 0 ? <p className="text-muted">No packages listed.</p> : packages.map((p) => <div key={p.id} className="card p-4"><h3 className="font-semibold text-primary-900">{p.name}</h3><p className="mt-1 text-sm text-muted">{p.description}</p><p className="mt-2 font-bold text-primary-700">{formatCurrency(p.price)}</p>{p.inclusions.length > 0 && <ul className="mt-2 text-sm text-muted">{p.inclusions.map((inc, i) => <li key={i}>• {inc}</li>)}</ul>}</div>)}</div>}
-          {tab === "gallery" && <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">{gallery.length === 0 ? <p className="text-muted">No images.</p> : gallery.map((g) => <div key={g.id} className="aspect-square overflow-hidden rounded-xl bg-primary-100"><img src={g.imageURL} alt={g.caption ?? ""} className="h-full w-full object-cover" loading="lazy" /></div>)}</div>}
+          {tab === "gallery" && <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">{gallery.length === 0 ? <p className="text-muted">No images.</p> : gallery.map((g) => <div key={g.id} className="aspect-square overflow-hidden rounded-xl bg-primary-100"><Image src={g.imageURL} alt={g.caption ?? ""} fill className="h-full w-full object-cover" loading="lazy" /></div>)}</div>}
           {tab === "reviews" && <div className="space-y-3">{reviews.length === 0 ? <p className="text-muted">No reviews yet.</p> : reviews.map((r) => <div key={r.id} className="card p-4"><div className="flex items-center justify-between"><p className="font-medium text-primary-900">{r.userName}</p><span className="flex items-center gap-0.5">{Array.from({ length: 5 }).map((_, i) => <Star key={i} className={`h-3.5 w-3.5 ${i < r.rating ? "text-secondary-500" : "text-primary-100"}`} fill="currentColor" />)}</span></div><p className="mt-2 text-sm text-muted">{r.review}</p></div>)}</div>}
         </div>
         <div className="lg:col-span-1">
