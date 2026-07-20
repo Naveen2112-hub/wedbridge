@@ -60,8 +60,8 @@ export default function HomePage() {
             <Link href="/register" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 24px", borderRadius: 12, background: "#d68a14", color: "white", fontWeight: 600, fontSize: 14, textDecoration: "none" }}>
               Create Free Account
             </Link>
-            <Link href="/membership" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 24px", borderRadius: 12, background: "rgba(255,255,255,0.1)", color: "white", fontWeight: 600, fontSize: 14, textDecoration: "none", border: "1px solid rgba(255,255,255,0.2)" }}>
-              View Plans
+            <Link href="/login" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 24px", borderRadius: 12, background: "rgba(255,255,255,0.1)", color: "white", fontWeight: 600, fontSize: 14, textDecoration: "none", border: "1px solid rgba(255,255,255,0.2)" }}>
+              Sign In
             </Link>
           </div>
         </div>
