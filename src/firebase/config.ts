@@ -1,4 +1,4 @@
-import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
+import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
@@ -12,21 +12,19 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const configured = Boolean(
-  firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId
-);
-export const isFirebaseConfigured = () => configured;
-
 let app: FirebaseApp | null = null;
-let auth: Auth | null = null;
-let db: Firestore | null = null;
-let storage: FirebaseStorage | null = null;
+let authInstance: Auth | null = null;
+let dbInstance: Firestore | null = null;
+let storageInstance: FirebaseStorage | null = null;
 
-if (configured) {
-  app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  db = getFirestore(app);
-  storage = getStorage(app);
+if (typeof window !== "undefined" && firebaseConfig.apiKey) {
+  app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+  authInstance = getAuth(app);
+  dbInstance = getFirestore(app);
+  storageInstance = getStorage(app);
 }
 
-export { app, auth, db, storage };
+export const db = dbInstance;
+export const auth = authInstance;
+export const storage = storageInstance;
+export { app };
