@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { BarChart3, Calendar } from "lucide-react";
+import { ChartBar as BarChart3, Calendar } from "lucide-react";
 import { getReport, type ReportRow } from "@/lib/admin/analyticsService";
 import { formatCurrency, formatDate } from "@/lib/utils";
 

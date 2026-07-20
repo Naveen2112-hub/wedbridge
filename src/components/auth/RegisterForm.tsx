@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Heart, Mail, Lock, User, Loader as Loader2, Eye, EyeOff, CheckCircle2 } from "lucide-react";
+import { Heart, Mail, Lock, User, Loader as Loader2, Eye, EyeOff, CircleCheck as CheckCircle2 } from "lucide-react";
 import { registerUser } from "@/lib/auth/authService";
 import { useToast } from "@/components/ui/Toast";
 import { validateEmail, sanitizeText } from "@/lib/utils";

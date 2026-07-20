@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Upload, Loader as Loader2, Check, AlertCircle } from "lucide-react";
+import { Upload, Loader as Loader2, Check, CircleAlert as AlertCircle } from "lucide-react";
 import { parseCSV, detectDuplicates } from "@/lib/admin/notificationService";
 import { createProfile } from "@/lib/admin/adminService";
 import { useToast } from "@/components/ui/Toast";

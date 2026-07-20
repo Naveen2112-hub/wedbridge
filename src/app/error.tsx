@@ -1,6 +1,6 @@
 "use client";
 import { useEffect } from "react";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { CircleAlert as AlertCircle, RefreshCw } from "lucide-react";
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => { console.error(error); }, [error]);

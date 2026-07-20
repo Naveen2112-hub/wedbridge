@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Home } from "lucide-react";
+import { Chrome as Home } from "lucide-react";
 
 export default function NotFound() {
   return (
