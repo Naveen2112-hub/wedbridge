@@ -9,6 +9,9 @@ export const collections = {
   recentlyViewed: "recentlyViewed",
   aiMatches: "aiMatches",
   matchHistory: "matchHistory",
+  subscriptions: "subscriptions",
+  payments: "payments",
+  membershipHistory: "membershipHistory",
 } as const;
 
 export const storagePaths = {
@@ -29,7 +32,60 @@ export type YesNo = "yes" | "no";
 export type ProfileVisibility = "visible" | "hidden";
 export type AccountStatus = "active" | "deactivated";
 export type VerificationStatus = "unverified" | "pending" | "verified" | "rejected";
-export type MembershipTier = "free" | "premium" | "elite";
+export type MembershipTier = "free" | "basic" | "premium" | "gold";
+
+export type PaymentStatus = "pending" | "paid" | "failed" | "cancelled" | "refunded" | "expired";
+
+export type PaymentGateway = "razorpay";
+
+export interface PlanInfo {
+  id: MembershipTier;
+  name: string;
+  price: number;
+  periodDays: number;
+  features: string[];
+  highlighted?: boolean;
+}
+
+export interface SubscriptionDocument {
+  id: string;
+  uid: string;
+  plan: MembershipTier;
+  status: "active" | "expired" | "cancelled";
+  startDate: unknown;
+  endDate: unknown;
+  paymentId?: string;
+  autoRenew: boolean;
+  createdAt: unknown;
+  updatedAt: unknown;
+}
+
+export interface PaymentDocument {
+  id: string;
+  uid: string;
+  orderId: string;
+  gateway: PaymentGateway;
+  amount: number;
+  currency: string;
+  plan: MembershipTier;
+  status: PaymentStatus;
+  gatewayPaymentId?: string;
+  gatewaySignature?: string;
+  notes?: Record<string, string>;
+  createdAt: unknown;
+  updatedAt: unknown;
+}
+
+export interface MembershipHistoryDocument {
+  id: string;
+  uid: string;
+  fromPlan: MembershipTier | null;
+  toPlan: MembershipTier;
+  action: "purchase" | "upgrade" | "renew" | "downgrade" | "refund" | "expiry";
+  paymentId?: string;
+  amount: number;
+  createdAt: unknown;
+}
 
 export interface UserDocument {
   uid: string;
@@ -182,6 +238,24 @@ export const FREE_PLAN_LIMITS = {
   interestsPerDay: 20,
   contactViewsPerDay: 5,
 } as const;
+
+export const PLAN_LIMITS: Record<MembershipTier, { interestsPerDay: number; contactViewsPerDay: number; priorityRanking: boolean; featured: boolean; ads: boolean }> = {
+  free: { interestsPerDay: 20, contactViewsPerDay: 5, priorityRanking: false, featured: false, ads: true },
+  basic: { interestsPerDay: Infinity, contactViewsPerDay: 20, priorityRanking: true, featured: false, ads: false },
+  premium: { interestsPerDay: Infinity, contactViewsPerDay: Infinity, priorityRanking: true, featured: true, ads: false },
+  gold: { interestsPerDay: Infinity, contactViewsPerDay: Infinity, priorityRanking: true, featured: true, ads: false },
+};
+
+export const MEMBERSHIP_PLANS: PlanInfo[] = [
+  { id: "free", name: "Free", price: 0, periodDays: 0, features: ["Unlimited registration & login", "Unlimited profile search", "Unlimited AI recommendations", "20 interests per day", "5 contact views per day"] },
+  { id: "basic", name: "Basic", price: 999, periodDays: 90, features: ["Unlimited interests", "20 contact views per day", "Priority search ranking", "No advertisements"] },
+  { id: "premium", name: "Premium", price: 2999, periodDays: 180, highlighted: true, features: ["Unlimited contact views", "Unlimited interests", "Unlimited AI matches", "Priority search ranking", "Premium badge", "Highlighted profile"] },
+  { id: "gold", name: "Gold", price: 5999, periodDays: 365, features: ["Everything in Premium", "Highest search priority", "Top featured profile", "Exclusive wedding vendor discounts", "Early access to new features"] },
+];
+
+export function planRank(tier: MembershipTier): number {
+  return { free: 0, basic: 1, premium: 2, gold: 3 }[tier];
+}
 
 export const REQUIRED_PROFILE_FIELDS: (keyof ProfileDocument)[] = [
   "photoURL", "name", "gender", "dateOfBirth", "religion", "caste", "motherTongue",

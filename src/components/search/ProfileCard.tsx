@@ -11,6 +11,7 @@ import { sendInterest, getInterestBetween, InterestLimitError } from "@/lib/inte
 import { addFavourite, removeFavourite, isFavourite } from "@/lib/favourites/favouriteService";
 import { getProfile } from "@/lib/profile/profileService";
 import { cn } from "@/lib/cn";
+import { PlanBadge } from "@/components/membership/PlanBadge";
 
 interface Props { profile: ProfileDocument; compatibility?: number; }
 
@@ -66,7 +67,7 @@ export function ProfileCard({ profile, compatibility }: Props) {
           <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-primary-950/60 to-transparent" />
           <div className="absolute left-3 top-3 flex gap-1.5">
             {profile.verificationStatus === "verified" && <span className="flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-xs font-semibold text-primary-800 backdrop-blur"><BadgeCheck className="h-3.5 w-3.5 text-secondary-600" />{t("search.card.verified")}</span>}
-            {profile.membership && profile.membership !== "free" && <span className="rounded-full bg-secondary-500 px-2 py-0.5 text-xs font-semibold text-white">{t("search.card.premium")}</span>}
+            {profile.membership && profile.membership !== "free" && <PlanBadge tier={profile.membership} />}
           </div>
           <button type="button" onClick={(e) => { e.preventDefault(); handleFav(); }} disabled={busy} aria-label={t("search.card.favourite")} className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur transition hover:scale-110">
             <Star className={cn("h-4 w-4", fav ? "fill-secondary-500 text-secondary-500" : "text-primary-700")} />
@@ -96,6 +97,3 @@ export function ProfileCard({ profile, compatibility }: Props) {
     </div>
   );
 }
-
-
-export { ProfileCard }

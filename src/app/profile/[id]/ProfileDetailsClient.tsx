@@ -16,6 +16,7 @@ import { sendInterest, getInterestBetween, InterestLimitError } from "@/lib/inte
 import { addFavourite, removeFavourite, isFavourite } from "@/lib/favourites/favouriteService";
 import { createNotification } from "@/lib/notifications/notificationService";
 import { cn } from "@/lib/cn";
+import { PlanBadge } from "@/components/membership/PlanBadge";
 
 export default function ProfileDetailsClient() {
   const params = useParams<{ id: string }>();
@@ -96,6 +97,7 @@ export default function ProfileDetailsClient() {
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1 rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-800"><Eye className="h-3.5 w-3.5" />{t("profile.details.views")}: {profile.viewCount ?? 0}</span>
             {profile.verificationStatus === "verified" && <span className="flex items-center gap-1 rounded-full bg-secondary-100 px-3 py-1 text-xs font-semibold text-secondary-800"><ShieldCheck className="h-3.5 w-3.5" />{t("profile.verified")}</span>}
+            {profile.membership && profile.membership !== "free" && <PlanBadge tier={profile.membership} />}
           </div>
           {!isOwn && (
             <div className="flex flex-wrap gap-2">

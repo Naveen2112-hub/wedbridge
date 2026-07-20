@@ -8,6 +8,7 @@ import { calculateAge } from "@/lib/format";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useState } from "react";
 import { cn } from "@/lib/cn";
+import { PlanBadge } from "@/components/membership/PlanBadge";
 
 export function AiMatchCard({ match }: { match: ScoredMatch }) {
   const { t } = useLanguage();
@@ -26,7 +27,7 @@ export function AiMatchCard({ match }: { match: ScoredMatch }) {
           <div className={cn("absolute right-3 top-3 flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold backdrop-blur", scoreBg, scoreColor)}><Sparkles className="h-3.5 w-3.5" />{score}%</div>
           <div className="absolute left-3 top-3 flex gap-1.5">
             {profile.verificationStatus === "verified" && <span className="flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-xs font-semibold text-primary-800 backdrop-blur"><BadgeCheck className="h-3.5 w-3.5 text-secondary-600" />{t("search.card.verified")}</span>}
-            {profile.membership && profile.membership !== "free" && <span className="rounded-full bg-secondary-500 px-2 py-0.5 text-xs font-semibold text-white">{t("search.card.premium")}</span>}
+            {profile.membership && profile.membership !== "free" && <PlanBadge tier={profile.membership} />}
           </div>
           <div className="absolute bottom-3 left-3 right-3 text-white"><p className="font-display text-base font-semibold drop-shadow">{profile.name}{age ? `, ${age}` : ""}</p><p className="text-xs text-white/85">{[profile.occupation, profile.district].filter(Boolean).join(" • ")}</p></div>
         </div>

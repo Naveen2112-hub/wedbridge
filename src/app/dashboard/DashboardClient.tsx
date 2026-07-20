@@ -8,6 +8,7 @@ import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { CompletionCard } from "@/components/profile/CompletionCard";
+import { MembershipCard } from "@/components/membership/MembershipCard";
 import { getProfile } from "@/lib/profile/profileService";
 import { cn } from "@/lib/cn";
 import type { ProfileDocument } from "@/firebase/schema";
@@ -48,6 +49,7 @@ function DashboardContent() {
 
         <div className="space-y-6">
           {profile && <CompletionCard profile={profile} />}
+          <MembershipCard />
           <Card title={t("dashboard.notifications")} icon={Bell} viewAllHref="/notifications" viewAllLabel={viewAll}><div className="space-y-3">{notifications.map((n, i) => (<div key={i} className="flex items-start gap-3 rounded-xl border border-primary-50 p-3"><span className="mt-1 h-2 w-2 flex-none rounded-full bg-secondary-500" /><div><p className="text-sm text-ink/80">{n.text}</p><p className="text-xs text-muted">{n.time}</p></div></div>))}</div></Card>
           <div className="rounded-2xl bg-card p-6 shadow-card"><div className="flex items-center gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50 text-primary-800"><Search className="h-5 w-5" /></span><h2 className="font-display text-lg font-semibold text-primary-900">{t("dashboard.quickSearch")}</h2></div><div className="mt-4 grid gap-3 sm:grid-cols-2"><select className="input"><option>Any religion</option><option>Hindu</option><option>Christian</option><option>Muslim</option></select><select className="input"><option>Any age</option><option>21-25</option><option>26-30</option><option>31-35</option></select><select className="input"><option>Any district</option><option>Chennai</option><option>Coimbatore</option><option>Madurai</option></select><Link href="/search" className="btn-primary">{t("nav.search")}</Link></div></div>
         </div>
