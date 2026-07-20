@@ -6,7 +6,7 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
 import { AuthGuard } from "@/components/auth/AuthGuard";
-import { getProfile } from "@/lib/profile/profileService";
+import { getProfileByUserId } from "@/lib/profile/profileService";
 import { AiMatchCard } from "@/components/ai/AiMatchCard";
 import { AiMatchFiltersPanel, AiTabs } from "@/components/ai/AiMatchFiltersPanel";
 import { AiMatchFilters, AiTab, ScoredMatch, generateAiMatches, getCachedMatches, saveCachedMatches, filterMatches, applyTab, limitByMembership, FREE_DAILY_LIMIT } from "@/lib/ai/aiMatchService";
@@ -25,7 +25,7 @@ export default function AiMatchesClient() {
 
   const loadMatches = useCallback(async (force = false) => {
     if (!user?.uid) return;
-    const myProfile = await getProfile(user.uid);
+    const myProfile = await getProfileByUserId(user.uid);
     setProfile(myProfile);
     if (!myProfile) { setLoading(false); return; }
     if (!force) {

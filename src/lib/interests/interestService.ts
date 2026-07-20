@@ -48,7 +48,7 @@ export async function sendInterest(senderId: string, senderName: string, receive
     }
     const now = serverTimestamp();
     const ref = await addDoc(collection(database, collections.interests), {
-      senderId, receiverId, status: "pending" as InterestStatus, createdAt: now, updatedAt: now,
+      senderId, fromUserId: senderId, fromUserName: senderName, receiverId, toUserId: receiverId, status: "pending" as InterestStatus, createdAt: now, updatedAt: now,
     } as Omit<InterestDocument, "id">);
     await createNotification(receiverId, {
       title: "New Interest Received",

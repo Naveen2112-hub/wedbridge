@@ -125,7 +125,7 @@ export async function searchProfiles(filters: SearchFilters, cursor?: QueryDocum
     const docs = snap.docs;
     const hasMore = docs.length > SEARCH_PAGE_SIZE;
     const slice = hasMore ? docs.slice(0, SEARCH_PAGE_SIZE) : docs;
-    let profiles = slice.map((d) => ({ id: d.id, ...(d.data() as Omit<ProfileDocument, "id">) }));
+    let profiles = slice.map((d) => ({ id: d.id, uid: d.id, ...(d.data() as Omit<ProfileDocument, "id" | "uid">) }));
     if (filters.caste) profiles = profiles.filter((r) => r.caste?.toLowerCase().includes(filters.caste!.toLowerCase()));
     return { profiles, cursor: slice[slice.length - 1] ?? null, hasMore };
   } catch { return { profiles: [], cursor: null, hasMore: false }; }

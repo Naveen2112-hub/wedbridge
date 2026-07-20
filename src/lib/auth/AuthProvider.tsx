@@ -3,13 +3,13 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, sendPasswordResetEmail, updateProfile, onAuthStateChanged, type User } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db, isFirebaseConfigured } from "@/firebase/config";
-import { collections, type UserRole, type Language, type ContactVisibility } from "@/firebase/schema";
+import { collections, type UserRole, type Language, type ContactVisibility, type AppUser } from "@/firebase/schema";
 
 export interface CompleteProfileInput { name: string; gender: Gender; dateOfBirth: string; religion: string; caste: string; district: string; phone: string; email?: string; photoURL?: string; contactVisibility: ContactVisibility; }
 import type { Gender } from "@/firebase/schema";
 
-interface AuthContextValue {
-  user: User | null; role: UserRole | null; profileCompleted: boolean; loading: boolean; configured: boolean;
+export interface AuthContextValue {
+  user: User | null; role: UserRole | null; appUser: AppUser | null; profileCompleted: boolean; loading: boolean; configured: boolean;
   registerWithEmail: (name: string, email: string, password: string) => Promise<User>;
   loginWithEmail: (email: string, password: string) => Promise<User>;
   loginWithGoogle: () => Promise<User>;
@@ -23,29 +23,31 @@ const googleProvider = new GoogleAuthProvider();
 
 function readLanguage(): Language { if (typeof window === "undefined") return "en"; return window.localStorage.getItem("wedbridge:lang") === "ta" ? "ta" : "en"; }
 
-async function ensureUserDoc(user: User, defaults: Partial<Record<string, unknown>> = {}): Promise<{ role: UserRole; profileCompleted: boolean }> {
+async function ensureUserDoc(user: User, defaults: Partial<Record<string, unknown>> = {}): Promise<{ role: UserRole; profileCompleted: boolean; appUser: AppUser | null }> {
   if (!db) throw new Error("auth.error.notConfigured");
   const ref = doc(db, collections.users, user.uid);
   const snap = await getDoc(ref);
   if (!snap.exists()) {
     const payload = { uid: user.uid, role: "user" as UserRole, name: user.displayName ?? defaults.name ?? "", email: user.email ?? "", phone: user.phoneNumber ?? "", gender: null, profileCompleted: false, photoURL: user.photoURL ?? "", contactVisibility: "after_accept" as ContactVisibility, language: readLanguage(), createdAt: serverTimestamp(), updatedAt: serverTimestamp(), ...defaults };
     await setDoc(ref, payload);
-    return { role: "user", profileCompleted: false };
+    const { uid: _u, email: _e, role: _r, ...restPayload } = payload;
+    return { role: "user", profileCompleted: false, appUser: { uid: user.uid, email: user.email ?? "", displayName: user.displayName ?? "", role: "user", status: "active", verified: false, ...restPayload } as AppUser };
   }
   const data = snap.data();
-  return { role: (data.role as UserRole) ?? "user", profileCompleted: Boolean(data.profileCompleted) };
+  return { role: (data.role as UserRole) ?? "user", profileCompleted: Boolean(data.profileCompleted), appUser: { uid: user.uid, ...(data as Omit<AppUser, "uid">) } };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [role, setRole] = useState<UserRole | null>(null);
+  const [appUser, setAppUser] = useState<AppUser | null>(null);
   const [profileCompleted, setProfileCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const configured = isFirebaseConfigured;
 
   useEffect(() => {
     if (!configured || !auth) { setLoading(false); return; }
-    const unsub = onAuthStateChanged(auth, async (u) => { setUser(u); if (u && db) { const meta = await ensureUserDoc(u); setRole(meta.role); setProfileCompleted(meta.profileCompleted); } else { setRole(null); setProfileCompleted(false); } setLoading(false); });
+    const unsub = onAuthStateChanged(auth, async (u) => { setUser(u); if (u && db) { const meta = await ensureUserDoc(u); setRole(meta.role); setAppUser(meta.appUser); setProfileCompleted(meta.profileCompleted); } else { setRole(null); setAppUser(null); setProfileCompleted(false); } setLoading(false); });
     return () => unsub();
   }, [configured]);
 
@@ -53,8 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!auth || !db) throw new Error("auth.error.notConfigured");
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(cred.user, { displayName: name });
-    await ensureUserDoc(cred.user, { name });
-    setUser(cred.user); setRole("user"); setProfileCompleted(false);
+    const meta = await ensureUserDoc(cred.user, { name });
+    setUser(cred.user); setRole(meta.role); setAppUser(meta.appUser); setProfileCompleted(meta.profileCompleted);
     return cred.user;
   }, []);
 
@@ -62,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!auth || !db) throw new Error("auth.error.notConfigured");
     const cred = await signInWithEmailAndPassword(auth, email, password);
     const meta = await ensureUserDoc(cred.user);
-    setUser(cred.user); setRole(meta.role); setProfileCompleted(meta.profileCompleted);
+    setUser(cred.user); setRole(meta.role); setAppUser(meta.appUser); setProfileCompleted(meta.profileCompleted);
     return cred.user;
   }, []);
 
@@ -70,13 +72,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!auth || !db) throw new Error("auth.error.notConfigured");
     const cred = await signInWithPopup(auth, googleProvider);
     const meta = await ensureUserDoc(cred.user, { name: cred.user.displayName ?? "" });
-    setUser(cred.user); setRole(meta.role); setProfileCompleted(meta.profileCompleted);
+    setUser(cred.user); setRole(meta.role); setAppUser(meta.appUser); setProfileCompleted(meta.profileCompleted);
     return cred.user;
   }, []);
 
   const resetPassword = useCallback(async (email: string) => { if (!auth) throw new Error("auth.error.notConfigured"); await sendPasswordResetEmail(auth, email); }, []);
 
-  const logout = useCallback(async () => { if (!auth) return; await signOut(auth); setUser(null); setRole(null); setProfileCompleted(false); }, []);
+  const logout = useCallback(async () => { if (!auth) return; await signOut(auth); setUser(null); setRole(null); setAppUser(null); setProfileCompleted(false); }, []);
 
   const completeProfile = useCallback(async (data: CompleteProfileInput) => {
     if (!auth || !db || !auth.currentUser) throw new Error("auth.error.notConfigured");
@@ -85,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfileCompleted(true);
   }, []);
 
-  const value = useMemo<AuthContextValue>(() => ({ user, role, profileCompleted, loading, configured, registerWithEmail, loginWithEmail, loginWithGoogle, resetPassword, logout, completeProfile, setProfileCompleted }), [user, role, profileCompleted, loading, configured, registerWithEmail, loginWithEmail, loginWithGoogle, resetPassword, logout, completeProfile]);
+  const value = useMemo<AuthContextValue>(() => ({ user, role, appUser, profileCompleted, loading, configured, registerWithEmail, loginWithEmail, loginWithGoogle, resetPassword, logout, completeProfile, setProfileCompleted }), [user, role, appUser, profileCompleted, loading, configured, registerWithEmail, loginWithEmail, loginWithGoogle, resetPassword, logout, completeProfile]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

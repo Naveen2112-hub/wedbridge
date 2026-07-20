@@ -1,21 +1,9 @@
-import Link from "next/link";
+import { RegisterForm } from "@/components/auth/RegisterForm";
 
 export default function RegisterPage() {
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-      <div style={{ background: "white", padding: 40, borderRadius: 16, boxShadow: "0 4px 12px rgba(0,0,0,0.1)", maxWidth: 400, width: "100%" }}>
-        <h1 style={{ fontSize: 28, fontWeight: 700, color: "#731e36", fontFamily: "Georgia, serif" }}>Create Account</h1>
-        <p style={{ marginTop: 8, color: "#6b7280", fontSize: 14 }}>Join WedBridge today</p>
-        <form style={{ marginTop: 24, display: "flex", flexDirection: "column", gap: 16 }}>
-          <input type="text" placeholder="Full Name" style={{ padding: "12px 16px", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 14 }} />
-          <input type="email" placeholder="Email" style={{ padding: "12px 16px", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 14 }} />
-          <input type="password" placeholder="Password" style={{ padding: "12px 16px", borderRadius: 8, border: "1px solid #e5e7eb", fontSize: 14 }} />
-          <button type="submit" style={{ padding: "12px", borderRadius: 8, background: "#a51d3c", color: "white", fontWeight: 600, fontSize: 14, border: "none", cursor: "pointer" }}>Create Account</button>
-        </form>
-        <p style={{ marginTop: 16, textAlign: "center", fontSize: 14, color: "#6b7280" }}>
-          Already have an account? <Link href="/login" style={{ color: "#a51d3c", fontWeight: 600 }}>Sign In</Link>
-        </p>
-      </div>
+    <div className="flex min-h-screen items-center justify-center bg-primary-50/30 px-4 py-12">
+      <RegisterForm />
     </div>
   );
 }

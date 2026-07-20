@@ -39,11 +39,12 @@ export function getPlan(tier: MembershipTier): PlanInfo | undefined {
   return PLANS.find((p) => p.id === tier);
 }
 
-export async function activateSubscription(uid: string, plan: MembershipTier, paymentId: string, _amount?: number, _mode?: string, durationDays = 30): Promise<SubscriptionDocument | null> {
+export async function activateSubscription(uid: string, plan: MembershipTier, paymentId: string, _amount?: number, _mode?: string, durationDays?: number): Promise<SubscriptionDocument | null> {
   if (!db) return null;
   try {
+    const days = durationDays ?? (plan === "gold" ? 365 : plan === "premium" ? 365 : 30);
     const startDate = new Date();
-    const endDate = new Date(startDate.getTime() + durationDays * 24 * 60 * 60 * 1000);
+    const endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
     const ref = await addDoc(collection(db, collections.subscriptions), {
       uid, plan, status: "active", startDate, endDate, paymentId, autoRenew: false, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
     } as Omit<SubscriptionDocument, "id">);

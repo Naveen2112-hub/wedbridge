@@ -11,7 +11,7 @@ export function AdminReportsView() {
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState<"daily" | "weekly" | "monthly" | "yearly">("daily");
 
-  useEffect(() => { setLoading(true); getReport(period).then((d) => { setData(d); setLoading(false); }); }, [period]);
+  useEffect(() => { setLoading(true); getReport(period).then((d) => { setData(d); setLoading(false); }).catch(() => setLoading(false)); }, [period]);
 
   const totalRevenue = data.reduce((s, d) => s + d.revenue, 0);
 

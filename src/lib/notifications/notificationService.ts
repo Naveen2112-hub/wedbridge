@@ -14,7 +14,7 @@ export async function createNotification(userId: string, input: { title: string;
 
 export async function broadcastNotification(input: { title: string; message: string; target: "all" | "premium" | "free" | "vendors" }): Promise<void> {
   if (!db) return;
-  try { await addDoc(collection(db, collections.notifications), { ...input, title: sanitizeText(input.title), message: sanitizeText(input.message), sentBy: "admin", createdAt: serverTimestamp() } as Omit<NotificationDocument, "id">); } catch { /* ignore */ }
+  try { await addDoc(collection(db, collections.notifications), { ...input, userId: input.target, title: sanitizeText(input.title), message: sanitizeText(input.message), read: false, sentBy: "admin", createdAt: serverTimestamp() } as Omit<NotificationDocument, "id">); } catch { /* ignore */ }
 }
 
 export async function getNotifications(max = 50): Promise<NotificationDocument[]> {
@@ -24,13 +24,13 @@ export async function getNotifications(max = 50): Promise<NotificationDocument[]
 
 export async function getUserNotifications(userId: string, max = 50): Promise<NotificationDocument[]> {
   if (!db) return [];
-  try { const snap = await getDocs(query(collection(db, collections.notifications), where("userId", "==", userId), orderBy("createdAt", "desc"), limit(max))); return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<NotificationDocument, "id">) })); } catch { return []; }
+  try { const snap = await getDocs(query(collection(db, collections.notifications), where("userId", "in", [userId, "all", "premium", "free", "vendors"]), orderBy("createdAt", "desc"), limit(max))); return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<NotificationDocument, "id">) })); } catch { return []; }
 }
 
 export function subscribeNotifications(userId: string, cb: (items: NotificationDocument[]) => void, max = 50): Unsubscribe {
   if (!db) return () => {};
   try {
-    const q = query(collection(db, collections.notifications), where("userId", "==", userId), orderBy("createdAt", "desc"), limit(max));
+    const q = query(collection(db, collections.notifications), where("userId", "in", [userId, "all", "premium", "free", "vendors"]), orderBy("createdAt", "desc"), limit(max));
     return onSnapshot(q, (snap) => cb(snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<NotificationDocument, "id">) }))), () => cb([]));
   } catch { return () => {}; }
 }

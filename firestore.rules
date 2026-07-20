@@ -39,7 +39,7 @@ service cloud.firestore {
       allow delete: if isOwner(resource.data.fromUserId) || isUserAdmin() || isAdmin();
     }
     match /notifications/{id} {
-      allow read: if isOwner(resource.data.userId) || (resource.data.target != null && resource.data.target == "all") || isUserAdmin() || isAdmin();
+      allow read: if isOwner(resource.data.userId) || (resource.data.target != null && (resource.data.target == "all" || (resource.data.target == "premium" && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.membershipTier != "free") || (resource.data.target == "free" && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.membershipTier == "free") || (resource.data.target == "vendors" && exists(/databases/$(database)/documents/vendors/$(request.auth.uid))))) || isUserAdmin() || isAdmin();
       allow create: if isUserAdmin() || isAdmin();
       allow update, delete: if isUserAdmin() || isAdmin() || isOwner(resource.data.userId);
     }

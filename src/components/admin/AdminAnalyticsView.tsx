@@ -8,7 +8,7 @@ export function AdminAnalyticsView() {
   const [data, setData] = useState<AdminAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { getAnalytics().then((d) => { setData(d); setLoading(false); }); }, []);
+  useEffect(() => { getAnalytics().then((d) => { setData(d); setLoading(false); }).catch(() => setLoading(false)); }, []);
 
   if (loading || !data) return <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{Array.from({ length: 8 }).map((_, i) => <div key={i} className="skeleton h-28 w-full rounded-2xl" />)}</div>;
 

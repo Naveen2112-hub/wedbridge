@@ -186,7 +186,7 @@ export async function addRecentlyViewed(uid: string, profileUid: string): Promis
   if (!db) return;
   try {
     const existing = await getDocs(query(collection(db, collections.recentlyViewed), where("uid", "==", uid), where("profileUid", "==", profileUid), limit(1)));
-    existing.forEach(async (d) => { await deleteDoc(d.ref); });
+    await Promise.all(existing.docs.map((d) => deleteDoc(d.ref)));
     await addDoc(collection(db, collections.recentlyViewed), {
       uid, profileUid, viewedAt: serverTimestamp(),
     } as Omit<RecentlyViewedDocument, "id">);

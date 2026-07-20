@@ -67,7 +67,7 @@ export default function MembershipClient() {
       <div className="space-y-6">
         <div><h1 className="heading-lg flex items-center gap-2"><Crown className="h-7 w-7 text-secondary-600" />{t("membershipPage.title")}</h1><p className="text-lead mt-2">{t("membershipPage.subtitle")}</p></div>
 
-        {sub && days !== null && (
+        {sub && days > 0 && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-secondary-200 bg-secondary-50/60 p-4">
             <div><p className="text-sm font-semibold text-secondary-900">{t("membershipPage.currentPlan")}: {MEMBERSHIP_PLANS.find((p) => p.id === currentTier)?.name}</p><p className="text-xs text-secondary-700">{t("membershipPage.expiresOn")}: {new Date(days * 86400000 + Date.now()).toLocaleDateString()}</p></div>
           </div>

@@ -29,7 +29,6 @@ export async function searchVendors(filters: VendorFilters, cursor?: QueryDocume
     if (filters.district) constraints.push(where("district", "==", filters.district));
     if (filters.state) constraints.push(where("state", "==", filters.state));
     if (filters.verifiedOnly) constraints.push(where("verificationStatus", "==", "verified"));
-    if (filters.minRating) constraints.push(where("rating", ">=", filters.minRating));
     let q = query(collection(db, collections.vendors), ...constraints, orderBy("featured", "desc"), orderBy("rating", "desc"), limit(PAGE_SIZE + 1));
     if (cursor) q = query(q, startAfter(cursor));
     const snap = await getDocs(q);
@@ -37,6 +36,7 @@ export async function searchVendors(filters: VendorFilters, cursor?: QueryDocume
     const hasMore = docs.length > PAGE_SIZE;
     const slice = hasMore ? docs.slice(0, PAGE_SIZE) : docs;
     let vendors = slice.map(toVendor);
+    if (filters.minRating) vendors = vendors.filter((v) => v.rating >= filters.minRating!);
     if (filters.minPrice !== undefined) vendors = vendors.filter((v) => v.startingPrice >= filters.minPrice!);
     if (filters.maxPrice !== undefined) vendors = vendors.filter((v) => v.startingPrice <= filters.maxPrice!);
     return { vendors, cursor: slice[slice.length - 1] ?? null, hasMore };
