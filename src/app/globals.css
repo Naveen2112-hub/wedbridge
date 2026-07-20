@@ -62,18 +62,18 @@ body { font-family: var(--font-inter); background-color: #FFFDF7; color: #1A1416
     font-family: var(--font-playfair);
   }
   .heading-sm {
-    @apply text-xl font-semibold text-ink;
+    @apply text-xl font-semibold text-gray-900;
     font-family: var(--font-playfair);
   }
   .heading-xs {
-    @apply text-lg font-semibold text-ink;
+    @apply text-lg font-semibold text-gray-900;
     font-family: var(--font-playfair);
   }
   .text-lead {
     @apply text-base text-muted sm:text-lg;
   }
   .text-body {
-    @apply text-sm text-ink/80 sm:text-base;
+    @apply text-sm text-gray-900/80 sm:text-base;
   }
   .text-caption {
     @apply text-xs text-muted;
