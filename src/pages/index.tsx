@@ -4,11 +4,21 @@ import Link from "next/link";
 import { Heart, Sparkles, ShieldCheck, Search, Store, Crown, BadgeCheck, Users } from "lucide-react";
 
 const Home: NextPage = () => {
+  const features = [
+    { icon: Sparkles, title: "AI Matchmaking", desc: "Intelligent algorithm for compatible matches.", color: "#d68a14", bg: "#fdfaef" },
+    { icon: BadgeCheck, title: "Verified Profiles", desc: "Every profile verified for authenticity.", color: "#16a34a", bg: "#f0fdf4" },
+    { icon: ShieldCheck, title: "Privacy First", desc: "Your data protected with industry security.", color: "#2563eb", bg: "#eff6ff" },
+    { icon: Store, title: "Wedding Marketplace", desc: "Trusted vendors for every wedding need.", color: "#9333ea", bg: "#faf5ff" },
+    { icon: Crown, title: "Premium Membership", desc: "Unlock unlimited interests and advanced filters.", color: "#d97706", bg: "#fffbeb" },
+    { icon: Users, title: "Community Trust", desc: "Join thousands of Tamil Nadu families.", color: "#a51d3c", bg: "#fdf2f4" },
+  ];
+
   return (
     <>
       <Head>
         <title>WedBridge - Tamil Nadu Matrimony</title>
         <meta name="description" content="AI-powered matrimony platform connecting Tamil Nadu families." />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
       <section style={{ background: "linear-gradient(135deg, #a51d3c, #881c38, #731e36)", color: "white", padding: "80px 24px" }}>
@@ -38,14 +48,7 @@ const Home: NextPage = () => {
           Why Choose WedBridge?
         </h2>
         <div style={{ marginTop: 48, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
-          {[
-            { icon: Sparkles, title: "AI Matchmaking", desc: "Intelligent algorithm for compatible matches.", color: "#d68a14", bg: "#fdfaef" },
-            { icon: BadgeCheck, title: "Verified Profiles", desc: "Every profile verified for authenticity.", color: "#16a34a", bg: "#f0fdf4" },
-            { icon: ShieldCheck, title: "Privacy First", desc: "Your data protected with industry security.", color: "#2563eb", bg: "#eff6ff" },
-            { icon: Store, title: "Wedding Marketplace", desc: "Trusted vendors for every wedding need.", color: "#9333ea", bg: "#faf5ff" },
-            { icon: Crown, title: "Premium Membership", desc: "Unlock unlimited interests and advanced filters.", color: "#d97706", bg: "#fffbeb" },
-            { icon: Users, title: "Community Trust", desc: "Join thousands of Tamil Nadu families.", color: "#a51d3c", bg: "#fdf2f4" },
-          ].map((f) => (
+          {features.map((f) => (
             <div key={f.title} style={{ background: "white", padding: 24, borderRadius: 16, boxShadow: "0 1px 3px rgba(0,0,0,0.08)", border: "1px solid #fce4e8" }}>
               <span style={{ display: "flex", width: 48, height: 48, alignItems: "center", justifyContent: "center", borderRadius: 12, background: f.bg, color: f.color }}>
                 <f.icon size={24} />
