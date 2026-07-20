@@ -9,7 +9,7 @@ import type { SubscriptionDocument, PaymentDocument, MembershipTier } from "@/fi
 import { cn } from "@/lib/cn";
 
 const planStyles: Record<string, string> = { free: "bg-primary-50 text-primary-800", basic: "bg-blue-50 text-blue-700", premium: "bg-secondary-100 text-secondary-800", gold: "bg-amber-100 text-amber-800" };
-const statusStyles: Record<string, string> = { pending: "bg-amber-50 text-amber-700", paid: "bg-green-50 text-green-700", failed: "bg-red-50 text-red-700", cancelled: "bg-muted/20 text-gray-500", refunded: "bg-purple-50 text-purple-700", expired: "bg-muted/20 text-gray-500" };
+const statusStyles: Record<string, string> = { pending: "bg-amber-50 text-amber-700", paid: "bg-green-50 text-green-700", failed: "bg-red-50 text-red-700", cancelled: "bg-gray-100 text-gray-500", refunded: "bg-purple-50 text-purple-700", expired: "bg-gray-100 text-gray-500" };
 
 export default function AdminMembershipsPage() {
   const { t } = useLanguage();
@@ -52,7 +52,7 @@ export default function AdminMembershipsPage() {
                     <tr key={s.id} className="border-b border-primary-50 last:border-0">
                       <td className="p-3 font-mono text-xs">{s.uid.slice(0, 8)}…</td>
                       <td className="p-3"><span className={cn("badge", planStyles[s.plan])}>{s.plan}</span></td>
-                      <td className="p-3"><span className={cn("badge", s.status === "active" ? "bg-green-50 text-green-700" : "bg-muted/20 text-gray-500")}>{s.status}</span></td>
+                      <td className="p-3"><span className={cn("badge", s.status === "active" ? "bg-green-50 text-green-700" : "bg-gray-100 text-gray-500")}>{s.status}</span></td>
                       <td className="p-3 text-xs text-gray-500">{s.endDate ? new Date(s.endDate as unknown as number).toLocaleDateString() : "—"}</td>
                     </tr>
                   ))}

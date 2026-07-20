@@ -86,7 +86,7 @@ export default function ProfileDetailsClient() {
   };
   const statusBadge: Record<string, string> = {
     pending: "bg-primary-50 text-primary-800", accepted: "bg-green-50 text-green-700",
-    rejected: "bg-red-50 text-red-700", cancelled: "bg-muted/20 text-gray-500", expired: "bg-muted/20 text-gray-500",
+    rejected: "bg-red-50 text-red-700", cancelled: "bg-gray-100 text-gray-500", expired: "bg-gray-100 text-gray-500",
   };
 
   return (
