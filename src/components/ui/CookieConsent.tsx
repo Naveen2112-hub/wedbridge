@@ -16,7 +16,7 @@ export function CookieConsent() {
       <div className="flex items-start gap-3">
         <Cookie className="mt-0.5 h-5 w-5 flex-none text-primary-600" />
         <div className="flex-1">
-          <p className="text-sm text-ink/80">We use cookies to improve your experience and analyze site traffic. By continuing, you agree to our Cookie Policy.</p>
+          <p className="text-sm text-gray-900/80">We use cookies to improve your experience and analyze site traffic. By continuing, you agree to our Cookie Policy.</p>
           <div className="mt-3 flex gap-2">
             <button type="button" onClick={accept} className="btn-primary text-sm">Accept</button>
             <button type="button" onClick={decline} className="btn-outline text-sm">Decline</button>

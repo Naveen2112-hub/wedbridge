@@ -30,18 +30,18 @@ export function VendorCard({ vendor }: { vendor: VendorDocument }) {
           )}
           <div className="min-w-0">
             <Link href={`/vendor/${vendor.id}`}><h3 className="truncate font-display text-base font-semibold text-primary-900 hover:text-primary-700">{vendor.businessName}</h3></Link>
-            <p className="text-xs text-muted">{getCategoryName(vendor.category)}</p>
+            <p className="text-xs text-gray-500">{getCategoryName(vendor.category)}</p>
           </div>
         </div>
-        <div className="mt-3 flex items-center gap-2 text-xs text-muted">
+        <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
           <MapPin className="h-3.5 w-3.5" /><span className="truncate">{vendor.city}, {vendor.state}</span>
         </div>
         <div className="mt-2 flex items-center gap-3">
-          <div className="flex items-center gap-1"><StarRating rating={vendor.rating} /><span className="text-xs font-medium text-ink/70">{vendor.rating > 0 ? vendor.rating.toFixed(1) : "New"}</span></div>
-          {vendor.experienceYears > 0 && <span className="text-xs text-muted">· {vendor.experienceYears}y exp</span>}
+          <div className="flex items-center gap-1"><StarRating rating={vendor.rating} /><span className="text-xs font-medium text-gray-900/70">{vendor.rating > 0 ? vendor.rating.toFixed(1) : "New"}</span></div>
+          {vendor.experienceYears > 0 && <span className="text-xs text-gray-500">· {vendor.experienceYears}y exp</span>}
         </div>
         <div className="mt-3 flex items-center justify-between">
-          <p className="flex items-center text-sm font-semibold text-primary-900"><IndianRupee className="h-3.5 w-3.5" />{vendor.startingPrice.toLocaleString()}<span className="text-xs font-normal text-muted"> onwards</span></p>
+          <p className="flex items-center text-sm font-semibold text-primary-900"><IndianRupee className="h-3.5 w-3.5" />{vendor.startingPrice.toLocaleString()}<span className="text-xs font-normal text-gray-500"> onwards</span></p>
         </div>
         <div className="mt-4 flex gap-2">
           <Link href={`/vendor/${vendor.id}`} className="btn-outline flex-1 text-xs">View Profile</Link>

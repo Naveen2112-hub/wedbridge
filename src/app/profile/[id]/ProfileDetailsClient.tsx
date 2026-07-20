@@ -86,13 +86,13 @@ export default function ProfileDetailsClient() {
   };
   const statusBadge: Record<string, string> = {
     pending: "bg-primary-50 text-primary-800", accepted: "bg-green-50 text-green-700",
-    rejected: "bg-red-50 text-red-700", cancelled: "bg-muted/20 text-muted", expired: "bg-muted/20 text-muted",
+    rejected: "bg-red-50 text-red-700", cancelled: "bg-muted/20 text-gray-500", expired: "bg-muted/20 text-gray-500",
   };
 
   return (
     <AuthGuard><ProtectedLayout>
       <div className="space-y-8">
-        <Link href="/search" className="inline-flex items-center gap-1 text-sm text-muted hover:text-primary-900"><ArrowLeft className="h-4 w-4" />{t("profile.details.backToSearch")}</Link>
+        <Link href="/search" className="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-primary-900"><ArrowLeft className="h-4 w-4" />{t("profile.details.backToSearch")}</Link>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1 rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-800"><Eye className="h-3.5 w-3.5" />{t("profile.details.views")}: {profile.viewCount ?? 0}</span>
@@ -110,12 +110,12 @@ export default function ProfileDetailsClient() {
         </div>
         <ProfileView profile={profile} />
         {profile.horoscope === "yes" && (
-          <div className="rounded-2xl bg-card p-6 shadow-card">
+          <div className="rounded-2xl bg-white p-6 shadow-md">
             <h3 className="font-display text-lg font-semibold text-primary-900">{t("profile.details.horoscope")}</h3>
-            <div className="mt-3 grid gap-2 text-sm sm:grid-cols-3"><p><span className="text-muted">{t("profile.star")}:</span> {profile.star || "—"}</p><p><span className="text-muted">{t("profile.rasi")}:</span> {profile.rasi || "—"}</p><p><span className="text-muted">{t("profile.manglik")}:</span> {profile.manglik || "—"}</p></div>
+            <div className="mt-3 grid gap-2 text-sm sm:grid-cols-3"><p><span className="text-gray-500">{t("profile.star")}:</span> {profile.star || "—"}</p><p><span className="text-gray-500">{t("profile.rasi")}:</span> {profile.rasi || "—"}</p><p><span className="text-gray-500">{t("profile.manglik")}:</span> {profile.manglik || "—"}</p></div>
           </div>
         )}
-        {!showContact && <p className="rounded-xl bg-primary-50/60 p-4 text-xs text-muted">{t("profile.details.contactHidden")}</p>}
+        {!showContact && <p className="rounded-xl bg-primary-50/60 p-4 text-xs text-gray-500">{t("profile.details.contactHidden")}</p>}
         <RelatedProfiles profiles={related} />
       </div>
     </ProtectedLayout></AuthGuard>

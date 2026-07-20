@@ -47,7 +47,7 @@ export default function CategoryPage() {
         <div className="mt-12 rounded-2xl bg-white p-12 text-center shadow-sm ring-1 ring-primary-100">
           <Store className="mx-auto h-10 w-10 text-primary-300" />
           <p className="mt-3 font-medium text-primary-900">No vendors found</p>
-          <p className="text-sm text-muted">Try adjusting your filters or check back soon.</p>
+          <p className="text-sm text-gray-500">Try adjusting your filters or check back soon.</p>
         </div>
       ) : (
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{vendors.map((v) => <VendorCard key={v.id} vendor={v} />)}</div>

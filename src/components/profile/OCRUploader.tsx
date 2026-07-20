@@ -24,7 +24,7 @@ export function OCRUploader({ onExtract }: OCRUploaderProps) {
         <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-secondary-100 text-secondary-800"><FileText className="h-5 w-5" /></span>
         <div className="flex-1">
           <h4 className="font-display text-sm font-semibold text-primary-900">{t("profile.ocr.title")}</h4>
-          <p className="text-xs text-muted">{t("profile.ocr.subtitle")}</p>
+          <p className="text-xs text-gray-500">{t("profile.ocr.subtitle")}</p>
         </div>
       </div>
       <label className="btn-outline mt-3 w-full cursor-pointer text-sm">
@@ -34,7 +34,7 @@ export function OCRUploader({ onExtract }: OCRUploaderProps) {
       </label>
       {phase === "done" && <p className="mt-2 flex items-center gap-1.5 text-xs text-green-700"><CheckCircle2 className="h-3.5 w-3.5" />{t("profile.ocr.applied")}</p>}
       {phase === "error" && <p className="mt-2 flex items-center gap-1.5 text-xs text-accent-700"><AlertCircle className="h-3.5 w-3.5" />{t("profile.ocr.failed")}</p>}
-      {phase === "extracting" && <p className="mt-2 text-xs text-muted">{t("profile.ocr.extracting")}</p>}
+      {phase === "extracting" && <p className="mt-2 text-xs text-gray-500">{t("profile.ocr.extracting")}</p>}
     </div>
   );
 }

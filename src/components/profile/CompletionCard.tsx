@@ -21,7 +21,7 @@ export function CompletionCard({ profile }: { profile: Partial<ProfileDocument> 
   const { percentage, filled, total, missing } = calculateCompletion(profile);
   const reached = percentage >= 50;
   return (
-    <div className="rounded-2xl bg-card p-6 shadow-card">
+    <div className="rounded-2xl bg-white p-6 shadow-md">
       <div className="flex items-center justify-between">
         <h3 className="font-display text-lg font-semibold text-primary-900">{t("profile.completion")}</h3>
         <span className={cn("badge", reached ? "bg-green-50 text-green-700" : "bg-accent-50 text-accent-700")}>{percentage}%</span>
@@ -29,7 +29,7 @@ export function CompletionCard({ profile }: { profile: Partial<ProfileDocument> 
       <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-primary-50">
         <div className={cn("h-full rounded-full transition-all", reached ? "bg-green-500" : "bg-secondary")} style={{ width: `${percentage}%` }} />
       </div>
-      <p className="mt-2 text-xs text-muted">{filled}/{total} fields · {t("profile.completionTarget")}</p>
+      <p className="mt-2 text-xs text-gray-500">{filled}/{total} fields · {t("profile.completionTarget")}</p>
       {missing.length > 0 && (
         <div className="mt-4">
           <p className="flex items-center gap-1.5 text-xs font-semibold text-primary-900"><AlertCircle className="h-3.5 w-3.5" />{t("profile.suggested")}</p>

@@ -83,14 +83,14 @@ export default function MembershipClient() {
             const isRenew = plan.id === currentTier && plan.id !== "free";
             const label = isCurrent ? t("membershipPage.current") : isUpgrade ? t("membershipPage.upgrade") : isRenew ? t("membershipPage.renew") : plan.id === "free" ? t("membershipPage.current") : t("membershipPage.choosePlan");
             return (
-              <div key={plan.id} className={cn("relative flex flex-col rounded-2xl bg-card p-6 shadow-card transition", plan.highlighted && "ring-2 ring-secondary-500")}>
+              <div key={plan.id} className={cn("relative flex flex-col rounded-2xl bg-white p-6 shadow-md transition", plan.highlighted && "ring-2 ring-secondary-500")}>
                 {plan.highlighted && <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-secondary-500 px-3 py-1 text-xs font-bold text-white">{t("membershipPage.popular")}</span>}
                 <span className={cn("flex h-12 w-12 items-center justify-center rounded-xl", plan.id === "gold" ? "bg-amber-100 text-amber-700" : plan.id === "premium" ? "bg-secondary-100 text-secondary-700" : plan.id === "basic" ? "bg-blue-50 text-blue-700" : "bg-primary-50 text-primary-700")}><Icon className="h-6 w-6" /></span>
                 <h3 className="mt-4 font-display text-xl font-bold text-primary-900">{t(`membershipPage.plans.${plan.id}.name` as never)}</h3>
-                <p className="mt-1 text-sm text-muted">{t(`membershipPage.plans.${plan.id}.desc` as never)}</p>
-                <p className="mt-3 font-display text-3xl font-bold text-primary-900">{t(`membershipPage.plans.${plan.id}.price` as never)}<span className="text-sm font-normal text-muted"> / {t(`membershipPage.plans.${plan.id}.period` as never)}</span></p>
+                <p className="mt-1 text-sm text-gray-500">{t(`membershipPage.plans.${plan.id}.desc` as never)}</p>
+                <p className="mt-3 font-display text-3xl font-bold text-primary-900">{t(`membershipPage.plans.${plan.id}.price` as never)}<span className="text-sm font-normal text-gray-500"> / {t(`membershipPage.plans.${plan.id}.period` as never)}</span></p>
                 <ul className="mt-4 flex-1 space-y-2">
-                  {plan.features.map((f) => <li key={f} className="flex items-start gap-2 text-sm text-ink/80"><Check className="mt-0.5 h-4 w-4 flex-none text-green-600" />{f}</li>)}
+                  {plan.features.map((f) => <li key={f} className="flex items-start gap-2 text-sm text-gray-900/80"><Check className="mt-0.5 h-4 w-4 flex-none text-green-600" />{f}</li>)}
                 </ul>
                 <button type="button" disabled={isCurrent || busy === plan.id || plan.id === "free"} onClick={() => handlePurchase(plan.id)} className={cn("mt-5 w-full justify-center", plan.highlighted ? "btn-secondary" : "btn-primary", (isCurrent || plan.id === "free") && "opacity-60")}>
                   {busy === plan.id ? <Loader2 className="h-4 w-4 animate-spin" /> : label}
@@ -100,11 +100,11 @@ export default function MembershipClient() {
           })}
         </div>
 
-        <div className="rounded-2xl bg-card p-6 shadow-card">
+        <div className="rounded-2xl bg-white p-6 shadow-md">
           <h2 className="flex items-center gap-2 font-display text-lg font-semibold text-primary-900"><Sparkles className="h-5 w-5 text-secondary-600" />{t("membershipPage.benefits")}</h2>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {[{ icon: Crown, title: "Premium Badge", desc: "Stand out with a premium badge on your profile" }, { icon: Star, title: "Priority Ranking", desc: "Appear higher in search results" }, { icon: ShieldCheck, title: "Unlimited Interests", desc: "Send unlimited interests to profiles you like" }, { icon: Sparkles, title: "Unlimited AI Matches", desc: "Get unlimited AI-powered compatibility matches" }, { icon: Check, title: "Unlimited Contact Views", desc: "View contact details without daily limits" }, { icon: Crown, title: "Featured Profile", desc: "Get featured placement on the homepage" }].map((b) => (
-              <div key={b.title} className="rounded-xl border border-primary-50 p-4"><b.icon className="h-5 w-5 text-secondary-600" /><p className="mt-2 text-sm font-semibold text-primary-900">{b.title}</p><p className="text-xs text-muted">{b.desc}</p></div>
+              <div key={b.title} className="rounded-xl border border-primary-50 p-4"><b.icon className="h-5 w-5 text-secondary-600" /><p className="mt-2 text-sm font-semibold text-primary-900">{b.title}</p><p className="text-xs text-gray-500">{b.desc}</p></div>
             ))}
           </div>
         </div>

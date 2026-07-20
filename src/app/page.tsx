@@ -42,7 +42,7 @@ export default function HomePage() {
               WedBridge connects you with verified profiles using our AI compatibility algorithm. Plus, discover trusted wedding vendors all in one place.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Link href="/register" className="inline-flex items-center gap-2 rounded-xl bg-secondary-500 px-6 py-3 text-sm font-semibold text-white shadow-elevated transition-all duration-300 hover:scale-[1.02] hover:bg-secondary-400 hover:shadow-glow">
+              <Link href="/register" className="inline-flex items-center gap-2 rounded-xl bg-secondary-500 px-6 py-3 text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-secondary-400 hover:shadow-lg">
                 <Heart className="h-4 w-4" /> Start Free Today
               </Link>
               <Link href="/search" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20">
@@ -60,11 +60,11 @@ export default function HomePage() {
 
       {/* Stats */}
       <section className="container-page -mt-8 relative z-10">
-        <div className="grid grid-cols-2 gap-4 rounded-2xl border border-primary-100/60 bg-card p-6 shadow-card sm:grid-cols-4 sm:p-8">
+        <div className="grid grid-cols-2 gap-4 rounded-2xl border border-primary-100/60 bg-white p-6 shadow-md sm:grid-cols-4 sm:p-8">
           {stats.map((s) => (
             <div key={s.label} className="text-center">
               <div className="font-display text-2xl font-bold text-primary-700 sm:text-3xl">{s.value}</div>
-              <div className="mt-1 text-xs text-muted sm:text-sm">{s.label}</div>
+              <div className="mt-1 text-xs text-gray-500 sm:text-sm">{s.label}</div>
             </div>
           ))}
         </div>
@@ -104,8 +104,8 @@ export default function HomePage() {
                 <div className="mt-4 flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-warm text-white font-semibold">{t.name[0]}</div>
                   <div>
-                    <div className="text-sm font-semibold text-ink">{t.name}</div>
-                    <div className="text-xs text-muted">{t.location}</div>
+                    <div className="text-sm font-semibold text-gray-900">{t.name}</div>
+                    <div className="text-xs text-gray-500">{t.location}</div>
                   </div>
                 </div>
               </div>
@@ -116,13 +116,13 @@ export default function HomePage() {
 
       {/* CTA */}
       <section className="container-page section-pad">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-warm px-6 py-16 text-center text-white shadow-elevated sm:px-12 lg:py-20">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-warm px-6 py-16 text-center text-white shadow-lg sm:px-12 lg:py-20">
           <div className="absolute inset-0 bg-hero-texture" />
           <div className="relative">
             <h2 className="font-display text-3xl font-bold sm:text-4xl">Ready to Find Your Match?</h2>
             <p className="mx-auto mt-4 max-w-lg text-primary-100/90">Join WedBridge today and start your journey towards a beautiful future together.</p>
             <div className="mt-8 flex flex-wrap justify-center gap-4">
-              <Link href="/register" className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-primary-700 shadow-elevated transition-all duration-300 hover:scale-[1.02]">
+              <Link href="/register" className="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-semibold text-primary-700 shadow-lg transition-all duration-300 hover:scale-[1.02]">
                 Create Free Account <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/login" className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20">

@@ -51,9 +51,9 @@ export default function AdminDashboardPage() {
 }
 
 function Card({ label, value, icon: Icon, color }: { label: string; value: string | number; icon: React.ComponentType<{ className?: string }>; color: string }) {
-  return <div className="card card-hover p-5"><span className={cn("flex h-10 w-10 items-center justify-center rounded-xl", color)}><Icon className="h-5 w-5" /></span><p className="mt-3 font-display text-2xl font-bold text-primary-900">{value}</p><p className="text-sm text-muted">{label}</p></div>;
+  return <div className="card card-hover p-5"><span className={cn("flex h-10 w-10 items-center justify-center rounded-xl", color)}><Icon className="h-5 w-5" /></span><p className="mt-3 font-display text-2xl font-bold text-primary-900">{value}</p><p className="text-sm text-gray-500">{label}</p></div>;
 }
 
 function MiniStat({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string | number }) {
-  return <div className="flex items-center justify-between"><span className="flex items-center gap-2 text-sm text-muted"><Icon className="h-4 w-4" />{label}</span><span className="font-semibold text-primary-900">{value}</span></div>;
+  return <div className="flex items-center justify-between"><span className="flex items-center gap-2 text-sm text-gray-500"><Icon className="h-4 w-4" />{label}</span><span className="font-semibold text-primary-900">{value}</span></div>;
 }

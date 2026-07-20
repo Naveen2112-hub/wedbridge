@@ -60,19 +60,19 @@ export default function NotificationsClient() {
         {loading ? (
           <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="skeleton h-16 w-full rounded-2xl" />)}</div>
         ) : items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl bg-card p-12 text-center shadow-card"><Bell className="h-12 w-12 text-primary-300" /><h3 className="heading-sm mt-4">{t("notifications.empty")}</h3></div>
+          <div className="flex flex-col items-center justify-center rounded-2xl bg-white p-12 text-center shadow-md"><Bell className="h-12 w-12 text-primary-300" /><h3 className="heading-sm mt-4">{t("notifications.empty")}</h3></div>
         ) : (
           <div className="space-y-3">
             {visible.map((n) => {
               const Icon = typeIcon[n.type ?? "system"] ?? Bell;
               const date = tsToDate(n.createdAt);
               return (
-                <div key={n.id} className={cn("flex items-start gap-3 rounded-2xl bg-card p-4 shadow-card transition", !n.read && "ring-1 ring-secondary-300")}>
+                <div key={n.id} className={cn("flex items-start gap-3 rounded-2xl bg-white p-4 shadow-md transition", !n.read && "ring-1 ring-secondary-300")}>
                   <span className={cn("flex h-10 w-10 flex-none items-center justify-center rounded-xl", n.read ? "bg-primary-50 text-primary-700" : "bg-secondary-100 text-secondary-700")}><Icon className="h-5 w-5" /></span>
                   <button type="button" onClick={() => !n.read && handleRead(n.id)} className="min-w-0 flex-1 text-left">
                     <p className="text-sm font-semibold text-primary-900">{n.title}</p>
-                    <p className="text-sm text-muted">{n.message}</p>
-                    <p className="mt-1 text-xs text-muted">{date ? formatRelativeTime(date) : ""}</p>
+                    <p className="text-sm text-gray-500">{n.message}</p>
+                    <p className="mt-1 text-xs text-gray-500">{date ? formatRelativeTime(date) : ""}</p>
                   </button>
                   <div className="flex flex-none items-center gap-1">
                     {!n.read && <button type="button" disabled={busy === n.id} onClick={() => handleRead(n.id)} aria-label={t("notifications.unread")} className="rounded-full p-1.5 text-secondary-600 hover:bg-secondary-50"><CheckCheck className="h-4 w-4" /></button>}

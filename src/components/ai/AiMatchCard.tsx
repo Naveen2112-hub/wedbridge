@@ -19,7 +19,7 @@ export function AiMatchCard({ match }: { match: ScoredMatch }) {
   const scoreBg = score >= 80 ? "bg-green-50" : score >= 60 ? "bg-secondary-50" : "bg-primary-50";
 
   return (
-    <div className="group overflow-hidden rounded-2xl bg-card shadow-card transition hover:shadow-glow">
+    <div className="group overflow-hidden rounded-2xl bg-white shadow-md transition hover:shadow-lg">
       <Link href={`/profile/${profile.uid}`} className="block" aria-label={`${profile.name} - ${t("search.card.viewProfile")}`}>
         <div className="relative aspect-[3/4] overflow-hidden bg-primary-100">
           {profile.photoURL ? <Image src={profile.photoURL} alt={profile.name} fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover transition duration-500 group-hover:scale-105" /> : <div className="flex h-full items-center justify-center text-primary-300"><Sparkles className="h-10 w-10" /></div>}
@@ -33,11 +33,11 @@ export function AiMatchCard({ match }: { match: ScoredMatch }) {
         </div>
       </Link>
       <div className="space-y-2 p-4">
-        <div className="flex items-center justify-between text-xs text-muted">
+        <div className="flex items-center justify-between text-xs text-gray-500">
           <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{[profile.district, profile.state].filter(Boolean).join(", ") || "—"}</span>
           <span className="flex items-center gap-1"><Briefcase className="h-3.5 w-3.5" />{profile.occupation || "—"}</span>
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted"><Star className="h-3.5 w-3.5" />{profile.religion || "—"} · {profile.caste || "—"}</div>
+        <div className="flex items-center gap-2 text-xs text-gray-500"><Star className="h-3.5 w-3.5" />{profile.religion || "—"} · {profile.caste || "—"}</div>
         {reasons.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {reasons.slice(0, 4).map((r) => <span key={r} className="rounded-full bg-secondary-50 px-2 py-0.5 text-[10px] font-medium text-secondary-800">✓ {t(`ai.reasons.${r}` as never)}</span>)}

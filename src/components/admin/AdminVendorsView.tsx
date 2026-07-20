@@ -29,11 +29,11 @@ export function AdminVendorsView() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {vendors.map((v) => (
             <div key={v.id} className="card p-4">
-              <div className="flex items-center gap-3"><div className="h-12 w-12 overflow-hidden rounded-xl bg-primary-100">{v.coverURL && <Image src={v.coverURL} alt={v.businessName} fill className="h-full w-full object-cover" />}</div><div className="flex-1"><h3 className="font-semibold text-primary-900">{v.businessName}</h3><p className="text-xs text-muted">{v.city}, {v.district}</p></div></div>
+              <div className="flex items-center gap-3"><div className="h-12 w-12 overflow-hidden rounded-xl bg-primary-100">{v.coverURL && <Image src={v.coverURL} alt={v.businessName} fill className="h-full w-full object-cover" />}</div><div className="flex-1"><h3 className="font-semibold text-primary-900">{v.businessName}</h3><p className="text-xs text-gray-500">{v.city}, {v.district}</p></div></div>
               <div className="mt-3 flex items-center justify-between"><div className="flex items-center gap-2"><span className="flex items-center gap-1 text-sm"><Star className="h-3.5 w-3.5 text-secondary-500" fill="currentColor" />{v.rating.toFixed(1)}</span><span className="text-sm font-semibold">{formatCurrency(v.startingPrice)}</span></div>
                 {acting === v.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <button type="button" onClick={() => toggleVerify(v)} className={cn("badge", v.verificationStatus === "verified" ? "bg-green-50 text-green-700" : "bg-amber-50 text-amber-700")}><BadgeCheck className="h-3 w-3" />{v.verificationStatus}</button>}
               </div>
-              <p className="mt-2 text-xs text-muted">{formatDate(v.createdAt as unknown as string)}</p>
+              <p className="mt-2 text-xs text-gray-500">{formatDate(v.createdAt as unknown as string)}</p>
             </div>
           ))}
         </div>

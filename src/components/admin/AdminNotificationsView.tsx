@@ -42,7 +42,7 @@ export function AdminNotificationsView() {
         </div>
         <div className="card p-6"><h2 className="heading-sm flex items-center gap-2"><Bell className="h-5 w-5 text-primary-600" />Recent</h2>
           {loading ? <div className="mt-3 space-y-2">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="skeleton h-20 w-full rounded-xl" />)}</div> : (
-            <div className="mt-3 space-y-2">{notifs.length === 0 ? <p className="text-sm text-muted">No notifications sent.</p> : notifs.map((n) => <div key={n.id} className="border-b border-primary-50 pb-2"><p className="font-medium text-primary-900">{n.title}</p><p className="text-sm text-muted">{n.message}</p><p className="text-xs text-muted">{formatDate(n.createdAt as unknown as string)}</p></div>)}</div>
+            <div className="mt-3 space-y-2">{notifs.length === 0 ? <p className="text-sm text-gray-500">No notifications sent.</p> : notifs.map((n) => <div key={n.id} className="border-b border-primary-50 pb-2"><p className="font-medium text-primary-900">{n.title}</p><p className="text-sm text-gray-500">{n.message}</p><p className="text-xs text-gray-500">{formatDate(n.createdAt as unknown as string)}</p></div>)}</div>
           )}
         </div>
       </div>

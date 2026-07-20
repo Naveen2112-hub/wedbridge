@@ -29,7 +29,7 @@ export default function SettingsPage() {
               </div>
               <div className="mt-4 flex gap-3">
                 {(["en", "ta"] as const).map((l) => (
-                  <button key={l} type="button" onClick={() => setLang(l)} className={cn("rounded-xl border px-4 py-2.5 text-sm font-medium transition-all", lang === l ? "border-primary-500 bg-primary-50 text-primary-700" : "border-primary-200 text-ink/70 hover:bg-primary-50")}>
+                  <button key={l} type="button" onClick={() => setLang(l)} className={cn("rounded-xl border px-4 py-2.5 text-sm font-medium transition-all", lang === l ? "border-primary-500 bg-primary-50 text-primary-700" : "border-primary-200 text-gray-900/70 hover:bg-primary-50")}>
                     {l === "en" ? "English" : "தமிழ்"}
                   </button>
                 ))}
@@ -44,9 +44,9 @@ export default function SettingsPage() {
               <div className="mt-4 space-y-3">
                 {[{ label: "Email Notifications", desc: "Receive match alerts via email", val: notifEmail, set: setNotifEmail }, { label: "Push Notifications", desc: "Get notified in real-time", val: notifPush, set: setNotifPush }].map((item) => (
                   <div key={item.label} className="flex items-center justify-between rounded-xl border border-primary-100 px-4 py-3">
-                    <div><p className="text-sm font-medium text-ink">{item.label}</p><p className="text-xs text-muted">{item.desc}</p></div>
+                    <div><p className="text-sm font-medium text-gray-900">{item.label}</p><p className="text-xs text-gray-500">{item.desc}</p></div>
                     <button type="button" onClick={() => item.set(!item.val)} className={cn("relative h-6 w-11 rounded-full transition-colors", item.val ? "bg-primary-600" : "bg-primary-200")} aria-label={item.label}>
-                      <span className={cn("absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-soft transition-transform", item.val ? "translate-x-5" : "translate-x-0.5")} />
+                      <span className={cn("absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform", item.val ? "translate-x-5" : "translate-x-0.5")} />
                     </button>
                   </div>
                 ))}
@@ -59,9 +59,9 @@ export default function SettingsPage() {
                 <div><h2 className="heading-sm">Privacy</h2><p className="text-caption">Control your profile visibility</p></div>
               </div>
               <div className="mt-4 flex items-center justify-between rounded-xl border border-primary-100 px-4 py-3">
-                <div><p className="text-sm font-medium text-ink">Profile Visible to Others</p><p className="text-xs text-muted">Allow your profile to appear in search results</p></div>
+                <div><p className="text-sm font-medium text-gray-900">Profile Visible to Others</p><p className="text-xs text-gray-500">Allow your profile to appear in search results</p></div>
                 <button type="button" onClick={() => setProfileVisible(!profileVisible)} className={cn("relative h-6 w-11 rounded-full transition-colors", profileVisible ? "bg-primary-600" : "bg-primary-200")} aria-label="Profile visibility">
-                  <span className={cn("absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-soft transition-transform", profileVisible ? "translate-x-5" : "translate-x-0.5")} />
+                  <span className={cn("absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform", profileVisible ? "translate-x-5" : "translate-x-0.5")} />
                 </button>
               </div>
             </div>

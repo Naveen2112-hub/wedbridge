@@ -43,13 +43,13 @@ export function VendorDashboardView() {
         <Stat icon={Star} label="Rating" value={vendor.rating.toFixed(1)} color="text-secondary-600 bg-secondary-50" />
       </div>
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <div className="card p-6"><h2 className="heading-sm">Recent Bookings</h2>{bookings.length === 0 ? <p className="mt-3 text-sm text-muted">No bookings yet.</p> : <div className="mt-3 space-y-2">{bookings.slice(0, 5).map((b) => <div key={b.id} className="flex items-center justify-between border-b border-primary-50 pb-2"><div><p className="text-sm font-medium text-primary-900">{b.userName}</p><p className="text-xs text-muted">{formatDate(b.preferredDate as unknown as string)}</p></div><p className="text-sm font-semibold">{formatCurrency(b.amount)}</p></div>)}</div>}</div>
-        <div className="card p-6"><h2 className="heading-sm">Packages</h2>{packages.length === 0 ? <p className="mt-3 text-sm text-muted">No packages yet.</p> : <div className="mt-3 space-y-2">{packages.map((p) => <div key={p.id} className="flex items-center justify-between border-b border-primary-50 pb-2"><div><p className="text-sm font-medium text-primary-900">{p.name}</p><p className="text-xs text-muted">{p.description}</p></div><p className="text-sm font-semibold">{formatCurrency(p.price)}</p></div>)}</div>}</div>
+        <div className="card p-6"><h2 className="heading-sm">Recent Bookings</h2>{bookings.length === 0 ? <p className="mt-3 text-sm text-gray-500">No bookings yet.</p> : <div className="mt-3 space-y-2">{bookings.slice(0, 5).map((b) => <div key={b.id} className="flex items-center justify-between border-b border-primary-50 pb-2"><div><p className="text-sm font-medium text-primary-900">{b.userName}</p><p className="text-xs text-gray-500">{formatDate(b.preferredDate as unknown as string)}</p></div><p className="text-sm font-semibold">{formatCurrency(b.amount)}</p></div>)}</div>}</div>
+        <div className="card p-6"><h2 className="heading-sm">Packages</h2>{packages.length === 0 ? <p className="mt-3 text-sm text-gray-500">No packages yet.</p> : <div className="mt-3 space-y-2">{packages.map((p) => <div key={p.id} className="flex items-center justify-between border-b border-primary-50 pb-2"><div><p className="text-sm font-medium text-primary-900">{p.name}</p><p className="text-xs text-gray-500">{p.description}</p></div><p className="text-sm font-semibold">{formatCurrency(p.price)}</p></div>)}</div>}</div>
       </div>
     </div>
   );
 }
 
 function Stat({ icon: Icon, label, value, color }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string; color: string }) {
-  return <div className="card p-5"><span className={`flex h-10 w-10 items-center justify-center rounded-xl ${color}`}><Icon className="h-5 w-5" /></span><p className="mt-3 font-display text-2xl font-bold text-primary-900">{value}</p><p className="text-sm text-muted">{label}</p></div>;
+  return <div className="card p-5"><span className={`flex h-10 w-10 items-center justify-center rounded-xl ${color}`}><Icon className="h-5 w-5" /></span><p className="mt-3 font-display text-2xl font-bold text-primary-900">{value}</p><p className="text-sm text-gray-500">{label}</p></div>;
 }

@@ -21,7 +21,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div className="pointer-events-none fixed bottom-4 right-4 z-[200] flex flex-col gap-2 sm:bottom-6 sm:right-6" role="region" aria-label="Notifications" aria-live="polite">
         {toasts.map((t) => (
-          <div key={t.id} role={t.type === "error" ? "alert" : "status"} className={cn("pointer-events-auto flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium shadow-lg ring-1", t.type === "success" && "bg-green-600 text-white ring-green-700", t.type === "error" && "bg-red-600 text-white ring-red-700", t.type === "info" && "bg-primary-700 text-white ring-primary-800", t.type === "loading" && "bg-white text-ink ring-primary-200")}>
+          <div key={t.id} role={t.type === "error" ? "alert" : "status"} className={cn("pointer-events-auto flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium shadow-lg ring-1", t.type === "success" && "bg-green-600 text-white ring-green-700", t.type === "error" && "bg-red-600 text-white ring-red-700", t.type === "info" && "bg-primary-700 text-white ring-primary-800", t.type === "loading" && "bg-white text-gray-900 ring-primary-200")}>
             {t.type === "success" && <CheckCircle2 className="h-4 w-4 flex-none" />}
             {t.type === "error" && <AlertCircle className="h-4 w-4 flex-none" />}
             {t.type === "info" && <Info className="h-4 w-4 flex-none" />}

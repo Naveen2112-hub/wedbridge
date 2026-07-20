@@ -29,5 +29,5 @@ export default function AdminMembershipPage() {
 }
 
 function TierCard({ icon: Icon, label, count, color }: { icon: React.ComponentType<{ className?: string }>; label: string; count: number; color: string }) {
-  return <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-primary-100"><span className={`flex h-10 w-10 items-center justify-center rounded-xl ${color}`}><Icon className="h-5 w-5" /></span><p className="mt-3 font-display text-2xl font-bold text-primary-900">{count}</p><p className="text-sm text-muted">{label}</p></div>;
+  return <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-primary-100"><span className={`flex h-10 w-10 items-center justify-center rounded-xl ${color}`}><Icon className="h-5 w-5" /></span><p className="mt-3 font-display text-2xl font-bold text-primary-900">{count}</p><p className="text-sm text-gray-500">{label}</p></div>;
 }

@@ -27,7 +27,7 @@ export default function DashboardPage() {
               <span className={`flex h-12 w-12 items-center justify-center rounded-xl ${c.color}`}>
                 <c.icon className="h-6 w-6" />
               </span>
-              <ArrowRight className="h-5 w-5 text-muted transition-transform group-hover:translate-x-1 group-hover:text-primary-600" />
+              <ArrowRight className="h-5 w-5 text-gray-500 transition-transform group-hover:translate-x-1 group-hover:text-primary-600" />
             </div>
             <h2 className="heading-sm mt-4">{c.title}</h2>
             <p className="text-body mt-1">{c.desc}</p>

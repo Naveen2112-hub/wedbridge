@@ -65,7 +65,7 @@ export default function AiMatchesClient() {
             <Link href="/membership" className="btn-secondary text-sm"><Crown className="h-4 w-4" />{t("ai.upgrade")}</Link>
           </div>
         )}
-        {isPremium && matches.length > 0 && <p className="text-sm text-muted">{t("ai.premiumUnlimited")}</p>}
+        {isPremium && matches.length > 0 && <p className="text-sm text-gray-500">{t("ai.premiumUnlimited")}</p>}
 
         <AiMatchFiltersPanel filters={filters} onChange={setFilters} onApply={() => setTab("top")} onReset={handleReset} loading={refreshing} />
         <AiTabs active={tab} onChange={setTab} />
@@ -73,11 +73,11 @@ export default function AiMatchesClient() {
         {loading ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" role="status" aria-label="Loading AI matches">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="overflow-hidden rounded-2xl bg-card shadow-card"><div className="skeleton aspect-[3/4] w-full" /><div className="space-y-2 p-4"><div className="skeleton h-3 w-2/3 rounded" /><div className="skeleton h-8 w-full rounded-xl" /></div></div>
+              <div key={i} className="overflow-hidden rounded-2xl bg-white shadow-md"><div className="skeleton aspect-[3/4] w-full" /><div className="space-y-2 p-4"><div className="skeleton h-3 w-2/3 rounded" /><div className="skeleton h-8 w-full rounded-xl" /></div></div>
             ))}
           </div>
         ) : limited.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl bg-card p-12 text-center shadow-card">
+          <div className="flex flex-col items-center justify-center rounded-2xl bg-white p-12 text-center shadow-md">
             <Sparkles className="h-12 w-12 text-primary-300" />
             <h3 className="heading-sm mt-4">{t("ai.noMatches")}</h3>
             <p className="text-lead mt-2 max-w-sm">{t("ai.noMatchesDesc")}</p>
@@ -87,7 +87,7 @@ export default function AiMatchesClient() {
             {limited.map((m) => <AiMatchCard key={m.profile.uid} match={m} />)}
           </div>
         )}
-        {fromCache && !loading && <p className="text-center text-xs text-muted">Cached results • {t("ai.refresh")} {t("ai.refresh").toLowerCase()}</p>}
+        {fromCache && !loading && <p className="text-center text-xs text-gray-500">Cached results • {t("ai.refresh")} {t("ai.refresh").toLowerCase()}</p>}
       </div>
     </ProtectedLayout></AuthGuard>
   );

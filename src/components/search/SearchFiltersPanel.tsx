@@ -24,7 +24,7 @@ const YESNO = ["any", "yes", "no"];
 const MANGLIK = ["any", "yes", "no", "dont_know"];
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (<label className="block"><span className="mb-1 block text-xs font-medium text-muted">{label}</span>{children}</label>);
+  return (<label className="block"><span className="mb-1 block text-xs font-medium text-gray-500">{label}</span>{children}</label>);
 }
 
 const inputCls = "w-full rounded-xl border border-primary-100 bg-white px-3 py-2 text-sm text-primary-900 transition focus:border-secondary-500 focus:outline-none focus:ring-2 focus:ring-secondary-200";
@@ -35,10 +35,10 @@ export function SearchFiltersPanel({ filters, onChange, onSearch, onReset, sort,
   const set = (patch: Partial<FilterState>) => onChange({ ...filters, ...patch });
 
   return (
-    <div className="rounded-2xl bg-card p-5 shadow-card">
+    <div className="rounded-2xl bg-white p-5 shadow-md">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2"><SlidersHorizontal className="h-5 w-5 text-primary-800" /><h2 className="font-display text-lg font-semibold text-primary-900">{t("search.filters")}</h2></div>
-        <button type="button" onClick={onReset} className="flex items-center gap-1 text-xs font-medium text-muted hover:text-primary-900"><RotateCcw className="h-3.5 w-3.5" />{t("search.reset")}</button>
+        <button type="button" onClick={onReset} className="flex items-center gap-1 text-xs font-medium text-gray-500 hover:text-primary-900"><RotateCcw className="h-3.5 w-3.5" />{t("search.reset")}</button>
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Field label={t("search.fields.gender")}><select className={inputCls} value={filters.gender ?? "any"} onChange={(e) => set({ gender: e.target.value })}>{GENDERS.map((g) => <option key={g} value={g}>{g === "any" ? t("search.fields.any") : g}</option>)}</select></Field>
@@ -77,7 +77,7 @@ export function SearchFiltersPanel({ filters, onChange, onSearch, onReset, sort,
       <div className="mt-5 flex flex-wrap gap-3">
         <button type="button" onClick={onSearch} disabled={loading} className="btn-primary flex-1"><Search className="h-4 w-4" />{loading ? t("search.loading") : t("search.apply")}</button>
       </div>
-      <div className="mt-3"><label className="mb-1 block text-xs font-medium text-muted">{t("search.sortBy")}</label><select className={inputCls} value={sort} onChange={(e) => onSortChange(e.target.value as SortOption)}><option value="newest">{t("search.sortNewest")}</option><option value="oldest">{t("search.sortOldest")}</option><option value="popular">{t("search.sortPopular")}</option></select></div>
+      <div className="mt-3"><label className="mb-1 block text-xs font-medium text-gray-500">{t("search.sortBy")}</label><select className={inputCls} value={sort} onChange={(e) => onSortChange(e.target.value as SortOption)}><option value="newest">{t("search.sortNewest")}</option><option value="oldest">{t("search.sortOldest")}</option><option value="popular">{t("search.sortPopular")}</option></select></div>
     </div>
   );
 }

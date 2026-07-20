@@ -21,11 +21,11 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen bg-grain">
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r border-primary-100 bg-primary-950 text-white lg:flex lg:flex-col"><SidebarContent pathname={pathname ?? ""} t={t} onLogout={handleLogout} /></aside>
-      {open && (<aside className="fixed inset-y-0 left-0 z-50 w-64 border-r border-primary-100 bg-primary-950 text-white shadow-card lg:hidden"><SidebarContent pathname={pathname ?? ""} t={t} onLogout={handleLogout} onClose={() => setOpen(false)} /></aside>)}
+      {open && (<aside className="fixed inset-y-0 left-0 z-50 w-64 border-r border-primary-100 bg-primary-950 text-white shadow-md lg:hidden"><SidebarContent pathname={pathname ?? ""} t={t} onLogout={handleLogout} onClose={() => setOpen(false)} /></aside>)}
       <div className="flex flex-1 flex-col lg:pl-64">
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-primary-100 bg-background/90 px-4 backdrop-blur-md lg:px-8">
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-primary-100 bg-[#FFFDF7]/90 px-4 backdrop-blur-md lg:px-8">
           <button type="button" onClick={() => setOpen(true)} className="rounded-full p-2 text-primary-900 lg:hidden" aria-label="Open menu"><Menu className="h-5 w-5" /></button>
-          <Link href="/admin/dashboard" className="flex items-center gap-2.5"><span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white shadow-soft"><Shield className="h-4 w-4" /></span><span className="font-display text-lg font-semibold text-primary-900">WedBridge <span className="text-secondary-600">Admin</span></span></Link>
+          <Link href="/admin/dashboard" className="flex items-center gap-2.5"><span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white shadow-sm"><Shield className="h-4 w-4" /></span><span className="font-display text-lg font-semibold text-primary-900">WedBridge <span className="text-secondary-600">Admin</span></span></Link>
           <button type="button" onClick={handleLogout} className="btn-ghost px-3 py-2 text-sm"><LogOut className="h-4 w-4" /><span className="hidden sm:inline">{t("nav.logout")}</span></button>
         </header>
         <main className="flex-1 px-4 py-6 lg:px-8 lg:py-8">{children}</main>

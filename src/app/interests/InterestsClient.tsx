@@ -55,7 +55,7 @@ export default function InterestsClient() {
   const isPremium = profile?.membership && profile.membership !== "free";
   const statusCls: Record<string, string> = {
     pending: "bg-primary-50 text-primary-800", accepted: "bg-green-50 text-green-700",
-    rejected: "bg-red-50 text-red-700", cancelled: "bg-muted/20 text-muted", expired: "bg-muted/20 text-muted",
+    rejected: "bg-red-50 text-red-700", cancelled: "bg-muted/20 text-gray-500", expired: "bg-muted/20 text-gray-500",
   };
 
   return (
@@ -73,18 +73,18 @@ export default function InterestsClient() {
 
         <div className="flex gap-2" role="tablist">
           {(["received", "sent"] as InterestDirection[]).map((d) => (
-            <button key={d} role="tab" aria-selected={tab === d} onClick={() => setTab(d)} className={cn("rounded-full px-4 py-1.5 text-sm font-medium transition", tab === d ? "bg-primary text-white shadow-soft" : "bg-card text-primary-800 hover:bg-primary-50")}>{t(`interests.tabs.${d}` as never)}</button>
+            <button key={d} role="tab" aria-selected={tab === d} onClick={() => setTab(d)} className={cn("rounded-full px-4 py-1.5 text-sm font-medium transition", tab === d ? "bg-primary text-white shadow-sm" : "bg-white text-primary-800 hover:bg-primary-50")}>{t(`interests.tabs.${d}` as never)}</button>
           ))}
         </div>
 
         {loading ? (
           <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="skeleton h-20 w-full rounded-2xl" />)}</div>
         ) : visible.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl bg-card p-12 text-center shadow-card"><HeartHandshake className="h-12 w-12 text-primary-300" /><h3 className="heading-sm mt-4">{tab === "received" ? t("interests.emptyReceived") : t("interests.emptySent")}</h3></div>
+          <div className="flex flex-col items-center justify-center rounded-2xl bg-white p-12 text-center shadow-md"><HeartHandshake className="h-12 w-12 text-primary-300" /><h3 className="heading-sm mt-4">{tab === "received" ? t("interests.emptyReceived") : t("interests.emptySent")}</h3></div>
         ) : (
           <div className="space-y-3">
             {visible.map((it) => (
-              <div key={it.id} className="flex flex-wrap items-center gap-3 rounded-2xl bg-card p-4 shadow-card">
+              <div key={it.id} className="flex flex-wrap items-center gap-3 rounded-2xl bg-white p-4 shadow-md">
                 <Link href={`/profile/${it.profileUid}`} className="relative h-14 w-14 flex-none overflow-hidden rounded-full bg-primary-100">
                   {it.profilePhoto ? <Image src={it.profilePhoto} alt={it.profileName} fill sizes="56px" className="object-cover" /> : <div className="flex h-full items-center justify-center text-primary-300"><HeartHandshake className="h-6 w-6" /></div>}
                 </Link>

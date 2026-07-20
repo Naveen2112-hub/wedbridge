@@ -52,11 +52,11 @@ export default function FavouritesClient() {
         {loading ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{Array.from({ length: 6 }).map((_, i) => <div key={i} className="skeleton aspect-[3/4] w-full rounded-2xl" />)}</div>
         ) : items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-2xl bg-card p-12 text-center shadow-card"><Star className="h-12 w-12 text-primary-300" /><h3 className="heading-sm mt-4">{t("favourites.empty")}</h3><p className="text-lead mt-2 max-w-sm">{t("favourites.emptyDesc")}</p></div>
+          <div className="flex flex-col items-center justify-center rounded-2xl bg-white p-12 text-center shadow-md"><Star className="h-12 w-12 text-primary-300" /><h3 className="heading-sm mt-4">{t("favourites.empty")}</h3><p className="text-lead mt-2 max-w-sm">{t("favourites.emptyDesc")}</p></div>
         ) : (
           <>
             {recent.length > 0 && (
-              <div className="rounded-2xl bg-card p-5 shadow-card">
+              <div className="rounded-2xl bg-white p-5 shadow-md">
                 <h2 className="font-display text-lg font-semibold text-primary-900">{t("favourites.recentlyFavourited")}</h2>
                 <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
                   {recent.map((f) => f.profile && (
@@ -72,7 +72,7 @@ export default function FavouritesClient() {
                 const p = f.profile;
                 const age = p?.dateOfBirth ? calculateAge(p.dateOfBirth) : null;
                 return (
-                  <div key={f.id} className="group overflow-hidden rounded-2xl bg-card shadow-card transition hover:shadow-glow">
+                  <div key={f.id} className="group overflow-hidden rounded-2xl bg-white shadow-md transition hover:shadow-lg">
                     <Link href={`/profile/${f.profileId}`} className="block">
                       <div className="relative aspect-[3/4] overflow-hidden bg-primary-100">
                         {p?.photoURL ? <Image src={p.photoURL} alt={p.name} fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover transition duration-500 group-hover:scale-105" /> : <div className="flex h-full items-center justify-center text-primary-300"><Heart className="h-10 w-10" /></div>}

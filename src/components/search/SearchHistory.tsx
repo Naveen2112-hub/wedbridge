@@ -21,7 +21,7 @@ export function SearchHistory({ onPick }: { onPick?: (filters: Record<string, un
 
   if (!loading && items.length === 0) return null;
   return (
-    <div className="rounded-2xl bg-card p-5 shadow-card">
+    <div className="rounded-2xl bg-white p-5 shadow-md">
       <div className="flex items-center justify-between">
         <h3 className="flex items-center gap-2 font-display text-lg font-semibold text-primary-900"><Clock className="h-4 w-4 text-secondary-600" />{t("search.history.title")}</h3>
         <button type="button" onClick={async () => { if (!user?.uid) return; await clearSearchHistory(user.uid); setItems([]); }} className="flex items-center gap-1 text-xs text-accent-700 hover:text-accent-800"><Trash2 className="h-3.5 w-3.5" />{t("search.history.clear")}</button>

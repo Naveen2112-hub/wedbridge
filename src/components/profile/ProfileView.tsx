@@ -34,7 +34,7 @@ export function ProfileView({ profile: passedProfile }: { profile?: ProfileDocum
         <div className="px-6 pb-6">
           <div className="-mt-12 flex items-end gap-4">
             <div className="h-24 w-24 overflow-hidden rounded-2xl border-4 border-white bg-primary-100">{profile.photoURL && <Image src={profile.photoURL} alt={profile.name} fill className="h-full w-full object-cover" />}</div>
-            <div className="flex-1 pb-2"><div className="flex items-center gap-2"><h1 className="heading-md">{profile.name}</h1>{profile.verified && <BadgeCheck className="h-5 w-5 text-green-600" />}{profile.premium && <Crown className="h-5 w-5 text-secondary-500" />}{profile.featured && <Star className="h-5 w-5 text-amber-500" />}</div><p className="text-sm text-muted">{profile.religion} · {profile.caste ?? ""}</p></div>
+            <div className="flex-1 pb-2"><div className="flex items-center gap-2"><h1 className="heading-md">{profile.name}</h1>{profile.verified && <BadgeCheck className="h-5 w-5 text-green-600" />}{profile.premium && <Crown className="h-5 w-5 text-secondary-500" />}{profile.featured && <Star className="h-5 w-5 text-amber-500" />}</div><p className="text-sm text-gray-500">{profile.religion} · {profile.caste ?? ""}</p></div>
             <Link href="/profile/edit" className="btn-outline mb-2 text-sm">Edit Profile</Link>
           </div>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -45,7 +45,7 @@ export function ProfileView({ profile: passedProfile }: { profile?: ProfileDocum
             <Info icon={Briefcase} label="Occupation" value={profile.occupation ?? "—"} />
             <Info icon={Phone} label="Phone" value={profile.phone ?? "—"} />
           </div>
-          {profile.bio && <div className="mt-6"><h3 className="font-semibold text-primary-900">About</h3><p className="mt-2 text-sm text-muted">{profile.bio}</p></div>}
+          {profile.bio && <div className="mt-6"><h3 className="font-semibold text-primary-900">About</h3><p className="mt-2 text-sm text-gray-500">{profile.bio}</p></div>}
         </div>
       </div>
     </div>
@@ -53,5 +53,5 @@ export function ProfileView({ profile: passedProfile }: { profile?: ProfileDocum
 }
 
 function Info({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string }) {
-  return <div className="flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-50 text-primary-600"><Icon className="h-4 w-4" /></span><div><p className="text-xs text-muted">{label}</p><p className="text-sm font-medium text-primary-900">{value}</p></div></div>;
+  return <div className="flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-50 text-primary-600"><Icon className="h-4 w-4" /></span><div><p className="text-xs text-gray-500">{label}</p><p className="text-sm font-medium text-primary-900">{value}</p></div></div>;
 }

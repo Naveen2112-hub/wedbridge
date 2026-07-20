@@ -19,7 +19,7 @@ export function RecentlyViewed() {
   }, [user?.uid]);
   if (!loading && items.length === 0) return null;
   return (
-    <div className="rounded-2xl bg-card p-6 shadow-card">
+    <div className="rounded-2xl bg-white p-6 shadow-md">
       <div className="flex items-center gap-2"><Eye className="h-5 w-5 text-secondary-600" /><h3 className="font-display text-lg font-semibold text-primary-900">{t("dashboard.recentlyViewed")}</h3></div>
       {loading ? (
         <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-6">{Array.from({ length: 6 }).map((_, i) => <div key={i} className="skeleton aspect-square w-full rounded-xl" />)}</div>

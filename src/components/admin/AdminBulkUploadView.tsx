@@ -56,14 +56,14 @@ export function AdminBulkUploadView() {
       <div className="mb-6"><h1 className="heading-md">Bulk Upload</h1><p className="text-lead mt-1 text-sm">Import profiles from a CSV file</p></div>
       <div className="card p-6">
         <label className="flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-primary-200 p-12 text-center hover:border-primary-400">
-          {uploading ? <Loader2 className="h-8 w-8 animate-spin text-primary-600" /> : <><Upload className="h-8 w-8 text-primary-400" /><p className="mt-2 text-sm font-medium text-primary-900">Click to upload CSV</p><p className="text-xs text-muted">Columns: name, gender, dob, religion, caste, education, occupation, city, phone</p></>}
+          {uploading ? <Loader2 className="h-8 w-8 animate-spin text-primary-600" /> : <><Upload className="h-8 w-8 text-primary-400" /><p className="mt-2 text-sm font-medium text-primary-900">Click to upload CSV</p><p className="text-xs text-gray-500">Columns: name, gender, dob, religion, caste, education, occupation, city, phone</p></>}
           <input type="file" accept=".csv" className="hidden" onChange={handleFile} />
         </label>
       </div>
       {preview.length > 0 && (
         <div className="mt-6">
           <div className="mb-3 flex items-center justify-between"><h2 className="heading-sm">Preview ({preview.length} rows)</h2><button type="button" onClick={importRows} disabled={importing} className="btn-primary text-sm">{importing ? `Importing ${done}/${preview.length}…` : "Import All"}</button></div>
-          <div className="card overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b border-primary-100 text-left text-xs text-muted">{Object.keys(preview[0]).filter((k) => !k.startsWith("_")).map((k) => <th key={k} className="p-2 capitalize">{k}</th>)}<th className="p-2">Status</th></tr></thead><tbody>{preview.slice(0, 50).map((r) => <tr key={r._row} className="border-b border-primary-50">{Object.keys(r).filter((k) => !k.startsWith("_")).map((k) => <td key={k} className="p-2">{String(r[k] ?? "")}</td>)}<td className="p-2">{r._duplicate ? <span className="flex items-center gap-1 text-amber-600"><AlertCircle className="h-3 w-3" />Duplicate</span> : <span className="flex items-center gap-1 text-green-600"><Check className="h-3 w-3" />OK</span>}</td></tr>)}</tbody></table></div>
+          <div className="card overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b border-primary-100 text-left text-xs text-gray-500">{Object.keys(preview[0]).filter((k) => !k.startsWith("_")).map((k) => <th key={k} className="p-2 capitalize">{k}</th>)}<th className="p-2">Status</th></tr></thead><tbody>{preview.slice(0, 50).map((r) => <tr key={r._row} className="border-b border-primary-50">{Object.keys(r).filter((k) => !k.startsWith("_")).map((k) => <td key={k} className="p-2">{String(r[k] ?? "")}</td>)}<td className="p-2">{r._duplicate ? <span className="flex items-center gap-1 text-amber-600"><AlertCircle className="h-3 w-3" />Duplicate</span> : <span className="flex items-center gap-1 text-green-600"><Check className="h-3 w-3" />OK</span>}</td></tr>)}</tbody></table></div>
         </div>
       )}
     </div>

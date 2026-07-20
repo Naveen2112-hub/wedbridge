@@ -56,11 +56,11 @@ export function ProfileCard({ profile, compatibility }: Props) {
 
   const statusBadge: Record<string, string> = {
     pending: "bg-primary-50 text-primary-800", accepted: "bg-green-50 text-green-700",
-    rejected: "bg-red-50 text-red-700", cancelled: "bg-muted/20 text-muted", expired: "bg-muted/20 text-muted",
+    rejected: "bg-red-50 text-red-700", cancelled: "bg-muted/20 text-gray-500", expired: "bg-muted/20 text-gray-500",
   };
 
   return (
-    <div className="group overflow-hidden rounded-2xl bg-card shadow-card transition hover:shadow-glow">
+    <div className="group overflow-hidden rounded-2xl bg-white shadow-md transition hover:shadow-lg">
       <Link href={`/profile/${profile.uid}`} className="block" aria-label={`${profile.name} - ${t("search.card.viewProfile")}`}>
         <div className="relative aspect-[3/4] overflow-hidden bg-primary-100">
           {profile.photoURL ? <Image src={profile.photoURL} alt={profile.name} fill sizes="(min-width: 1024px) 33vw, 100vw" className="object-cover transition duration-500 group-hover:scale-105" /> : <div className="flex h-full items-center justify-center text-primary-300"><Heart className="h-10 w-10" /></div>}
@@ -77,15 +77,15 @@ export function ProfileCard({ profile, compatibility }: Props) {
         </div>
       </Link>
       <div className="space-y-2 p-4">
-        <div className="flex items-center justify-between text-xs text-muted">
+        <div className="flex items-center justify-between text-xs text-gray-500">
           <span className="flex items-center gap-1"><MapPin className="h-3.5 w-3.5" />{[profile.district, profile.state].filter(Boolean).join(", ") || "—"}</span>
           <span className="flex items-center gap-1"><Eye className="h-3.5 w-3.5" />{profile.viewCount ?? 0}</span>
         </div>
-        <div className="flex items-center gap-3 text-xs text-muted">
+        <div className="flex items-center gap-3 text-xs text-gray-500">
           <span className="flex items-center gap-1"><GraduationCap className="h-3.5 w-3.5" />{profile.education || "—"}</span>
           <span className="flex items-center gap-1"><Briefcase className="h-3.5 w-3.5" />{profile.occupation || "—"}</span>
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted"><Star className="h-3.5 w-3.5" />{profile.religion || "—"} · {profile.caste || "—"}</div>
+        <div className="flex items-center gap-2 text-xs text-gray-500"><Star className="h-3.5 w-3.5" />{profile.religion || "—"} · {profile.caste || "—"}</div>
         {compatibility !== undefined && <div className="flex items-center gap-2 rounded-lg bg-secondary-50 px-2 py-1 text-xs font-semibold text-secondary-800"><Sparkles className="h-3.5 w-3.5" />{t("search.card.compatibility")}: {compatibility}%</div>}
         {interestStatus && <span className={cn("badge", statusBadge[interestStatus] ?? statusBadge.pending)}>{t(`interests.${interestStatus}` as never)}</span>}
         {limitError && <p className="text-xs text-red-600">{t("interests.limitReached")}</p>}

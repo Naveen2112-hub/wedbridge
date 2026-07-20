@@ -31,10 +31,10 @@ export function ForgotPasswordForm() {
       <h1 className="heading-md">Forgot Password</h1>
       <p className="text-lead mt-2 text-sm">Enter your email and we&apos;ll send you a reset link.</p>
       <form onSubmit={submit} className="mt-6 space-y-4">
-        <div><label className="label" htmlFor="fp-email">Email</label><div className="relative"><Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" /><input id="fp-email" type="email" required className="input pl-10" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" /></div></div>
+        <div><label className="label" htmlFor="fp-email">Email</label><div className="relative"><Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" /><input id="fp-email" type="email" required className="input pl-10" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" /></div></div>
         <button type="submit" disabled={loading} className="btn-primary w-full">{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send Reset Link"}</button>
       </form>
-      <Link href="/login" className="mt-4 flex items-center justify-center gap-1 text-sm text-muted hover:text-primary-700"><ArrowLeft className="h-3 w-3" />Back to login</Link>
+      <Link href="/login" className="mt-4 flex items-center justify-center gap-1 text-sm text-gray-500 hover:text-primary-700"><ArrowLeft className="h-3 w-3" />Back to login</Link>
     </div>
   );
 }

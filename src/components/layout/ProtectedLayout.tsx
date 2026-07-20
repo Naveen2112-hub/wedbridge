@@ -41,7 +41,7 @@ export function ProtectedLayout({ children }: { children: ReactNode }) {
         {open && (
           <>
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-40 bg-primary-950/40 backdrop-blur-sm lg:hidden" onClick={() => setOpen(false)} />
-            <motion.aside initial={{ x: "-100%" }} animate={{ x: 0 }} exit={{ x: "-100%" }} transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }} className="fixed inset-y-0 left-0 z-50 w-64 border-r border-primary-100 bg-white shadow-elevated lg:hidden">
+            <motion.aside initial={{ x: "-100%" }} animate={{ x: 0 }} exit={{ x: "-100%" }} transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }} className="fixed inset-y-0 left-0 z-50 w-64 border-r border-primary-100 bg-white shadow-lg lg:hidden">
               <SidebarContent pathname={pathname ?? ""} t={t} onLogout={handleLogout} userName={user?.displayName ?? user?.email ?? ""} onClose={() => setOpen(false)} />
             </motion.aside>
           </>
@@ -50,11 +50,11 @@ export function ProtectedLayout({ children }: { children: ReactNode }) {
 
       <div className="flex flex-1 flex-col lg:pl-64">
         <header className="glass sticky top-0 z-30 flex h-16 items-center justify-between border-b border-primary-100/80 px-4 lg:px-8">
-          <button type="button" onClick={() => setOpen(true)} className="rounded-lg p-2 text-ink/70 transition-colors hover:bg-primary-50 lg:hidden" aria-label="Open menu">
+          <button type="button" onClick={() => setOpen(true)} className="rounded-lg p-2 text-gray-900/70 transition-colors hover:bg-primary-50 lg:hidden" aria-label="Open menu">
             <Menu className="h-5 w-5" />
           </button>
           <Link href="/" className="flex items-center gap-2.5" aria-label="WedBridge home">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-warm shadow-soft">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-warm shadow-sm">
               <Heart className="h-4 w-4 text-white" fill="currentColor" />
             </span>
             <span className="font-display text-lg font-bold text-primary-800">WedBridge</span>
@@ -74,24 +74,24 @@ function SidebarContent({ pathname, t, onLogout, userName, onClose }: { pathname
     <div className="flex h-full flex-col">
       <div className="flex items-center justify-between gap-2 px-5 py-5">
         <Link href="/" className="flex items-center gap-2.5" onClick={onClose}>
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-warm shadow-soft">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-warm shadow-sm">
             <Heart className="h-4 w-4 text-white" fill="currentColor" />
           </span>
           <span className="font-display text-lg font-bold text-primary-800">WedBridge</span>
         </Link>
-        {onClose && <button type="button" onClick={onClose} className="rounded-lg p-1.5 text-ink/60 hover:bg-primary-50" aria-label="Close menu"><X className="h-5 w-5" /></button>}
+        {onClose && <button type="button" onClick={onClose} className="rounded-lg p-1.5 text-gray-900/60 hover:bg-primary-50" aria-label="Close menu"><X className="h-5 w-5" /></button>}
       </div>
       <div className="px-5 py-2">
         <div className="flex items-center gap-3 rounded-xl bg-primary-50/60 px-3 py-2.5">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-warm text-sm font-semibold text-white">{userName[0]?.toUpperCase() ?? "U"}</div>
-          <p className="truncate text-sm font-medium text-ink">{userName}</p>
+          <p className="truncate text-sm font-medium text-gray-900">{userName}</p>
         </div>
       </div>
       <nav className="flex-1 space-y-1 px-3 py-3">
         {navItems.map((item) => {
           const active = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
-            <Link key={item.href} href={item.href} onClick={onClose} className={cn("flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200", active ? "bg-primary-600 text-white shadow-soft" : "text-ink/70 hover:bg-primary-50 hover:text-primary-700")}>
+            <Link key={item.href} href={item.href} onClick={onClose} className={cn("flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200", active ? "bg-primary-600 text-white shadow-sm" : "text-gray-900/70 hover:bg-primary-50 hover:text-primary-700")}>
               <item.icon className="h-4 w-4" />{t(item.key as never)}
             </Link>
           );

@@ -54,7 +54,7 @@ export function SearchView() {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="mb-6"><h1 className="heading-md">Find Your Match</h1><p className="text-lead mt-1 text-sm">Search verified profiles across Tamil Nadu</p></div>
       <div className="mb-6 flex gap-3">
-        <div className="relative flex-1"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" /><input className="input pl-10" placeholder="Search by caste…" onChange={(e) => setFilters((f) => ({ ...f, caste: e.target.value }))} /></div>
+        <div className="relative flex-1"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" /><input className="input pl-10" placeholder="Search by caste…" onChange={(e) => setFilters((f) => ({ ...f, caste: e.target.value }))} /></div>
         <button type="button" onClick={() => setShowFilters(!showFilters)} className="btn-outline"><SlidersHorizontal className="h-4 w-4" />Filters</button>
       </div>
       {showFilters && (
@@ -68,7 +68,7 @@ export function SearchView() {
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{Array.from({ length: 6 }).map((_, i) => <div key={i} className="skeleton h-64 w-full rounded-2xl" />)}</div>
       ) : results.length === 0 ? (
-        <div className="rounded-2xl bg-white p-12 text-center text-muted">No profiles found. Try adjusting your filters.</div>
+        <div className="rounded-2xl bg-white p-12 text-center text-gray-500">No profiles found. Try adjusting your filters.</div>
       ) : (
         <>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -88,9 +88,9 @@ const ProfileCard = memo(function ProfileCard({ profile, sending, onInterest }: 
         <div className="h-20 w-20 flex-none overflow-hidden rounded-xl bg-primary-100">{profile.photoURL && <Image src={profile.photoURL} alt={profile.name} fill className="h-full w-full object-cover" loading="lazy" />}</div>
         <div className="flex-1">
           <div className="flex items-center gap-1.5"><h3 className="font-display text-lg font-semibold text-primary-900">{profile.name}</h3>{profile.verified && <BadgeCheck className="h-4 w-4 text-green-600" />}{profile.premium && <Crown className="h-4 w-4 text-secondary-500" />}</div>
-          <p className="text-xs text-muted">{profile.religion} · {profile.caste ?? "Any"}</p>
-          <p className="mt-1 flex items-center gap-1 text-xs text-muted"><MapPin className="h-3 w-3" />{profile.district ?? profile.city ?? "Tamil Nadu"}</p>
-          <p className="mt-1 text-xs text-muted">{profile.occupation ?? ""}</p>
+          <p className="text-xs text-gray-500">{profile.religion} · {profile.caste ?? "Any"}</p>
+          <p className="mt-1 flex items-center gap-1 text-xs text-gray-500"><MapPin className="h-3 w-3" />{profile.district ?? profile.city ?? "Tamil Nadu"}</p>
+          <p className="mt-1 text-xs text-gray-500">{profile.occupation ?? ""}</p>
         </div>
       </div>
       <div className="border-t border-primary-50 p-3"><button type="button" onClick={onInterest} disabled={sending} className="btn-primary w-full text-sm">{sending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send Interest"}</button></div>

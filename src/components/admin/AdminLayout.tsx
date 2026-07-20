@@ -34,7 +34,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
         <div className="p-6"><Link href="/admin/dashboard" className="font-display text-xl font-bold text-primary-900">WedBridge<span className="text-secondary-500"> Admin</span></Link></div>
         <nav className="px-3 pb-4">{nav.map((n) => {
           const active = pathname === n.href || (pathname ?? "").startsWith(n.href + "/");
-          return <Link key={n.href} href={n.href} className={`mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${active ? "bg-primary-700 text-white" : "text-muted hover:bg-primary-50 hover:text-primary-700"}`}><n.icon className="h-4 w-4" />{n.label}</Link>;
+          return <Link key={n.href} href={n.href} className={`mb-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${active ? "bg-primary-700 text-white" : "text-gray-500 hover:bg-primary-50 hover:text-primary-700"}`}><n.icon className="h-4 w-4" />{n.label}</Link>;
         })}</nav>
         <div className="px-3"><button type="button" onClick={handleLogout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50"><LogOut className="h-4 w-4" />Logout</button></div>
       </aside>

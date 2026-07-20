@@ -42,7 +42,7 @@ function ProfileContent() {
 
   if (loading) return <div className="flex min-h-[40vh] items-center justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary-800" /></div>;
   if (!profile) return (
-    <div className="mx-auto max-w-2xl rounded-2xl bg-card p-8 text-center shadow-card">
+    <div className="mx-auto max-w-2xl rounded-2xl bg-white p-8 text-center shadow-md">
       <AlertCircle className="mx-auto h-10 w-10 text-accent-600" />
       <h1 className="heading-md mt-4">No profile yet</h1>
       <p className="text-lead mt-2">Complete your profile to get started.</p>
@@ -65,15 +65,15 @@ function ProfileContent() {
         <div className="lg:col-span-2"><ProfileView profile={profile} /></div>
         <div className="space-y-6">
           <CompletionCard profile={profile} />
-          <div className="rounded-2xl bg-card p-6 shadow-card">
+          <div className="rounded-2xl bg-white p-6 shadow-md">
             <h3 className="font-display text-lg font-semibold text-primary-900">{t("profile.verify.title")}</h3>
-            <p className="mt-2 text-sm text-muted">{t("profile.verify.desc")}</p>
+            <p className="mt-2 text-sm text-gray-500">{t("profile.verify.desc")}</p>
             <div className="mt-3 flex items-center gap-2 text-sm">
-              <ShieldCheck className={`h-4 w-4 ${profile.verificationStatus === "verified" ? "text-green-600" : "text-muted"}`} />
+              <ShieldCheck className={`h-4 w-4 ${profile.verificationStatus === "verified" ? "text-green-600" : "text-gray-500"}`} />
               <span>{t("profile.verify.status")}: <strong className="text-primary-900">{profile.verificationStatus}</strong></span>
             </div>
             {profile.verificationStatus === "unverified" && <button onClick={submitVerification} disabled={action === "verify"} className="btn-primary mt-4 w-full">{t("profile.verify.submit")}</button>}
-            {profile.verificationStatus === "pending" && <p className="mt-3 text-xs text-muted">{t("profile.verify.submitted")}</p>}
+            {profile.verificationStatus === "pending" && <p className="mt-3 text-xs text-gray-500">{t("profile.verify.submitted")}</p>}
           </div>
         </div>
       </div>

@@ -35,7 +35,7 @@ export function MatchesView() {
     else toast(res.error ?? "Failed", "error");
   };
 
-  if (!user) return <div className="px-4 py-16 text-center text-muted">Please login to view your matches.</div>;
+  if (!user) return <div className="px-4 py-16 text-center text-gray-500">Please login to view your matches.</div>;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -43,7 +43,7 @@ export function MatchesView() {
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{Array.from({ length: 6 }).map((_, i) => <div key={i} className="skeleton h-72 w-full rounded-2xl" />)}</div>
       ) : matches.length === 0 ? (
-        <div className="rounded-2xl bg-white p-12 text-center"><Sparkles className="mx-auto h-10 w-10 text-primary-300" /><p className="mt-3 text-muted">No matches yet. Complete your profile for better matches.</p></div>
+        <div className="rounded-2xl bg-white p-12 text-center"><Sparkles className="mx-auto h-10 w-10 text-primary-300" /><p className="mt-3 text-gray-500">No matches yet. Complete your profile for better matches.</p></div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {matches.map((m) => <MatchCard key={m.profile.id} match={m} sending={sending === m.profile.id} onInterest={() => handleInterest(m.profile)} />)}
@@ -60,7 +60,7 @@ const MatchCard = memo(function MatchCard({ match, sending, onInterest }: { matc
       <div className="flex items-start justify-between bg-gradient-to-r from-secondary-50 to-primary-50 p-3"><span className="badge bg-secondary-100 text-secondary-800"><Sparkles className="h-3 w-3" />{match.score}% Match</span></div>
       <div className="flex gap-4 p-4">
         <div className="h-20 w-20 flex-none overflow-hidden rounded-xl bg-primary-100">{p.photoURL && <Image src={p.photoURL} alt={p.name} fill className="h-full w-full object-cover" loading="lazy" />}</div>
-        <div className="flex-1"><div className="flex items-center gap-1.5"><h3 className="font-display text-lg font-semibold text-primary-900">{p.name}</h3>{p.verified && <BadgeCheck className="h-4 w-4 text-green-600" />}{p.premium && <Crown className="h-4 w-4 text-secondary-500" />}</div><p className="text-xs text-muted">{p.religion} · {p.caste ?? ""}</p><p className="mt-1 flex items-center gap-1 text-xs text-muted"><MapPin className="h-3 w-3" />{p.district ?? "TN"}</p></div>
+        <div className="flex-1"><div className="flex items-center gap-1.5"><h3 className="font-display text-lg font-semibold text-primary-900">{p.name}</h3>{p.verified && <BadgeCheck className="h-4 w-4 text-green-600" />}{p.premium && <Crown className="h-4 w-4 text-secondary-500" />}</div><p className="text-xs text-gray-500">{p.religion} · {p.caste ?? ""}</p><p className="mt-1 flex items-center gap-1 text-xs text-gray-500"><MapPin className="h-3 w-3" />{p.district ?? "TN"}</p></div>
       </div>
       <div className="px-4 pb-2"><div className="flex flex-wrap gap-1">{match.reasons.slice(0, 3).map((r) => <span key={r} className="badge bg-primary-50 text-primary-700 text-[10px]">{r}</span>)}</div></div>
       <div className="border-t border-primary-50 p-3"><button type="button" onClick={onInterest} disabled={sending} className="btn-primary w-full text-sm">{sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Heart className="h-4 w-4" />Send Interest</>}</button></div>

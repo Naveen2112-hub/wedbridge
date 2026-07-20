@@ -70,42 +70,42 @@ body { font-family: var(--font-inter); background-color: #FFFDF7; color: #1A1416
     font-family: var(--font-playfair);
   }
   .text-lead {
-    @apply text-base text-muted sm:text-lg;
+    @apply text-base text-gray-500 sm:text-lg;
   }
   .text-body {
-    @apply text-sm text-gray-900/80 sm:text-base;
+    @apply text-sm text-gray-700 sm:text-base;
   }
   .text-caption {
-    @apply text-xs text-muted;
+    @apply text-xs text-gray-500;
   }
 }
 
 /* ========== Buttons ========== */
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition-all duration-300 ease-smooth-out hover:bg-primary-700 hover:shadow-card active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-300 ease-out hover:bg-primary-700 hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-secondary-500 px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition-all duration-300 ease-smooth-out hover:bg-secondary-600 hover:shadow-card active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-secondary-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-300 ease-out hover:bg-secondary-600 hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
   }
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-primary-200 bg-white px-5 py-2.5 text-sm font-semibold text-primary-700 shadow-soft transition-all duration-300 ease-smooth-out hover:border-primary-400 hover:bg-primary-50 hover:shadow-card active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-primary-200 bg-white px-5 py-2.5 text-sm font-semibold text-primary-700 shadow-sm transition-all duration-300 ease-out hover:border-primary-400 hover:bg-primary-50 hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-ink/70 transition-all duration-300 ease-smooth-out hover:bg-primary-50 hover:text-primary-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-gray-700 transition-all duration-300 ease-out hover:bg-primary-50 hover:text-primary-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
   }
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-error-600 px-5 py-2.5 text-sm font-semibold text-white shadow-soft transition-all duration-300 ease-smooth-out hover:bg-error-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-error-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-300 ease-out hover:bg-error-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60;
   }
 }
 
 /* ========== Cards ========== */
 @layer components {
   .card {
-    @apply rounded-2xl border border-primary-100/60 bg-card shadow-card transition-all duration-300 ease-smooth-out;
+    @apply rounded-2xl border border-primary-100/60 bg-white shadow-md transition-all duration-300 ease-out;
   }
   .card-hover {
-    @apply hover:shadow-elevated hover:border-primary-200;
+    @apply hover:shadow-lg hover:border-primary-200;
   }
   .card-flat {
     @apply rounded-xl border border-primary-100/40 bg-white;
@@ -115,19 +115,19 @@ body { font-family: var(--font-inter); background-color: #FFFDF7; color: #1A1416
 /* ========== Inputs ========== */
 @layer components {
   .input {
-    @apply w-full rounded-xl border border-primary-200/70 bg-white px-4 py-2.5 text-sm text-ink shadow-soft transition-all duration-200 placeholder:text-muted/60 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60;
+    @apply w-full rounded-xl border border-primary-200/70 bg-white px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-all duration-200 placeholder:text-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60;
   }
   .input-icon {
     @apply pl-10;
   }
   .label {
-    @apply mb-1.5 block text-sm font-medium text-ink;
+    @apply mb-1.5 block text-sm font-medium text-gray-900;
   }
   .textarea {
-    @apply w-full rounded-xl border border-primary-200/70 bg-white px-4 py-2.5 text-sm text-ink shadow-soft transition-all duration-200 placeholder:text-muted/60 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none;
+    @apply w-full rounded-xl border border-primary-200/70 bg-white px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-all duration-200 placeholder:text-gray-400 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none;
   }
   .select {
-    @apply w-full rounded-xl border border-primary-200/70 bg-white px-4 py-2.5 text-sm text-ink shadow-soft transition-all duration-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none;
+    @apply w-full rounded-xl border border-primary-200/70 bg-white px-4 py-2.5 text-sm text-gray-900 shadow-sm transition-all duration-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none;
   }
   .checkbox {
     @apply h-4 w-4 rounded border-primary-300 text-primary-600 focus:ring-2 focus:ring-primary-500/30;
@@ -162,7 +162,7 @@ body { font-family: var(--font-inter); background-color: #FFFDF7; color: #1A1416
 /* ========== Navigation Links ========== */
 @layer components {
   .nav-link {
-    @apply relative text-sm font-medium text-ink/70 transition-colors duration-200 hover:text-primary-700;
+    @apply relative text-sm font-medium text-gray-700 transition-colors duration-200 hover:text-primary-700;
   }
   .nav-link-active {
     @apply text-primary-700;
@@ -175,7 +175,7 @@ body { font-family: var(--font-inter); background-color: #FFFDF7; color: #1A1416
 /* ========== Skeleton Loading ========== */
 @layer components {
   .skeleton {
-    @apply animate-shimmer rounded-lg bg-gradient-to-r from-primary-50 via-primary-100/50 to-primary-50 bg-[length:200%_100%];
+    @apply animate-pulse rounded-lg bg-gray-200;
   }
 }
 

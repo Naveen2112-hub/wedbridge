@@ -45,11 +45,11 @@ export default function OCRUploadPage() {
         <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary-200 p-8 text-center transition hover:border-primary-400 hover:bg-primary-50/50">
           <ScanLine className="h-10 w-10 text-primary-400" />
           <p className="text-sm font-medium text-primary-900">Upload document for OCR</p>
-          <p className="text-xs text-muted">Supports PDF, JPG, PNG</p>
+          <p className="text-xs text-gray-500">Supports PDF, JPG, PNG</p>
           <input type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
         </label>
         {fileName && <p className="mt-3 flex items-center gap-2 text-sm text-primary-900">{fileName.endsWith(".pdf") ? <FileText className="h-4 w-4" /> : <ImageIcon className="h-4 w-4" />}{fileName}</p>}
-        {extracting && <p className="mt-3 flex items-center gap-2 text-sm text-muted"><Loader2 className="h-4 w-4 animate-spin" />Extracting data…</p>}
+        {extracting && <p className="mt-3 flex items-center gap-2 text-sm text-gray-500"><Loader2 className="h-4 w-4 animate-spin" />Extracting data…</p>}
       </div>
       {result && (
         <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-primary-100">

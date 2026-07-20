@@ -45,7 +45,7 @@ export default function SearchClient() {
         <div><h1 className="heading-lg">{t("search.title")}</h1><p className="text-lead mt-2">{t("search.subtitle")}</p></div>
         <SearchHistory onPick={(f) => setFilters(f as FilterState)} />
         <SearchFiltersPanel filters={filters} onChange={setFilters} onSearch={() => runSearch(true)} onReset={handleReset} sort={sort} onSortChange={setSort} loading={loading} />
-        {searched && <p className="text-sm text-muted">{t("search.showing")} {profiles.length} {t("search.of")} {t("search.results")}</p>}
+        {searched && <p className="text-sm text-gray-500">{t("search.showing")} {profiles.length} {t("search.of")} {t("search.results")}</p>}
         <ProfileGrid profiles={profiles} loading={loading} hasMore={hasMore} onLoadMore={() => runSearch(false)} />
       </div>
     </ProtectedLayout></AuthGuard>

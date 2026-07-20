@@ -87,7 +87,7 @@ export default function CompleteProfilePage() {
                 <Field label={t("auth.complete.dob")} icon={Calendar} error={errors.dateOfBirth && t("auth.error.required")}><input type="date" className="auth-input pl-10" {...register("dateOfBirth")} /></Field>
               </div>
 
-              <div><label className="label">{t("auth.complete.gender")}</label><div className="grid grid-cols-3 gap-2">{(["male", "female", "other"] as const).map((g) => (<label key={g} className={cn("cursor-pointer rounded-xl border px-3 py-2.5 text-center text-sm transition", watch("gender") === g ? "border-secondary bg-secondary-50 text-primary-900" : "border-primary-100 bg-white text-muted hover:border-primary-300")}><input type="radio" value={g} className="sr-only" {...register("gender")} />{t(`auth.complete.${g}` as never)}</label>))}</div></div>
+              <div><label className="label">{t("auth.complete.gender")}</label><div className="grid grid-cols-3 gap-2">{(["male", "female", "other"] as const).map((g) => (<label key={g} className={cn("cursor-pointer rounded-xl border px-3 py-2.5 text-center text-sm transition", watch("gender") === g ? "border-secondary bg-secondary-50 text-primary-900" : "border-primary-100 bg-white text-gray-500 hover:border-primary-300")}><input type="radio" value={g} className="sr-only" {...register("gender")} />{t(`auth.complete.${g}` as never)}</label>))}</div></div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <Field label={t("auth.complete.religion")} icon={Shield} error={errors.religion && t("auth.error.required")}><select className="auth-input pl-10" {...register("religion")}><option value="">Select…</option>{RELIGIONS.map((r) => <option key={r} value={r}>{r}</option>)}</select></Field>
@@ -115,7 +115,7 @@ export default function CompleteProfilePage() {
 
               <Field label={t("auth.complete.annualIncome")} icon={IndianRupee} error={errors.annualIncome && t("auth.error.required")}><input placeholder="₹5,00,000" className="auth-input pl-10" {...register("annualIncome")} /></Field>
 
-              <div><label className="label">{t("auth.complete.contactVisibility")}</label><div className="space-y-2">{visibilityOptions.map((o) => (<label key={o.value} className={cn("flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm transition", visibility === o.value ? "border-secondary bg-secondary-50 text-primary-900" : "border-primary-100 bg-white text-muted hover:border-primary-300")}><input type="radio" value={o.value} className="sr-only" {...register("contactVisibility")} /><span className={cn("flex h-4 w-4 flex-none items-center justify-center rounded-full border", visibility === o.value ? "border-secondary bg-secondary" : "border-primary-200")}>{visibility === o.value && <span className="h-2 w-2 rounded-full bg-white" />}</span>{t(o.labelKey)}</label>))}</div></div>
+              <div><label className="label">{t("auth.complete.contactVisibility")}</label><div className="space-y-2">{visibilityOptions.map((o) => (<label key={o.value} className={cn("flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 text-sm transition", visibility === o.value ? "border-secondary bg-secondary-50 text-primary-900" : "border-primary-100 bg-white text-gray-500 hover:border-primary-300")}><input type="radio" value={o.value} className="sr-only" {...register("contactVisibility")} /><span className={cn("flex h-4 w-4 flex-none items-center justify-center rounded-full border", visibility === o.value ? "border-secondary bg-secondary" : "border-primary-200")}>{visibility === o.value && <span className="h-2 w-2 rounded-full bg-white" />}</span>{t(o.labelKey)}</label>))}</div></div>
 
               <div className="rounded-2xl bg-primary-50/40 p-4"><CompletionCard profile={draftProfile as never} /></div>
 
@@ -129,5 +129,5 @@ export default function CompleteProfilePage() {
 }
 
 function Field({ label, icon: Icon, error, children }: { label: string; icon: React.ComponentType<{ className?: string }>; error?: string | null; children: React.ReactNode }) {
-  return (<div><label className="label">{label}</label><div className="relative"><Icon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" />{children}</div>{error && <p className="mt-1 text-xs text-accent-700">{error}</p>}</div>);
+  return (<div><label className="label">{label}</label><div className="relative"><Icon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />{children}</div>{error && <p className="mt-1 text-xs text-accent-700">{error}</p>}</div>);
 }

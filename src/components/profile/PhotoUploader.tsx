@@ -52,7 +52,7 @@ export function PhotoUploader({ uid, value, onChange }: PhotoUploaderProps) {
     <div>
       <div className="flex items-center gap-4">
         <div className="relative h-20 w-20 flex-none overflow-hidden rounded-full bg-primary-50 ring-2 ring-secondary/30">
-          {value ? <Image src={value} alt="Profile" fill className="h-full w-full object-cover" /> : <span className="flex h-full w-full items-center justify-center text-xs text-muted">No photo</span>}
+          {value ? <Image src={value} alt="Profile" fill className="h-full w-full object-cover" /> : <span className="flex h-full w-full items-center justify-center text-xs text-gray-500">No photo</span>}
         </div>
         <div>
           <label className="btn-outline cursor-pointer text-sm">
@@ -60,20 +60,20 @@ export function PhotoUploader({ uid, value, onChange }: PhotoUploaderProps) {
             {value ? t("profile.changePhoto") : t("profile.uploadPhoto")}
             <input type="file" accept="image/*" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.currentTarget.value = ""; }} />
           </label>
-          <p className="mt-1.5 text-xs text-muted">{t("profile.maxSize")}</p>
+          <p className="mt-1.5 text-xs text-gray-500">{t("profile.maxSize")}</p>
         </div>
         {phase === "done" && <span className="flex items-center gap-1 text-xs text-green-700"><Check className="h-3.5 w-3.5" />Saved</span>}
       </div>
 
       {error && <p className="mt-2 text-xs text-accent-700">{error}</p>}
       {(phase === "compressing" || phase === "uploading") && (
-        <p className="mt-2 flex items-center gap-1.5 text-xs text-muted"><Loader2 className="h-3.5 w-3.5 animate-spin" />{phase === "compressing" ? t("profile.compressing") : t("profile.uploading")}</p>
+        <p className="mt-2 flex items-center gap-1.5 text-xs text-gray-500"><Loader2 className="h-3.5 w-3.5 animate-spin" />{phase === "compressing" ? t("profile.compressing") : t("profile.uploading")}</p>
       )}
 
       {imageSrc && phase === "cropping" && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-primary-950/80 p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white p-4 shadow-card">
-            <div className="mb-3 flex items-center justify-between"><h3 className="font-display text-base font-semibold text-primary-900">{t("profile.cropPhoto")}</h3><button onClick={() => { setImageSrc(null); setPhase("idle"); }} className="rounded-full p-1.5 text-muted hover:bg-primary-50"><X className="h-4 w-4" /></button></div>
+          <div className="w-full max-w-md rounded-2xl bg-white p-4 shadow-md">
+            <div className="mb-3 flex items-center justify-between"><h3 className="font-display text-base font-semibold text-primary-900">{t("profile.cropPhoto")}</h3><button onClick={() => { setImageSrc(null); setPhase("idle"); }} className="rounded-full p-1.5 text-gray-500 hover:bg-primary-50"><X className="h-4 w-4" /></button></div>
             <div className="relative h-64 w-full overflow-hidden rounded-xl bg-primary-950">
               <Cropper image={imageSrc} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onZoomChange={setZoom} onCropComplete={onCropComplete} />
             </div>

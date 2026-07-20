@@ -27,7 +27,7 @@ export function AdminAnalyticsView() {
     <div>
       <div className="mb-6"><h1 className="heading-md">Analytics</h1><p className="text-lead mt-1 text-sm">Deep-dive platform analytics</p></div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {metrics.map((m) => <div key={m.label} className="card p-5"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50 text-primary-600"><m.icon className="h-5 w-5" /></span><p className="mt-3 font-display text-2xl font-bold text-primary-900">{m.value}</p><p className="text-sm text-muted">{m.label}</p></div>)}
+        {metrics.map((m) => <div key={m.label} className="card p-5"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-50 text-primary-600"><m.icon className="h-5 w-5" /></span><p className="mt-3 font-display text-2xl font-bold text-primary-900">{m.value}</p><p className="text-sm text-gray-500">{m.label}</p></div>)}
       </div>
     </div>
   );

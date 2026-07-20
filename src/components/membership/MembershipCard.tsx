@@ -26,7 +26,7 @@ export function MembershipCard() {
   const expiring = isExpiringSoon(sub);
 
   return (
-    <div className="rounded-2xl bg-card p-6 shadow-card">
+    <div className="rounded-2xl bg-white p-6 shadow-md">
       <div className="flex items-center gap-3">
         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-secondary-100 text-secondary-800"><Crown className="h-5 w-5" /></span>
         <h2 className="font-display text-lg font-semibold text-primary-900">{t("membershipPage.currentPlan")}</h2>
@@ -38,9 +38,9 @@ export function MembershipCard() {
             <PlanBadge tier={tier} />
           </div>
           {sub && days !== null ? (
-            <p className="mt-1 flex items-center gap-1 text-sm text-muted"><Calendar className="h-3.5 w-3.5" />{t("membershipPage.expiresOn")}: {new Date(days * 86400000 + Date.now()).toLocaleDateString()}</p>
+            <p className="mt-1 flex items-center gap-1 text-sm text-gray-500"><Calendar className="h-3.5 w-3.5" />{t("membershipPage.expiresOn")}: {new Date(days * 86400000 + Date.now()).toLocaleDateString()}</p>
           ) : (
-            <p className="mt-1 text-sm text-muted">{t("membershipPage.noActive")}</p>
+            <p className="mt-1 text-sm text-gray-500">{t("membershipPage.noActive")}</p>
           )}
         </div>
       </div>
