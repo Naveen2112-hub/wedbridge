@@ -2,6 +2,7 @@ export const collections = {
   users: "users",
   profiles: "profiles",
   interests: "interests",
+  favourites: "favourites",
   notifications: "notifications",
   profileViews: "profileViews",
   searchHistory: "searchHistory",
@@ -136,6 +137,44 @@ export interface MatchHistoryDocument {
   profileUid: string;
   score: number;
   action: "viewed" | "interested" | "favourited";
+  createdAt: unknown;
+}
+
+export type InterestStatus = "pending" | "accepted" | "rejected" | "cancelled" | "expired";
+
+export interface InterestDocument {
+  id: string;
+  senderId: string;
+  receiverId: string;
+  status: InterestStatus;
+  createdAt: unknown;
+  updatedAt: unknown;
+}
+
+export interface FavouriteDocument {
+  id: string;
+  userId: string;
+  profileId: string;
+  createdAt: unknown;
+}
+
+export type NotificationType =
+  | "interest_received"
+  | "interest_accepted"
+  | "interest_rejected"
+  | "profile_viewed"
+  | "premium_activated"
+  | "new_ai_matches"
+  | "new_message"
+  | "admin_announcement";
+
+export interface NotificationDocument {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  read: boolean;
   createdAt: unknown;
 }
 

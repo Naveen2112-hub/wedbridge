@@ -18,15 +18,20 @@ service cloud.firestore {
       allow delete: if isOwner(uid) || isAdmin();
     }
     match /interests/{id} {
-      allow read: if isSignedIn() && (resource.data.senderUid == request.auth.uid || resource.data.receiverUid == request.auth.uid || isAdmin());
-      allow create: if isSignedIn() && request.resource.data.senderUid == request.auth.uid;
-      allow update: if isSignedIn() && (resource.data.receiverUid == request.auth.uid || isAdmin());
-      allow delete: if isSignedIn() && (resource.data.senderUid == request.auth.uid || isAdmin());
+      allow read: if isSignedIn() && (resource.data.senderId == request.auth.uid || resource.data.receiverId == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.senderId == request.auth.uid;
+      allow update: if isSignedIn() && (resource.data.senderId == request.auth.uid || resource.data.receiverId == request.auth.uid || isAdmin());
+      allow delete: if isSignedIn() && (resource.data.senderId == request.auth.uid || isAdmin());
+    }
+    match /favourites/{id} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isOwner(request.resource.data.userId);
+      allow delete: if isOwner(resource.data.userId);
     }
     match /notifications/{id} {
-      allow read: if isOwner(resource.data.uid) || isAdmin();
-      allow create: if isAdmin();
-      allow update, delete: if isOwner(resource.data.uid) || isAdmin();
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isOwner(resource.data.userId) || isAdmin();
     }
     match /profileViews/{id} {
       allow read: if isOwner(resource.data.profileUid) || isAdmin();
