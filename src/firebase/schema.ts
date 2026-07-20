@@ -6,6 +6,8 @@ export const collections = {
   profileViews: "profileViews",
   searchHistory: "searchHistory",
   recentlyViewed: "recentlyViewed",
+  aiMatches: "aiMatches",
+  matchHistory: "matchHistory",
 } as const;
 
 export const storagePaths = {
@@ -116,6 +118,25 @@ export interface RecentlyViewedDocument {
   uid: string;
   profileUid: string;
   viewedAt: unknown;
+}
+
+export interface AiMatchDocument {
+  id: string;
+  uid: string;
+  profileUid: string;
+  score: number;
+  reasons: string[];
+  insights: string[];
+  generatedAt: unknown;
+}
+
+export interface MatchHistoryDocument {
+  id: string;
+  uid: string;
+  profileUid: string;
+  score: number;
+  action: "viewed" | "interested" | "favourited";
+  createdAt: unknown;
 }
 
 export const FREE_PLAN_LIMITS = {
