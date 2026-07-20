@@ -5,41 +5,70 @@ service cloud.firestore {
     function isSignedIn() { return request.auth != null; }
     function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
     function isAdmin() { return isSignedIn() && request.auth.token.admin == true; }
+    function isUserAdmin(uid) { return isSignedIn() && exists(/databases/$(database)/documents/users/$(uid)) && get(/databases/$(database)/documents/users/$(uid)).data.role == "admin"; }
 
+    // Admin collections
+    match /users/{id} {
+      allow read: if isOwner(id) || isUserAdmin(request.auth.uid) || isAdmin();
+      allow create: if isSignedIn();
+      allow update: if isOwner(id) || isUserAdmin(request.auth.uid) || isAdmin();
+      allow delete: if isUserAdmin(request.auth.uid) || isAdmin();
+    }
+    match /profiles/{id} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isUserAdmin(request.auth.uid) || isAdmin();
+    }
+    match /payments/{id} {
+      allow read: if isOwner(resource.data.userId) || isUserAdmin(request.auth.uid) || isAdmin();
+      allow create: if isSignedIn();
+      allow update: if isUserAdmin(request.auth.uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+    match /subscriptions/{id} {
+      allow read: if isOwner(resource.data.userId) || isUserAdmin(request.auth.uid) || isAdmin();
+      allow create: if isSignedIn();
+      allow update: if isUserAdmin(request.auth.uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+    match /interests/{id} {
+      allow read: if isOwner(resource.data.userId) || isOwner(resource.data.targetUserId) || isUserAdmin(request.auth.uid) || isAdmin();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isUserAdmin(request.auth.uid) || isAdmin();
+    }
+    match /notifications/{id} {
+      allow read: if true;
+      allow create: if isUserAdmin(request.auth.uid) || isAdmin();
+      allow update, delete: if isUserAdmin(request.auth.uid) || isAdmin();
+    }
+    match /settings/{id} {
+      allow read: if true;
+      allow write: if isUserAdmin(request.auth.uid) || isAdmin();
+    }
+    match /auditLog/{id} {
+      allow read: if isUserAdmin(request.auth.uid) || isAdmin();
+      allow create: if isSignedIn();
+      allow update, delete: if isAdmin();
+    }
+
+    // Marketplace collections
     match /vendors/{id} {
       allow read: if resource.data.status == "approved" || isOwner(resource.data.ownerUid) || isAdmin();
       allow create: if isSignedIn();
       allow update: if isOwner(resource.data.ownerUid) || isAdmin();
       allow delete: if isAdmin();
     }
-    match /vendorCategories/{id} {
-      allow read: if true;
-      allow write: if isAdmin();
-    }
+    match /vendorCategories/{id} { allow read: if true; allow write: if isAdmin(); }
     match /vendorBookings/{id} {
-      allow read: if isOwner(resource.data.userId) || (resource.data.vendorId != null && isVendorOwner(resource.data.vendorId)) || isAdmin();
+      allow read: if isOwner(resource.data.userId) || isAdmin();
       allow create: if isSignedIn();
       allow update: if isOwner(resource.data.userId) || isAdmin();
       allow delete: if isAdmin();
     }
-    match /vendorReviews/{id} {
-      allow read: if true;
-      allow create: if isSignedIn();
-      allow update: if isOwner(resource.data.userId) || isAdmin();
-      allow delete: if isAdmin();
-    }
-    match /vendorGallery/{id} {
-      allow read: if true;
-      allow create, update: if isSignedIn();
-      allow delete: if isAdmin();
-    }
-    match /vendorPackages/{id} {
-      allow read: if true;
-      allow create, update: if isSignedIn();
-      allow delete: if isAdmin();
-    }
-    function isVendorOwner(vendorId) {
-      return isSignedIn() && get(/databases/$(database)/documents/vendors/$(vendorId)).data.ownerUid == request.auth.uid;
-    }
+    match /vendorReviews/{id} { allow read: if true; allow create: if isSignedIn(); allow update: if isOwner(resource.data.userId) || isAdmin(); allow delete: if isAdmin(); }
+    match /vendorGallery/{id} { allow read: if true; allow create, update: if isSignedIn(); allow delete: if isAdmin(); }
+    match /vendorPackages/{id} { allow read: if true; allow create, update: if isSignedIn(); allow delete: if isAdmin(); }
   }
 }

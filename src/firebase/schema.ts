@@ -9,26 +9,11 @@ export const collections = {
 } as const;
 
 export type VendorCategory =
-  | "marriage_halls"
-  | "photographers"
-  | "videographers"
-  | "catering"
-  | "decorators"
-  | "makeup_artists"
-  | "bridal_wear"
-  | "groom_wear"
-  | "jewellery"
-  | "invitation_designers"
-  | "wedding_planners"
-  | "flower_decoration"
-  | "music_dj"
-  | "travel_transport"
-  | "mehendi_artists"
-  | "priest_purohit"
-  | "stage_decoration"
-  | "return_gifts"
-  | "wedding_cakes"
-  | "live_streaming";
+  | "marriage_halls" | "photographers" | "videographers" | "catering" | "decorators"
+  | "makeup_artists" | "bridal_wear" | "groom_wear" | "jewellery" | "invitation_designers"
+  | "wedding_planners" | "flower_decoration" | "music_dj" | "travel_transport"
+  | "mehendi_artists" | "priest_purohit" | "stage_decoration" | "return_gifts"
+  | "wedding_cakes" | "live_streaming";
 
 export const VENDOR_CATEGORIES: { id: VendorCategory; name: string; icon: string }[] = [
   { id: "marriage_halls", name: "Marriage Halls", icon: "Building2" },
@@ -62,79 +47,17 @@ export type VerificationStatus = "unverified" | "verified";
 export type ContactVisibility = "everyone" | "after_booking" | "premium_only";
 
 export interface VendorDocument {
-  id: string;
-  ownerUid: string;
-  businessName: string;
-  category: VendorCategory;
-  logoURL: string;
-  coverURL: string;
-  about: string;
-  city: string;
-  district: string;
-  state: string;
-  location: { lat: number; lng: number } | null;
-  phone: string;
-  email: string;
-  website?: string;
-  businessHours?: { days: string; hours: string };
-  startingPrice: number;
-  experienceYears: number;
-  rating: number;
-  reviewCount: number;
-  featured: boolean;
-  status: VendorStatus;
-  verificationStatus: VerificationStatus;
-  contactVisibility: ContactVisibility;
-  createdAt: unknown;
-  updatedAt: unknown;
+  id: string; ownerUid: string; businessName: string; category: VendorCategory;
+  logoURL: string; coverURL: string; about: string; city: string; district: string; state: string;
+  location: { lat: number; lng: number } | null; phone: string; email: string; website?: string;
+  businessHours?: { days: string; hours: string }; startingPrice: number; experienceYears: number;
+  rating: number; reviewCount: number; featured: boolean; status: VendorStatus;
+  verificationStatus: VerificationStatus; contactVisibility: ContactVisibility;
+  createdAt: unknown; updatedAt: unknown;
 }
 
-export interface VendorPackageDocument {
-  id: string;
-  vendorId: string;
-  name: string;
-  description: string;
-  price: number;
-  inclusions: string[];
-  createdAt: unknown;
-}
-
-export interface VendorGalleryDocument {
-  id: string;
-  vendorId: string;
-  imageURL: string;
-  caption?: string;
-  createdAt: unknown;
-}
-
+export interface VendorPackageDocument { id: string; vendorId: string; name: string; description: string; price: number; inclusions: string[]; createdAt: unknown; }
+export interface VendorGalleryDocument { id: string; vendorId: string; imageURL: string; caption?: string; createdAt: unknown; }
 export type BookingStatus = "pending" | "confirmed" | "completed" | "cancelled";
-
-export interface VendorBookingDocument {
-  id: string;
-  vendorId: string;
-  vendorName: string;
-  userId: string;
-  userName: string;
-  userEmail: string;
-  packageId?: string;
-  preferredDate: unknown;
-  time: string;
-  guestCount: number;
-  specialNotes?: string;
-  status: BookingStatus;
-  amount: number;
-  createdAt: unknown;
-  updatedAt: unknown;
-}
-
-export interface VendorReviewDocument {
-  id: string;
-  vendorId: string;
-  userId: string;
-  userName: string;
-  rating: number;
-  review: string;
-  verifiedBooking: boolean;
-  reported: boolean;
-  createdAt: unknown;
-}
+export interface VendorBookingDocument { id: string; vendorId: string; vendorName: string; userId: string; userName: string; userEmail: string; packageId?: string; preferredDate: unknown; time: string; guestCount: number; specialNotes?: string; status: BookingStatus; amount: number; createdAt: unknown; updatedAt: unknown; }
+export interface VendorReviewDocument { id: string; vendorId: string; userId: string; userName: string; rating: number; review: string; verifiedBooking: boolean; reported: boolean; createdAt: unknown; }

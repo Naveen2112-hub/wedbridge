@@ -4,53 +4,23 @@ import { collections, type VendorDocument, type VendorCategory, type VendorStatu
 
 export const PAGE_SIZE = 9;
 
-export interface VendorFilters {
-  category?: VendorCategory;
-  city?: string;
-  district?: string;
-  state?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  minRating?: number;
-  verifiedOnly?: boolean;
-  availableDate?: string;
-}
+export interface VendorFilters { category?: VendorCategory; city?: string; district?: string; state?: string; minPrice?: number; maxPrice?: number; minRating?: number; verifiedOnly?: boolean; availableDate?: string; }
+export interface VendorListResult { vendors: VendorDocument[]; cursor: QueryDocumentSnapshot<DocumentData> | null; hasMore: boolean; }
 
-export interface VendorListResult {
-  vendors: VendorDocument[];
-  cursor: QueryDocumentSnapshot<DocumentData> | null;
-  hasMore: boolean;
-}
-
-function toVendor(d: QueryDocumentSnapshot<DocumentData>): VendorDocument {
-  return { id: d.id, ...(d.data() as Omit<VendorDocument, "id">) };
-}
+function toVendor(d: QueryDocumentSnapshot<DocumentData>): VendorDocument { return { id: d.id, ...(d.data() as Omit<VendorDocument, "id">) }; }
 
 export async function getApprovedVendors(max = 100): Promise<VendorDocument[]> {
   if (!db) return [];
-  try {
-    const snap = await getDocs(query(collection(db, collections.vendors), where("status", "==", "approved" as VendorStatus), orderBy("featured", "desc"), orderBy("rating", "desc"), limit(max)));
-    return snap.docs.map(toVendor);
-  } catch { return []; }
+  try { const snap = await getDocs(query(collection(db, collections.vendors), where("status", "==", "approved" as VendorStatus), orderBy("featured", "desc"), orderBy("rating", "desc"), limit(max))); return snap.docs.map(toVendor); } catch { return []; }
 }
-
 export async function getFeaturedVendors(max = 8): Promise<VendorDocument[]> {
   if (!db) return [];
-  try {
-    const snap = await getDocs(query(collection(db, collections.vendors), where("status", "==", "approved" as VendorStatus), where("featured", "==", true), limit(max)));
-    return snap.docs.map(toVendor);
-  } catch { return []; }
+  try { const snap = await getDocs(query(collection(db, collections.vendors), where("status", "==", "approved" as VendorStatus), where("featured", "==", true), limit(max))); return snap.docs.map(toVendor); } catch { return []; }
 }
-
 export async function getVendor(id: string): Promise<VendorDocument | null> {
   if (!db) return null;
-  try {
-    const snap = await getDoc(doc(db, collections.vendors, id));
-    if (!snap.exists()) return null;
-    return { id: snap.id, ...(snap.data() as Omit<VendorDocument, "id">) };
-  } catch { return null; }
+  try { const snap = await getDoc(doc(db, collections.vendors, id)); if (!snap.exists()) return null; return { id: snap.id, ...(snap.data() as Omit<VendorDocument, "id">) }; } catch { return null; }
 }
-
 export async function searchVendors(filters: VendorFilters, cursor?: QueryDocumentSnapshot<DocumentData> | null): Promise<VendorListResult> {
   if (!db) return { vendors: [], cursor: null, hasMore: false };
   try {
@@ -69,41 +39,25 @@ export async function searchVendors(filters: VendorFilters, cursor?: QueryDocume
     const slice = hasMore ? docs.slice(0, PAGE_SIZE) : docs;
     let vendors = slice.map(toVendor);
     if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
-      vendors = vendors.filter((v) => {
-        const ok = filters.minPrice === undefined || v.startingPrice >= filters.minPrice;
-        const ok2 = filters.maxPrice === undefined || v.startingPrice <= filters.maxPrice;
-        return ok && ok2;
-      });
+      vendors = vendors.filter((v) => { const ok = filters.minPrice === undefined || v.startingPrice >= filters.minPrice; const ok2 = filters.maxPrice === undefined || v.startingPrice <= filters.maxPrice; return ok && ok2; });
     }
     return { vendors, cursor: slice[slice.length - 1] ?? null, hasMore };
   } catch { return { vendors: [], cursor: null, hasMore: false }; }
 }
-
 export async function getVendorByOwner(uid: string): Promise<VendorDocument | null> {
   if (!db) return null;
-  try {
-    const snap = await getDocs(query(collection(db, collections.vendors), where("ownerUid", "==", uid), limit(1)));
-    if (snap.empty) return null;
-    const d = snap.docs[0];
-    return { id: d.id, ...(d.data() as Omit<VendorDocument, "id">) };
-  } catch { return null; }
+  try { const snap = await getDocs(query(collection(db, collections.vendors), where("ownerUid", "==", uid), limit(1))); if (snap.empty) return null; const d = snap.docs[0]; return { id: d.id, ...(d.data() as Omit<VendorDocument, "id">) }; } catch { return null; }
 }
-
 export async function createVendor(data: Omit<VendorDocument, "id" | "createdAt" | "updatedAt" | "rating" | "reviewCount" | "featured" | "status" | "verificationStatus">): Promise<string> {
   if (!db) throw new Error("db-not-configured");
   const ref = await addDoc(collection(db, collections.vendors), { ...data, rating: 0, reviewCount: 0, featured: false, status: "pending" as VendorStatus, verificationStatus: "unverified", createdAt: serverTimestamp(), updatedAt: serverTimestamp() } as Omit<VendorDocument, "id">);
   return ref.id;
 }
-
 export async function updateVendor(id: string, data: Partial<VendorDocument>): Promise<void> {
   if (!db) return;
   try { await updateDoc(doc(db, collections.vendors, id), { ...data, updatedAt: serverTimestamp() }); } catch { /* ignore */ }
 }
-
 export async function listAllVendors(max = 100): Promise<VendorDocument[]> {
   if (!db) return [];
-  try {
-    const snap = await getDocs(query(collection(db, collections.vendors), orderBy("createdAt", "desc"), limit(max)));
-    return snap.docs.map(toVendor);
-  } catch { return []; }
+  try { const snap = await getDocs(query(collection(db, collections.vendors), orderBy("createdAt", "desc"), limit(max))); return snap.docs.map(toVendor); } catch { return []; }
 }
