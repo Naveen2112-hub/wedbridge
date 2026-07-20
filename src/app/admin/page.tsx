@@ -10,7 +10,7 @@ export default function AdminDashboardPage() {
 
   useEffect(() => { getAnalytics().then((d) => { setData(d); setLoading(false); }).catch(() => setLoading(false)); }, []);
 
-  if (loading) return <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{Array.from({ length: 8 }).map((_, i) => <div key={i} className="skeleton h-28 w-full rounded-2xl" />)}</div>;
+  if (loading) return <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{Array.from({ length: 8 }).map((_, i) => <div key={i} className="skeleton h-28 w-full rounded-2xl" />)}</div>;
   if (!data) return null;
 
   const cards = [
@@ -34,8 +34,8 @@ export default function AdminDashboardPage() {
         {cards.map((c) => <Card key={c.label} {...c} />)}
       </div>
       <div className="mt-8 grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-primary-100">
-          <h2 className="font-display text-lg font-semibold text-primary-900">Quick Analytics</h2>
+        <div className="card p-5">
+          <h2 className="heading-sm">Quick Analytics</h2>
           <div className="mt-4 space-y-3">
             <MiniStat icon={Users} label="New Users" value={data.newUsers} />
             <MiniStat icon={Eye} label="Profile Views" value={data.profileViews} />
@@ -51,7 +51,7 @@ export default function AdminDashboardPage() {
 }
 
 function Card({ label, value, icon: Icon, color }: { label: string; value: string | number; icon: React.ComponentType<{ className?: string }>; color: string }) {
-  return <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-primary-100 transition hover:shadow-md"><span className={cn("flex h-10 w-10 items-center justify-center rounded-xl", color)}><Icon className="h-5 w-5" /></span><p className="mt-3 font-display text-2xl font-bold text-primary-900">{value}</p><p className="text-sm text-muted">{label}</p></div>;
+  return <div className="card card-hover p-5"><span className={cn("flex h-10 w-10 items-center justify-center rounded-xl", color)}><Icon className="h-5 w-5" /></span><p className="mt-3 font-display text-2xl font-bold text-primary-900">{value}</p><p className="text-sm text-muted">{label}</p></div>;
 }
 
 function MiniStat({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string | number }) {

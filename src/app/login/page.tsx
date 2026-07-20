@@ -1,9 +1,10 @@
+import { AuthShell } from "@/components/auth/AuthShell";
 import { LoginForm } from "@/components/auth/LoginForm";
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-primary-50/30 px-4 py-12">
+    <AuthShell>
       <LoginForm />
-    </div>
+    </AuthShell>
   );
 }
