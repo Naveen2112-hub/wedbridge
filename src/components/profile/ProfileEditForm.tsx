@@ -1,0 +1,79 @@
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Loader as Loader2, Save } from "lucide-react";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { createProfile, getProfileByUserId, updateProfile } from "@/lib/profile/profileService";
+import { useToast } from "@/components/ui/Toast";
+import { sanitizeText, validatePhone } from "@/lib/utils";
+import { useEffect } from "react";
+
+const religions = ["Hindu", "Christian", "Muslim", "Sikh", "Jain"];
+const districts = ["Chennai", "Coimbatore", "Madurai", "Tirunelveli", "Salem", "Trichy", "Vellore"];
+
+export function ProfileEditForm() {
+  const router = useRouter();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const [profileId, setProfileId] = useState<string | null>(null);
+  const [form, setForm] = useState({
+    name: "", gender: "male" as "male" | "female", dob: "", religion: "Hindu", caste: "", motherTongue: "Tamil",
+    education: "", occupation: "", income: "", phone: "", city: "", district: "", state: "Tamil Nadu",
+    height: "", weight: "", maritalStatus: "Never Married", familyType: "Nuclear", bio: "",
+  });
+
+  useEffect(() => {
+    (async () => {
+      if (!user) return;
+      const p = await getProfileByUserId(user.uid);
+      if (p) { setProfileId(p.id); setForm((f) => ({ ...f, ...p, dob: p.dob as string })); }
+    })();
+  }, [user]);
+
+  const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) return;
+    if (sanitizeText(form.name).length < 2) { toast("Name is required", "error"); return; }
+    if (form.phone && !validatePhone(form.phone)) { toast("Enter a valid 10-digit phone", "error"); return; }
+    setLoading(true);
+    const data = { ...form, name: sanitizeText(form.name), bio: sanitizeText(form.bio), userId: user.uid };
+    if (profileId) { await updateProfile(profileId, data); toast("Profile updated!", "success"); }
+    else { const id = await createProfile(data); if (id) { setProfileId(id); toast("Profile created!", "success"); } else { toast("Failed to create profile", "error"); setLoading(false); return; } }
+    setLoading(false);
+    router.push("/profile");
+  };
+
+  return (
+    <div className="mx-auto max-w-2xl px-4 py-8">
+      <h1 className="heading-md">{profileId ? "Edit Profile" : "Create Profile"}</h1>
+      <p className="text-lead mt-1 text-sm">Fill in your details to find the best matches.</p>
+      <form onSubmit={submit} className="mt-6 space-y-4">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label="Full Name" value={form.name} onChange={(v) => set("name", v)} required />
+          <div><label className="label">Gender</label><select className="input" value={form.gender} onChange={(e) => set("gender", e.target.value)}><option value="male">Male</option><option value="female">Female</option></select></div>
+          <Field label="Date of Birth" type="date" value={form.dob} onChange={(v) => set("dob", v)} required />
+          <div><label className="label">Religion</label><select className="input" value={form.religion} onChange={(e) => set("religion", e.target.value)}>{religions.map((r) => <option key={r}>{r}</option>)}</select></div>
+          <Field label="Caste" value={form.caste} onChange={(v) => set("caste", v)} />
+          <Field label="Mother Tongue" value={form.motherTongue} onChange={(v) => set("motherTongue", v)} />
+          <Field label="Education" value={form.education} onChange={(v) => set("education", v)} />
+          <Field label="Occupation" value={form.occupation} onChange={(v) => set("occupation", v)} />
+          <Field label="Annual Income" value={form.income} onChange={(v) => set("income", v)} />
+          <Field label="Phone" value={form.phone} onChange={(v) => set("phone", v)} />
+          <Field label="City" value={form.city} onChange={(v) => set("city", v)} />
+          <div><label className="label">District</label><select className="input" value={form.district} onChange={(e) => set("district", e.target.value)}><option value="">Select</option>{districts.map((d) => <option key={d}>{d}</option>)}</select></div>
+          <div><label className="label">Marital Status</label><select className="input" value={form.maritalStatus} onChange={(e) => set("maritalStatus", e.target.value)}><option>Never Married</option><option>Divorced</option><option>Widowed</option></select></div>
+          <div><label className="label">Family Type</label><select className="input" value={form.familyType} onChange={(e) => set("familyType", e.target.value)}><option>Nuclear</option><option>Joint</option></select></div>
+        </div>
+        <div><label className="label">About Yourself</label><textarea className="input" rows={4} value={form.bio} onChange={(e) => set("bio", e.target.value)} placeholder="Tell us about yourself…" maxLength={500} /></div>
+        <button type="submit" disabled={loading} className="btn-primary w-full">{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Save className="h-4 w-4" />{profileId ? "Update Profile" : "Create Profile"}</>}</button>
+      </form>
+    </div>
+  );
+}
+
+function Field({ label, value, onChange, type = "text", required }: { label: string; value: string; onChange: (v: string) => void; type?: string; required?: boolean }) {
+  return <div><label className="label">{label}{required && " *"}</label><input type={type} className="input" value={value} onChange={(e) => onChange(e.target.value)} required={required} /></div>;
+}

@@ -18,13 +18,18 @@ let dbInstance: Firestore | null = null;
 let storageInstance: FirebaseStorage | null = null;
 
 if (typeof window !== "undefined" && firebaseConfig.apiKey) {
-  app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-  authInstance = getAuth(app);
-  dbInstance = getFirestore(app);
-  storageInstance = getStorage(app);
+  try {
+    app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+    authInstance = getAuth(app);
+    dbInstance = getFirestore(app);
+    storageInstance = getStorage(app);
+  } catch (e) {
+    console.error("Firebase initialization failed:", e);
+  }
 }
 
 export const db = dbInstance;
 export const auth = authInstance;
 export const storage = storageInstance;
 export { app };
+export const isFirebaseConfigured = Boolean(app);

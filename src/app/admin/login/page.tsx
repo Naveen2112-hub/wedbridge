@@ -31,8 +31,8 @@ export default function AdminLoginPage() {
             <p className="text-lead mt-2 text-sm">Sign in with an admin account to access the panel.</p>
           </div>
           <form onSubmit={submit} className="mt-6 space-y-4">
-            <div><label className="label">Email</label><div className="relative"><Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" /><input type="email" required className="input pl-10" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@wedbridge.com" /></div></div>
-            <div><label className="label">Password</label><div className="relative"><Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" /><input type="password" required className="input pl-10" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" /></div></div>
+            <div><label className="label" htmlFor="admin-email">Email</label><div className="relative"><Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" /><input id="admin-email" type="email" required autoComplete="email" className="input pl-10" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="admin@wedbridge.com" /></div></div>
+            <div><label className="label" htmlFor="admin-pass">Password</label><div className="relative"><Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" /><input id="admin-pass" type="password" required autoComplete="current-password" className="input pl-10" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" /></div></div>
             {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
             <button type="submit" disabled={loading} className="btn-primary w-full">{loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In"}</button>
           </form>

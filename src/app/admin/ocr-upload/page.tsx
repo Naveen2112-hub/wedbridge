@@ -4,7 +4,7 @@ import { ScanLine, FileText, Image as ImageIcon, Loader as Loader2, CircleCheck 
 import { mockOCR, type OCRResult } from "@/lib/admin/notificationService";
 import { createProfile } from "@/lib/admin/adminService";
 import { useAdminAuth } from "@/lib/admin/AdminAuthContext";
-import type { AdminProfile } from "@/lib/admin/schema";
+import type { ProfileDocument } from "@/firebase/schema";
 
 export default function OCRUploadPage() {
   const { adminUser } = useAdminAuth();
@@ -26,8 +26,8 @@ export default function OCRUploadPage() {
   const save = async () => {
     if (!result) return;
     setSaving(true);
-    const profile: Omit<AdminProfile, "id" | "createdAt"> = {
-      userId: "ocr", name: result.name, gender: "male", religion: result.religion, caste: result.caste, education: result.education, occupation: result.occupation, phone: result.phone, district: result.district, dob: result.dob, status: "pending", premium: false, verified: false, featured: false, createdBy: "ocr",
+    const profile: Omit<ProfileDocument, "id" | "createdAt"> = {
+      userId: "admin", name: result.name, gender: "male", dob: result.dob, religion: result.religion, caste: result.caste, education: result.education, occupation: result.occupation, phone: result.phone, district: result.district, state: "Tamil Nadu", status: "pending", premium: false, verified: false, featured: false, createdBy: "admin",
     };
     await createProfile(profile, admin);
     setSaving(false); setSaved(true);
@@ -41,7 +41,6 @@ export default function OCRUploadPage() {
     <div>
       <h1 className="heading-md">OCR Import</h1>
       <p className="text-lead mt-1 text-sm">Upload PDF, JPG, or PNG to extract profile data automatically.</p>
-
       <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-primary-100">
         <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary-200 p-8 text-center transition hover:border-primary-400 hover:bg-primary-50/50">
           <ScanLine className="h-10 w-10 text-primary-400" />
@@ -52,7 +51,6 @@ export default function OCRUploadPage() {
         {fileName && <p className="mt-3 flex items-center gap-2 text-sm text-primary-900">{fileName.endsWith(".pdf") ? <FileText className="h-4 w-4" /> : <ImageIcon className="h-4 w-4" />}{fileName}</p>}
         {extracting && <p className="mt-3 flex items-center gap-2 text-sm text-muted"><Loader2 className="h-4 w-4 animate-spin" />Extracting data…</p>}
       </div>
-
       {result && (
         <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-primary-100">
           <div className="flex items-center justify-between">
@@ -60,14 +58,11 @@ export default function OCRUploadPage() {
             {saved && <span className="badge bg-green-50 text-green-700"><CheckCircle2 className="h-3.5 w-3.5" />Saved</span>}
           </div>
           <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            {fields.map((f) => (
-              <div key={f.key}><label className="label">{f.label}</label><input className="input" value={result[f.key]} onChange={(e) => setResult({ ...result, [f.key]: e.target.value })} /></div>
-            ))}
+            {fields.map((f) => <div key={f.key}><label className="label">{f.label}</label><input className="input" value={result[f.key]} onChange={(e) => setResult({ ...result, [f.key]: e.target.value })} /></div>)}
           </div>
           <div className="mt-4 flex gap-2">
             <button type="button" onClick={save} disabled={saving || saved} className="btn-primary">{saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}{saving ? "Saving…" : "Save Profile"}</button>
           </div>
-          <p className="mt-2 text-xs text-muted">Profile created with <code className="rounded bg-primary-50 px-1">createdBy = "admin"</code></p>
         </div>
       )}
     </div>

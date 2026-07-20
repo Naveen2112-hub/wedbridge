@@ -1,6 +1,6 @@
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/firebase/config";
-import { collections, defaultSettings, type SiteSettings } from "@/lib/admin/schema";
+import { collections, defaultSettings, type SiteSettings } from "@/firebase/schema";
 
 const SETTINGS_DOC = "global";
 

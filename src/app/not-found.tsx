@@ -1,3 +1,14 @@
 "use client";
 import Link from "next/link";
-export default function NotFound() { return <div className="flex min-h-[60vh] items-center justify-center bg-grain px-4"><div className="text-center"><p className="font-display text-6xl font-semibold text-primary-800">404</p><h1 className="heading-md mt-4">Page not found</h1><p className="text-lead mt-2">The page you're looking for doesn't exist.</p><Link href="/" className="btn-primary mt-6">Go home</Link></div></div>; }
+import { Heart } from "lucide-react";
+
+export default function NotFound() {
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center bg-primary-50 px-4 text-center">
+      <Heart className="h-12 w-12 text-primary-300" />
+      <h1 className="heading-lg mt-4">404 - Page Not Found</h1>
+      <p className="text-lead mt-2 max-w-md">The page you&apos;re looking for doesn&apos;t exist or has been moved.</p>
+      <Link href="/" className="btn-primary mt-6">Back to Home</Link>
+    </div>
+  );
+}

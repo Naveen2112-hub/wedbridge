@@ -7,7 +7,6 @@ service cloud.firestore {
     function isAdmin() { return isSignedIn() && request.auth.token.admin == true; }
     function isUserAdmin(uid) { return isSignedIn() && exists(/databases/$(database)/documents/users/$(uid)) && get(/databases/$(database)/documents/users/$(uid)).data.role == "admin"; }
 
-    // Admin collections
     match /users/{id} {
       allow read: if isOwner(id) || isUserAdmin(request.auth.uid) || isAdmin();
       allow create: if isSignedIn();
@@ -33,7 +32,7 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
     match /interests/{id} {
-      allow read: if isOwner(resource.data.userId) || isOwner(resource.data.targetUserId) || isUserAdmin(request.auth.uid) || isAdmin();
+      allow read: if isOwner(resource.data.fromUserId) || isOwner(resource.data.toUserId) || isUserAdmin(request.auth.uid) || isAdmin();
       allow create: if isSignedIn();
       allow update: if isSignedIn();
       allow delete: if isUserAdmin(request.auth.uid) || isAdmin();
@@ -52,8 +51,6 @@ service cloud.firestore {
       allow create: if isSignedIn();
       allow update, delete: if isAdmin();
     }
-
-    // Marketplace collections
     match /vendors/{id} {
       allow read: if resource.data.status == "approved" || isOwner(resource.data.ownerUid) || isAdmin();
       allow create: if isSignedIn();
@@ -62,9 +59,9 @@ service cloud.firestore {
     }
     match /vendorCategories/{id} { allow read: if true; allow write: if isAdmin(); }
     match /vendorBookings/{id} {
-      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow read: if isOwner(resource.data.userId) || isOwner(resource.data.vendorId) || isAdmin();
       allow create: if isSignedIn();
-      allow update: if isOwner(resource.data.userId) || isAdmin();
+      allow update: if isSignedIn();
       allow delete: if isAdmin();
     }
     match /vendorReviews/{id} { allow read: if true; allow create: if isSignedIn(); allow update: if isOwner(resource.data.userId) || isAdmin(); allow delete: if isAdmin(); }

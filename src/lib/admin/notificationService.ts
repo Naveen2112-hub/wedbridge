@@ -1,18 +1,13 @@
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/firebase/config";
-import { collections } from "@/lib/admin/schema";
+import { collections, type NotificationDocument } from "@/firebase/schema";
+import { sanitizeText } from "@/lib/utils";
 
-export interface BroadcastInput {
-  title: string;
-  message: string;
-  target: "all" | "premium" | "free" | "vendors";
-}
+export interface BroadcastInput { title: string; message: string; target: "all" | "premium" | "free" | "vendors"; }
 
 export async function broadcastNotification(input: BroadcastInput): Promise<void> {
   if (!db) return;
-  try {
-    await addDoc(collection(db, collections.notifications), { ...input, createdAt: serverTimestamp(), sentBy: "admin" });
-  } catch { /* ignore */ }
+  try { await addDoc(collection(db, collections.notifications), { ...input, title: sanitizeText(input.title), message: sanitizeText(input.message), sentBy: "admin", createdAt: serverTimestamp() } as Omit<NotificationDocument, "id">); } catch { /* ignore */ }
 }
 
 export function parseCSV(text: string): Record<string, string>[] {
@@ -36,9 +31,7 @@ export function detectDuplicates(rows: Record<string, string>[], key: string): n
   return dupes;
 }
 
-export interface OCRResult {
-  name: string; dob: string; religion: string; caste: string; education: string; occupation: string; phone: string; district: string;
-}
+export interface OCRResult { name: string; dob: string; religion: string; caste: string; education: string; occupation: string; phone: string; district: string; }
 
 export function mockOCR(fileName: string): OCRResult {
   const religions = ["Hindu", "Christian", "Muslim", "Sikh", "Jain"];
@@ -47,14 +40,5 @@ export function mockOCR(fileName: string): OCRResult {
   const occupations = ["Software Engineer", "Doctor", "Teacher", "Business", "Govt Employee"];
   const districts = ["Chennai", "Coimbatore", "Madurai", "Tirunelveli", "Salem"];
   const idx = fileName.length % 5;
-  return {
-    name: `Profile ${idx + 1}`,
-    dob: `199${idx}-0${idx + 1}-1${idx}`,
-    religion: religions[idx],
-    caste: castes[idx],
-    education: educations[idx],
-    occupation: occupations[idx],
-    phone: `98${idx}0${idx}0${idx}0${idx}0`,
-    district: districts[idx],
-  };
+  return { name: `Profile ${idx + 1}`, dob: `199${idx}-0${idx + 1}-1${idx}`, religion: religions[idx], caste: castes[idx], education: educations[idx], occupation: occupations[idx], phone: `98${idx}0${idx}0${idx}0${idx}0`, district: districts[idx] };
 }

@@ -1,26 +1,88 @@
 "use client";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Heart, Menu, X } from "lucide-react";
-import { useLanguage } from "@/lib/i18n/LanguageProvider";
-import { useAuth } from "@/lib/auth/AuthProvider";
-import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
-import { cn } from "@/lib/cn";
+import { Heart, Menu, X, User, LogOut, Search, Store, Bell } from "lucide-react";
+import { useAuth } from "@/lib/auth/AuthContext";
+import { logoutUser } from "@/lib/auth/authService";
+import { cn } from "@/lib/utils";
+
+const links = [
+  { href: "/search", label: "Find Matches" },
+  { href: "/matches", label: "AI Matches" },
+  { href: "/services", label: "Marketplace" },
+  { href: "/membership", label: "Membership" },
+];
 
 export function Navbar() {
-  const { t } = useLanguage();
-  const { user } = useAuth();
+  const pathname = usePathname();
+  const { user, appUser } = useAuth();
   const [open, setOpen] = useState(false);
-  const links = [{ href: "/", label: t("nav.home") }, { href: "/#why", label: t("home.why.title") }, { href: "/#membership", label: t("home.membership.title") }, { href: "/#faq", label: t("home.faq.title") }];
+
+  const isAdmin = appUser?.role === "admin";
+  const isVendor = appUser?.role === "vendor";
+
+  const handleLogout = async () => { await logoutUser(); setOpen(false); };
+
   return (
-    <header className="sticky top-0 z-50 border-b border-primary-100/60 bg-background/85 backdrop-blur-md">
-      <nav className="container-page flex h-16 items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5" aria-label="WedBridge home"><span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white shadow-soft"><Heart className="h-4 w-4" fill="currentColor" /></span><span className="font-display text-lg font-semibold text-primary-900">Wed<span className="text-secondary-600">Bridge</span></span></Link>
-        <div className="hidden items-center gap-7 md:flex">{links.map((l) => <Link key={l.href} href={l.href} className="text-sm font-medium text-ink/70 transition hover:text-primary-900">{l.label}</Link>)}</div>
-        <div className="hidden items-center gap-3 md:flex"><LanguageSwitcher />{user ? <Link href="/dashboard" className="btn-primary">{t("nav.dashboard")}</Link> : <><Link href="/login" className="btn-ghost">{t("nav.login")}</Link><Link href="/register" className="btn-primary">{t("nav.register")}</Link></>}</div>
-        <button type="button" onClick={() => setOpen((v) => !v)} className="rounded-full p-2 text-primary-900 md:hidden" aria-label="Menu">{open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}</button>
+    <header className="sticky top-0 z-40 border-b border-primary-100 bg-white/90 backdrop-blur-md">
+      <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8" aria-label="Main navigation">
+        <div className="flex items-center gap-8">
+          <Link href="/" className="flex items-center gap-2 font-display text-xl font-bold text-primary-800" aria-label="WedBridge home">
+            <Heart className="h-6 w-6 text-primary-600" fill="currentColor" />
+            WedBridge
+          </Link>
+          <div className="hidden items-center gap-6 md:flex">
+            {links.map((l) => (
+              <Link key={l.href} href={l.href} className={cn("text-sm font-medium transition", pathname === l.href || pathname.startsWith(l.href + "/") ? "text-primary-700" : "text-ink/70 hover:text-primary-700")}>
+                {l.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="hidden items-center gap-3 md:flex">
+          {user ? (
+            <>
+              <Link href="/notifications" className="rounded-lg p-2 text-ink/70 hover:bg-primary-50 hover:text-primary-700" aria-label="Notifications"><Bell className="h-5 w-5" /></Link>
+              {isVendor && <Link href="/vendor-dashboard" className="rounded-lg p-2 text-ink/70 hover:bg-primary-50 hover:text-primary-700" aria-label="Vendor Dashboard"><Store className="h-5 w-5" /></Link>}
+              {isAdmin && <Link href="/admin" className="rounded-lg p-2 text-ink/70 hover:bg-primary-50 hover:text-primary-700" aria-label="Admin Panel"><User className="h-5 w-5" /></Link>}
+              <Link href="/profile" className="btn-primary text-sm">My Profile</Link>
+              <button type="button" onClick={handleLogout} className="btn-ghost text-sm" aria-label="Logout"><LogOut className="h-4 w-4" /></button>
+            </>
+          ) : (
+            <>
+              <Link href="/search" className="btn-ghost text-sm"><Search className="h-4 w-4" />Browse</Link>
+              <Link href="/login" className="btn-ghost text-sm">Login</Link>
+              <Link href="/register" className="btn-primary text-sm">Register</Link>
+            </>
+          )}
+        </div>
+
+        <button type="button" onClick={() => setOpen(!open)} className="md:hidden" aria-label="Toggle menu" aria-expanded={open}>
+          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
       </nav>
-      {open && (<div className="border-t border-primary-100 bg-background md:hidden"><div className="container-page space-y-1 py-3">{links.map((l) => <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className={cn("block rounded-lg px-3 py-2 text-sm font-medium text-ink/80 hover:bg-primary-50")}>{l.label}</Link>)}<div className="flex items-center gap-2 px-3 pt-2"><LanguageSwitcher />{user ? <Link href="/dashboard" className="btn-primary flex-1">{t("nav.dashboard")}</Link> : <><Link href="/login" className="btn-outline flex-1">{t("nav.login")}</Link><Link href="/register" className="btn-primary flex-1">{t("nav.register")}</Link></>}</div></div></div>)}
+
+      {open && (
+        <div className="border-t border-primary-100 bg-white px-4 py-3 md:hidden">
+          <div className="flex flex-col gap-2">
+            {links.map((l) => <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-ink/70 hover:bg-primary-50">{l.label}</Link>)}
+            {user ? (
+              <>
+                <Link href="/profile" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-ink/70 hover:bg-primary-50">My Profile</Link>
+                <Link href="/notifications" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-ink/70 hover:bg-primary-50">Notifications</Link>
+                <button type="button" onClick={handleLogout} className="rounded-lg px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50">Logout</button>
+              </>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-ink/70 hover:bg-primary-50">Login</Link>
+                <Link href="/register" onClick={() => setOpen(false)} className="rounded-lg px-3 py-2 text-sm font-medium text-primary-700 hover:bg-primary-50">Register</Link>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

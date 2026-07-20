@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useState, type ReactNode } from "react";
 import { LayoutDashboard, Users, CircleUser as UserCircle, CloudUpload as UploadCloud, ScanLine, CreditCard, Wallet, Store, CalendarCheck, Bell, ChartBar as BarChart3, ChartBar as FileBarChart, Settings, LogOut, Menu, X, ShieldCheck } from "lucide-react";
 import { AdminAuthProvider, useAdminAuth } from "@/lib/admin/AdminAuthContext";
 import { AdminRouteGuard } from "@/components/admin/AdminRouteGuard";
-import { cn } from "@/lib/cn";
+import { cn } from "@/lib/utils";
 
 const nav = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -46,7 +46,7 @@ function AdminShell({ children }: { children: ReactNode }) {
       <aside className={cn("fixed inset-y-0 left-0 z-40 w-64 transform bg-primary-900 text-white transition-transform duration-200 lg:translate-x-0", open ? "translate-x-0" : "-translate-x-full")}>
         <div className="flex h-16 items-center justify-between px-5">
           <Link href="/admin" className="flex items-center gap-2 font-display text-lg font-bold"><ShieldCheck className="h-6 w-6 text-secondary-400" />Admin Panel</Link>
-          <button type="button" onClick={() => setOpen(false)} className="lg:hidden"><X className="h-5 w-5" /></button>
+          <button type="button" onClick={() => setOpen(false)} className="lg:hidden" aria-label="Close menu"><X className="h-5 w-5" /></button>
         </div>
         <nav className="mt-2 space-y-1 overflow-y-auto px-3 pb-4" style={{ maxHeight: "calc(100vh - 4rem)" }}>
           {nav.map((item) => {
@@ -61,7 +61,7 @@ function AdminShell({ children }: { children: ReactNode }) {
 
       <div className="lg:pl-64">
         <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-primary-100 bg-white/80 px-4 backdrop-blur sm:px-6">
-          <button type="button" onClick={() => setOpen(true)} className="lg:hidden"><Menu className="h-5 w-5" /></button>
+          <button type="button" onClick={() => setOpen(true)} className="lg:hidden" aria-label="Open menu"><Menu className="h-5 w-5" /></button>
           <div className="hidden lg:block" />
           <div className="flex items-center gap-3">
             <div className="text-right"><p className="text-sm font-semibold text-primary-900">{adminUser?.displayName ?? "Admin"}</p><p className="text-xs text-muted">{adminUser?.email}</p></div>

@@ -3,12 +3,12 @@ import { useEffect, useState } from "react";
 import { Search, Check, X, Eye, EyeOff, Trash2, Crown, BadgeCheck, Star } from "lucide-react";
 import { listProfiles, updateProfile, deleteProfile } from "@/lib/admin/adminService";
 import { useAdminAuth } from "@/lib/admin/AdminAuthContext";
-import type { AdminProfile } from "@/lib/admin/schema";
-import { cn } from "@/lib/cn";
+import type { ProfileDocument } from "@/firebase/schema";
+import { cn } from "@/lib/utils";
 
 export default function AdminProfilesPage() {
   const { adminUser } = useAdminAuth();
-  const [profiles, setProfiles] = useState<AdminProfile[]>([]);
+  const [profiles, setProfiles] = useState<ProfileDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected" | "hidden">("all");
@@ -24,21 +24,17 @@ export default function AdminProfilesPage() {
     return match && f;
   });
 
-  const act = async (p: AdminProfile, data: Partial<AdminProfile>) => { await updateProfile(p.id, data, admin); load(); };
+  const act = async (p: ProfileDocument, data: Partial<ProfileDocument>) => { await updateProfile(p.id, data, admin); load(); };
 
   if (loading) return <div className="space-y-3">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="skeleton h-16 w-full rounded-2xl" />)}</div>;
 
   return (
     <div>
       <div className="mb-6"><h1 className="heading-md">Profiles</h1><p className="text-lead mt-1 text-sm">Approve, verify, feature and manage profiles.</p></div>
-
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px]"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" /><input className="input pl-10" placeholder="Search by name or phone…" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
-        <select className="input max-w-[180px]" value={filter} onChange={(e) => setFilter(e.target.value as typeof filter)}>
-          <option value="all">All</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="hidden">Hidden</option>
-        </select>
+        <select className="input max-w-[180px]" value={filter} onChange={(e) => setFilter(e.target.value as typeof filter)}><option value="all">All</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option><option value="hidden">Hidden</option></select>
       </div>
-
       <div className="mt-4 overflow-x-auto rounded-2xl bg-white shadow-sm ring-1 ring-primary-100">
         <table className="w-full text-sm">
           <thead><tr className="border-b border-primary-100 text-left text-muted"><th className="p-3">Profile</th><th className="p-3">Gender</th><th className="p-3">Status</th><th className="p-3">Flags</th><th className="p-3">Created By</th><th className="p-3">Actions</th></tr></thead>

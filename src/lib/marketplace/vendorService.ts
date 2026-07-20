@@ -4,7 +4,7 @@ import { collections, type VendorDocument, type VendorCategory, type VendorStatu
 
 export const PAGE_SIZE = 9;
 
-export interface VendorFilters { category?: VendorCategory; city?: string; district?: string; state?: string; minPrice?: number; maxPrice?: number; minRating?: number; verifiedOnly?: boolean; availableDate?: string; }
+export interface VendorFilters { category?: VendorCategory; city?: string; district?: string; state?: string; minPrice?: number; maxPrice?: number; minRating?: number; verifiedOnly?: boolean; }
 export interface VendorListResult { vendors: VendorDocument[]; cursor: QueryDocumentSnapshot<DocumentData> | null; hasMore: boolean; }
 
 function toVendor(d: QueryDocumentSnapshot<DocumentData>): VendorDocument { return { id: d.id, ...(d.data() as Omit<VendorDocument, "id">) }; }
@@ -38,9 +38,8 @@ export async function searchVendors(filters: VendorFilters, cursor?: QueryDocume
     const hasMore = docs.length > PAGE_SIZE;
     const slice = hasMore ? docs.slice(0, PAGE_SIZE) : docs;
     let vendors = slice.map(toVendor);
-    if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
-      vendors = vendors.filter((v) => { const ok = filters.minPrice === undefined || v.startingPrice >= filters.minPrice; const ok2 = filters.maxPrice === undefined || v.startingPrice <= filters.maxPrice; return ok && ok2; });
-    }
+    if (filters.minPrice !== undefined) vendors = vendors.filter((v) => v.startingPrice >= filters.minPrice!);
+    if (filters.maxPrice !== undefined) vendors = vendors.filter((v) => v.startingPrice <= filters.maxPrice!);
     return { vendors, cursor: slice[slice.length - 1] ?? null, hasMore };
   } catch { return { vendors: [], cursor: null, hasMore: false }; }
 }

@@ -1,9 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
-import { CalendarCheck, Clock, CircleCheck as CheckCircle2, Circle as XCircle } from "lucide-react";
 import { listAllBookings } from "@/lib/marketplace/bookingService";
 import type { VendorBookingDocument } from "@/firebase/schema";
-import { cn } from "@/lib/cn";
+import { cn, formatCurrency, formatDate } from "@/lib/utils";
 
 export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<VendorBookingDocument[]>([]);
@@ -25,9 +24,9 @@ export default function AdminBookingsPage() {
               <tr key={b.id} className="border-b border-primary-100 last:border-0">
                 <td className="p-3 font-medium text-primary-900">{b.vendorName}</td>
                 <td className="p-3 text-xs">{b.userName}</td>
-                <td className="p-3 text-xs">{new Date(b.preferredDate as unknown as string).toLocaleDateString()}</td>
+                <td className="p-3 text-xs">{formatDate(b.preferredDate as unknown as string)}</td>
                 <td className="p-3 text-xs">{b.guestCount}</td>
-                <td className="p-3 font-medium">₹{b.amount.toLocaleString()}</td>
+                <td className="p-3 font-medium">{formatCurrency(b.amount)}</td>
                 <td className="p-3"><span className={cn("badge", b.status === "completed" ? "bg-green-50 text-green-700" : b.status === "confirmed" ? "bg-blue-50 text-blue-700" : b.status === "cancelled" ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-700")}>{b.status}</span></td>
               </tr>
             ))}

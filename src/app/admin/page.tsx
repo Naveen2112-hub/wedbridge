@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Users, CircleUser as UserCircle, Crown, Gem, BadgeCheck, Store, CalendarPlus, Heart, IndianRupee, TrendingUp, Eye, Sparkles, Send } from "lucide-react";
 import { getAnalytics, type AdminAnalytics } from "@/lib/admin/analyticsService";
-import { cn } from "@/lib/cn";
+import { cn } from "@/lib/utils";
 
 export default function AdminDashboardPage() {
   const [data, setData] = useState<AdminAnalytics | null>(null);
@@ -10,7 +10,7 @@ export default function AdminDashboardPage() {
 
   useEffect(() => { getAnalytics().then((d) => { setData(d); setLoading(false); }); }, []);
 
-  if (loading) return <div className="space-y-4">{Array.from({ length: 3 }).map((_, i) => <div key={i} className="skeleton h-28 w-full rounded-2xl" />)}</div>;
+  if (loading) return <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{Array.from({ length: 8 }).map((_, i) => <div key={i} className="skeleton h-28 w-full rounded-2xl" />)}</div>;
   if (!data) return null;
 
   const cards = [
@@ -33,7 +33,6 @@ export default function AdminDashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {cards.map((c) => <Card key={c.label} {...c} />)}
       </div>
-
       <div className="mt-8 grid gap-4 lg:grid-cols-2">
         <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-primary-100">
           <h2 className="font-display text-lg font-semibold text-primary-900">Quick Analytics</h2>
@@ -52,15 +51,7 @@ export default function AdminDashboardPage() {
 }
 
 function Card({ label, value, icon: Icon, color }: { label: string; value: string | number; icon: React.ComponentType<{ className?: string }>; color: string }) {
-  return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-primary-100 transition hover:shadow-md">
-      <div className="flex items-center justify-between">
-        <span className={cn("flex h-10 w-10 items-center justify-center rounded-xl", color)}><Icon className="h-5 w-5" /></span>
-      </div>
-      <p className="mt-3 font-display text-2xl font-bold text-primary-900">{value}</p>
-      <p className="text-sm text-muted">{label}</p>
-    </div>
-  );
+  return <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-primary-100 transition hover:shadow-md"><span className={cn("flex h-10 w-10 items-center justify-center rounded-xl", color)}><Icon className="h-5 w-5" /></span><p className="mt-3 font-display text-2xl font-bold text-primary-900">{value}</p><p className="text-sm text-muted">{label}</p></div>;
 }
 
 function MiniStat({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string | number }) {

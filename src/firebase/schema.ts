@@ -1,12 +1,34 @@
 export const collections = {
+  users: "users",
+  profiles: "profiles",
   vendors: "vendors",
   vendorCategories: "vendorCategories",
   vendorBookings: "vendorBookings",
   vendorReviews: "vendorReviews",
   vendorGallery: "vendorGallery",
   vendorPackages: "vendorPackages",
-  profiles: "profiles",
+  payments: "payments",
+  subscriptions: "subscriptions",
+  interests: "interests",
+  notifications: "notifications",
+  auditLog: "auditLog",
+  settings: "settings",
 } as const;
+
+export type UserRole = "user" | "admin" | "vendor";
+
+export interface AppUser {
+  uid: string;
+  email: string;
+  displayName: string;
+  role: UserRole;
+  status: "active" | "blocked";
+  verified: boolean;
+  gender?: "male" | "female" | "other";
+  membershipTier?: "free" | "premium" | "gold";
+  createdAt: unknown;
+  updatedAt?: unknown;
+}
 
 export type VendorCategory =
   | "marriage_halls" | "photographers" | "videographers" | "catering" | "decorators"
@@ -61,3 +83,53 @@ export interface VendorGalleryDocument { id: string; vendorId: string; imageURL:
 export type BookingStatus = "pending" | "confirmed" | "completed" | "cancelled";
 export interface VendorBookingDocument { id: string; vendorId: string; vendorName: string; userId: string; userName: string; userEmail: string; packageId?: string; preferredDate: unknown; time: string; guestCount: number; specialNotes?: string; status: BookingStatus; amount: number; createdAt: unknown; updatedAt: unknown; }
 export interface VendorReviewDocument { id: string; vendorId: string; userId: string; userName: string; rating: number; review: string; verifiedBooking: boolean; reported: boolean; createdAt: unknown; }
+
+export interface ProfileDocument {
+  id: string; userId: string; name: string; gender: "male" | "female"; dob: string;
+  religion: string; caste?: string; motherTongue?: string; education?: string; occupation?: string;
+  income?: string; phone?: string; city?: string; district?: string; state?: string;
+  height?: string; weight?: string; maritalStatus?: string; familyType?: string;
+  bio?: string; photoURL?: string; photoURLs?: string[];
+  status: "pending" | "approved" | "rejected" | "hidden";
+  premium: boolean; verified: boolean; featured: boolean;
+  createdBy: "user" | "admin" | "ocr" | "bulk";
+  createdAt: unknown; updatedAt?: unknown;
+}
+
+export interface InterestDocument {
+  id: string; fromUserId: string; fromUserName: string; toUserId: string; toProfileId: string;
+  status: "pending" | "accepted" | "rejected"; message?: string;
+  createdAt: unknown; updatedAt?: unknown;
+}
+
+export interface PaymentDocument {
+  id: string; userId: string; userName: string; amount: number; plan: string;
+  status: "pending" | "verified" | "refunded" | "failed"; paymentMethod?: string;
+  transactionId?: string; createdAt: unknown; updatedAt?: unknown;
+}
+
+export interface NotificationDocument {
+  id: string; title: string; message: string; target: "all" | "premium" | "free" | "vendors";
+  sentBy: string; createdAt: unknown;
+}
+
+export interface AuditLogEntry {
+  id: string; adminUid: string; adminEmail: string; action: string; target: string;
+  details?: string; createdAt: unknown;
+}
+
+export interface SiteSettings {
+  websiteName: string; logoURL: string; bannerURL: string;
+  supportPhone: string; supportEmail: string;
+  socialLinks: { facebook?: string; instagram?: string; twitter?: string; youtube?: string };
+  membershipPricing: { premium: number; gold: number };
+  homepageBanners: string[];
+}
+
+export const defaultSettings: SiteSettings = {
+  websiteName: "WedBridge", logoURL: "", bannerURL: "",
+  supportPhone: "", supportEmail: "",
+  socialLinks: {},
+  membershipPricing: { premium: 999, gold: 1999 },
+  homepageBanners: [],
+};

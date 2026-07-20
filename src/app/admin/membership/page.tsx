@@ -2,10 +2,10 @@
 import { useEffect, useState } from "react";
 import { Crown, Gem, Users } from "lucide-react";
 import { listUsers } from "@/lib/admin/adminService";
-import type { AdminUser } from "@/lib/admin/schema";
+import type { AppUser } from "@/firebase/schema";
 
 export default function AdminMembershipPage() {
-  const [users, setUsers] = useState<AdminUser[]>([]);
+  const [users, setUsers] = useState<AppUser[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => { listUsers(500).then((u) => { setUsers(u); setLoading(false); }); }, []);
