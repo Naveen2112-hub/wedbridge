@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { Mail, Loader as Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
+import { Mail, Loader as Loader2, ArrowLeft, CircleCheck as CheckCircle2 } from "lucide-react";
 import { resetPassword } from "@/lib/auth/authService";
 import { useToast } from "@/components/ui/Toast";
 import { validateEmail } from "@/lib/utils";
