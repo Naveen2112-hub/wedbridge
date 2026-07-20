@@ -1,67 +1,104 @@
-# Firebase Setup Guide
+# Firebase Setup Guide for WedBridge
 
-## 1. Create a Firebase Project
+## 1. Create Firebase Project
 
 1. Go to [Firebase Console](https://console.firebase.google.com)
-2. Click "Add Project"
-3. Name your project (e.g., `wedbridge`)
+2. Click "Add project"
+3. Name it "wedbridge" (or your preferred name)
 4. Enable Google Analytics (optional)
-5. Click "Create Project"
+5. Wait for project creation
 
 ## 2. Enable Authentication
 
-1. In the Firebase Console, go to **Authentication > Get Started**
-2. Enable **Email/Password** sign-in method
-3. Enable **Google** sign-in method (optional)
-4. Add your app's domain to authorized domains
+1. In Firebase Console, go to **Authentication**
+2. Click "Get started"
+3. Enable **Email/Password** sign-in method
+4. (Optional) Enable **Google** sign-in for social login
 
 ## 3. Create Firestore Database
 
-1. Go to **Firestore Database > Create Database**
-2. Start in **production mode**
-3. Choose a location close to your users
+1. Go to **Firestore Database**
+2. Click "Create database"
+3. Choose **Production mode**
+4. Select a location close to your users (e.g., `asia-south1` for India)
+5. Wait for provisioning
 
-## 4. Get Configuration
+## 4. Enable Storage
+
+1. Go to **Storage**
+2. Click "Get started"
+3. Choose production rules
+4. Select same location as Firestore
+
+## 5. Get Configuration
 
 1. Go to **Project Settings** (gear icon)
-2. Scroll to "Your apps" section
-3. Click the web icon (`</>`) to add a web app
-4. Register the app and copy the configuration
-5. Add these values to your `.env.local`:
+2. Under "Your apps", click the web icon `</>`
+3. Register app name "wedbridge"
+4. Copy the `firebaseConfig` values:
+   - `apiKey` → `NEXT_PUBLIC_FIREBASE_API_KEY`
+   - `authDomain` → `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`
+   - `projectId` → `NEXT_PUBLIC_FIREBASE_PROJECT_ID`
+   - `storageBucket` → `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`
+   - `messagingSenderId` → `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
+   - `appId` → `NEXT_PUBLIC_FIREBASE_APP_ID`
 
-```
-NEXT_PUBLIC_FIREBASE_API_KEY=AIza...
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
-NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abc123
-```
-
-## 5. Deploy Security Rules
-
-### Firestore Rules
-
-Deploy the `firestore.rules` file:
+## 6. Deploy Security Rules
 
 ```bash
+# Install Firebase CLI
+npm install -g firebase-tools
+
+# Login
+firebase login
+
+# Initialize (select Firestore only)
+firebase init firestore
+
+# Deploy rules
 firebase deploy --only firestore:rules
 ```
 
-Or paste the contents of `firestore.rules` into the Firebase Console:
-- Go to **Firestore > Rules**
-- Paste the rules
-- Click "Publish"
+## 7. Create Composite Indexes
 
-### Storage Rules
+Firebase Console > Firestore > Indexes > Composite. Create:
 
-Go to **Storage > Rules** and set:
+| Collection | Fields |
+|---|---|
+| profiles | status (asc) + gender (asc) + createdAt (desc) |
+| profiles | status (asc) + gender (asc) + religion (asc) + createdAt (desc) |
+| profiles | status (asc) + gender (asc) + district (asc) + createdAt (desc) |
+| profiles | userId (asc) + createdAt (desc) |
+| vendors | status (asc) + featured (desc) + rating (desc) |
+| vendors | status (asc) + category (asc) + rating (desc) |
+| vendors | ownerUid (asc) |
+| vendorBookings | userId (asc) + createdAt (desc) |
+| vendorBookings | vendorId (asc) + createdAt (desc) |
+| vendorPackages | vendorId (asc) + createdAt (desc) |
+| vendorGallery | vendorId (asc) + createdAt (desc) |
+| vendorReviews | vendorId (asc) + createdAt (desc) |
+| interests | toUserId (asc) + createdAt (desc) |
+| interests | fromUserId (asc) + createdAt (desc) |
+| interests | fromUserId (asc) + toProfileId (asc) |
+| payments | userId (asc) + createdAt (desc) |
+| notifications | createdAt (desc) |
+| auditLog | createdAt (desc) |
+
+## 8. Storage Rules
+
+Deploy these rules via Firebase Console > Storage > Rules:
 
 ```
 rules_version = '2';
-service cloud.storage {
+service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
+    match /profiles/{userId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == userId
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+    match /vendors/{vendorId}/{allPaths=**} {
       allow read: if true;
       allow write: if request.auth != null;
     }
@@ -69,57 +106,27 @@ service cloud.storage {
 }
 ```
 
-## 6. Create Firestore Indexes
+## 9. Create Admin User
 
-The following composite indexes are required (Firebase will auto-suggest these in the console when queries fail):
+1. Register a user via the WedBridge app
+2. Go to Firebase Console > Firestore > `users` collection
+3. Find your user document
+4. Edit the `role` field to `"admin"`
+5. Login at `/admin/login`
 
-### Profiles Collection
-- `status` (Ascending) + `gender` (Ascending) + `createdAt` (Descending)
-- `status` (Ascending) + `gender` (Ascending) + `religion` (Ascending) + `createdAt` (Descending)
-- `status` (Ascending) + `gender` (Ascending) + `district` (Ascending) + `createdAt` (Descending)
-- `status` (Ascending) + `gender` (Ascending) + `verified` (Ascending) + `createdAt` (Descending)
-- `userId` (Ascending) — for profile lookup by user
+## 10. Collections Overview
 
-### Vendors Collection
-- `status` (Ascending) + `featured` (Descending) + `rating` (Descending)
-- `status` (Ascending) + `category` (Ascending) + `rating` (Descending)
-- `status` (Ascending) + `city` (Ascending) + `rating` (Descending)
-- `ownerUid` (Ascending) — for vendor lookup by owner
-
-### Vendor Bookings Collection
-- `userId` (Ascending) + `createdAt` (Descending)
-- `vendorId` (Ascending) + `createdAt` (Descending)
-- `createdAt` (Descending)
-
-### Interests Collection
-- `toUserId` (Ascending) + `createdAt` (Descending)
-- `fromUserId` (Ascending) + `createdAt` (Descending)
-- `fromUserId` (Ascending) + `toProfileId` (Ascending)
-
-### Payments Collection
-- `userId` (Ascending) + `createdAt` (Descending)
-- `status` (Ascending) + `createdAt` (Descending)
-
-### Notifications Collection
-- `createdAt` (Descending)
-
-### Audit Log Collection
-- `createdAt` (Descending)
-
-## 7. Create Admin User
-
-1. Register a normal user through the app at `/register`
-2. In Firebase Console, go to **Firestore > Data > users**
-3. Find your user document and edit it
-4. Add/set the field `role` to `"admin"`
-5. Save the document
-6. You can now log in at `/admin/login`
-
-## 8. Storage Setup
-
-1. Go to **Storage > Get Started**
-2. Set up with production rules
-3. The app uses Storage for:
-   - Profile photos
-   - Vendor logos and cover images
-   - Vendor gallery images
+| Collection | Purpose |
+|---|---|
+| users | User accounts with role and membership tier |
+| profiles | Matrimony profiles |
+| vendors | Wedding service vendors |
+| vendorPackages | Vendor pricing packages |
+| vendorGallery | Vendor photo gallery |
+| vendorReviews | Vendor reviews and ratings |
+| vendorBookings | User booking requests |
+| payments | Payment transactions |
+| interests | Profile interest connections |
+| notifications | Broadcast notifications |
+| auditLog | Admin action audit trail |
+| settings | Site-wide settings |

@@ -1,12 +1,11 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Loader as Loader2, Save } from "lucide-react";
+import { Loader as Loader2, Save, Upload, X } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
-import { createProfile, getProfileByUserId, updateProfile } from "@/lib/profile/profileService";
+import { createProfile, getProfileByUserId, updateProfile, uploadProfilePhoto } from "@/lib/profile/profileService";
 import { useToast } from "@/components/ui/Toast";
 import { sanitizeText, validatePhone } from "@/lib/utils";
-import { useEffect } from "react";
 
 const religions = ["Hindu", "Christian", "Muslim", "Sikh", "Jain"];
 const districts = ["Chennai", "Coimbatore", "Madurai", "Tirunelveli", "Salem", "Trichy", "Vellore"];
@@ -16,7 +15,9 @@ export function ProfileEditForm() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [profileId, setProfileId] = useState<string | null>(null);
+  const [photoURL, setPhotoURL] = useState("");
   const [form, setForm] = useState({
     name: "", gender: "male" as "male" | "female", dob: "", religion: "Hindu", caste: "", motherTongue: "Tamil",
     education: "", occupation: "", income: "", phone: "", city: "", district: "", state: "Tamil Nadu",
@@ -27,11 +28,22 @@ export function ProfileEditForm() {
     (async () => {
       if (!user) return;
       const p = await getProfileByUserId(user.uid);
-      if (p) { setProfileId(p.id); setForm((f) => ({ ...f, ...p, dob: p.dob as string })); }
+      if (p) { setProfileId(p.id); setPhotoURL(p.photoURL ?? ""); setForm((f) => ({ ...f, ...p, dob: p.dob as string })); }
     })();
   }, [user]);
 
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
+
+  const handlePhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    if (file.size > 5 * 1024 * 1024) { toast("Image must be under 5MB", "error"); return; }
+    setUploading(true);
+    const url = await uploadProfilePhoto(user.uid, file);
+    setUploading(false);
+    if (url) { setPhotoURL(url); toast("Photo uploaded", "success"); }
+    else toast("Upload failed", "error");
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +51,7 @@ export function ProfileEditForm() {
     if (sanitizeText(form.name).length < 2) { toast("Name is required", "error"); return; }
     if (form.phone && !validatePhone(form.phone)) { toast("Enter a valid 10-digit phone", "error"); return; }
     setLoading(true);
-    const data = { ...form, name: sanitizeText(form.name), bio: sanitizeText(form.bio), userId: user.uid };
+    const data = { ...form, name: sanitizeText(form.name), bio: sanitizeText(form.bio), userId: user.uid, photoURL, photoURLs: [], createdBy: "user" as const };
     if (profileId) { await updateProfile(profileId, data); toast("Profile updated!", "success"); }
     else { const id = await createProfile(data); if (id) { setProfileId(id); toast("Profile created!", "success"); } else { toast("Failed to create profile", "error"); setLoading(false); return; } }
     setLoading(false);
@@ -50,6 +62,11 @@ export function ProfileEditForm() {
     <div className="mx-auto max-w-2xl px-4 py-8">
       <h1 className="heading-md">{profileId ? "Edit Profile" : "Create Profile"}</h1>
       <p className="text-lead mt-1 text-sm">Fill in your details to find the best matches.</p>
+      <div className="mt-6 flex items-center gap-4">
+        <div className="h-20 w-20 overflow-hidden rounded-2xl bg-primary-100">{photoURL && <img src={photoURL} alt="Profile" className="h-full w-full object-cover" />}</div>
+        <label className="btn-outline cursor-pointer text-sm">{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Upload className="h-4 w-4" />Upload Photo</>}<input type="file" accept="image/*" className="hidden" onChange={handlePhoto} /></label>
+        {photoURL && <button type="button" onClick={() => setPhotoURL("")} className="btn-ghost text-sm"><X className="h-4 w-4" />Remove</button>}
+      </div>
       <form onSubmit={submit} className="mt-6 space-y-4">
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Full Name" value={form.name} onChange={(v) => set("name", v)} required />

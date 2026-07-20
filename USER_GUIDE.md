@@ -1,102 +1,97 @@
-# User Guide
+# WedBridge User Guide
 
 ## Getting Started
 
-### Registration
-
-1. Go to the homepage and click "Register"
-2. Enter your full name, email, and password
-3. Accept the Terms & Conditions
+### Register
+1. Click "Register" on the homepage
+2. Enter your name, email, password
+3. Accept terms and conditions
 4. Click "Create Account"
-5. You'll be redirected to complete your profile
 
 ### Login
+1. Click "Login"
+2. Enter email and password
+3. Or continue with Google
 
-1. Click "Login" on the homepage
-2. Enter your email and password
-3. Click "Sign In"
-4. Or click "Continue with Google" for Google login
+## Matrimony
 
-### Forgot Password
+### Create Your Profile
+1. After registration, you'll be prompted to create a profile
+2. Fill in: name, gender, date of birth, religion, caste, education, occupation, city, district
+3. Upload a profile photo (max 5MB)
+4. Write a short bio
+5. Click "Create Profile"
 
-1. On the login page, click "Forgot password?"
-2. Enter your email address
-3. Click "Send Reset Link"
-4. Check your email for the reset link
-
-## Creating Your Profile
-
-1. After registration, go to "Edit Profile"
-2. Fill in your details:
-   - Full name, date of birth, gender
-   - Religion, caste, mother tongue
-   - Education, occupation, income
-   - Contact details (phone, city, district)
-   - Marital status, family type
-   - About yourself (bio)
-3. Click "Create Profile"
-
-## Finding Matches
-
-### Search
-
-1. Click "Find Matches" in the navigation
-2. Use the search bar to find by name
-3. Click "Filters" to filter by:
-   - Gender (Bride/Groom)
-   - Religion
-   - District
-   - Verified profiles only
-4. Click "Send Interest" on profiles you like
+### Find Matches
+1. Go to "Find Matches" in the navbar
+2. Use filters: gender, religion, district, verified only
+3. Search by caste
+4. Click "Load More" for additional profiles
+5. Click "Send Interest" to express interest
 
 ### AI Matches
+1. Go to "AI Matches"
+2. View profiles matched by our AI algorithm
+3. Match score based on: religion, caste, mother tongue, city, education, marital status, verification, district
+4. Click "Send Interest" on matched profiles
 
-1. Click "AI Matches" in the navigation
-2. View AI-compatible profiles with match scores
-3. See match reasons (same religion, caste, city, etc.)
-4. Send interests to profiles you like
-
-## Interests & Notifications
-
-1. Click the notification bell icon to view:
-   - Interests received from other users
-   - Accept or reject interests
-   - Platform announcements
-2. You'll see the status of interests you've sent
+### Manage Interests
+1. Go to "Notifications"
+2. View interests received from other users
+3. Accept or reject interests
+4. View broadcast announcements
 
 ## Membership
 
-1. Click "Membership" in the navigation
-2. Choose between Premium (₹999/year) or Gold (₹1999/year)
-3. Premium features: View contacts, unlimited interests, AI matching, advanced filters
-4. Gold features: All Premium + profile highlighting, featured placement, dedicated manager, background verification
+### Plans
+- **Premium (₹999/year)**: View contact details, unlimited interests, AI matching, priority support, advanced filters
+- **Gold (₹1999/year)**: All Premium features + profile highlighting, featured placement, dedicated manager, background verification, exclusive matches
+
+### Subscribe
+1. Go to "Membership"
+2. Choose a plan
+3. Pay via Razorpay (secure checkout)
+4. Membership activates instantly
 
 ## Wedding Marketplace
 
 ### Browse Services
-
-1. Click "Marketplace" in the navigation
-2. Browse all vendors or filter by category
+1. Go to "Marketplace"
+2. Filter by category (20 categories available)
 3. Search by vendor name or city
 
-### Vendor Details
+### View Vendor Details
+1. Click on a vendor card
+2. View: about, packages, gallery, reviews
+3. Check rating, pricing, contact info
 
-1. Click on a vendor to see their profile
-2. View tabs: About, Packages, Gallery, Reviews
-3. See ratings, reviews, pricing, and contact info
-
-### Booking a Vendor
-
-1. On the vendor page, use the "Book Now" form
-2. Select preferred date, time, and guest count
-3. Choose a package (if available)
-4. Add any special notes
+### Book a Vendor
+1. On vendor detail page, fill the booking form
+2. Select preferred date, time, guest count
+3. Choose a package (optional)
+4. Add special notes
 5. Click "Send Booking Request"
-6. Track your bookings in "My Bookings"
 
-## Vendor Dashboard
+### My Bookings
+1. Go to "My Bookings"
+2. View all your booking requests
+3. Check status: pending, confirmed, completed, cancelled
 
-If you're a vendor:
-1. Navigate to "Vendor Dashboard"
-2. View your booking statistics (revenue, total bookings, pending, rating)
-3. See recent bookings and packages
+## Profile Management
+
+### Edit Profile
+1. Go to "My Profile"
+2. Click "Edit Profile"
+3. Update any fields
+4. Upload or change photo
+5. Click "Update Profile"
+
+### Logout
+- Click the logout icon in the navbar
+
+## Privacy
+
+- Your contact information is protected
+- Only premium members can view contact details
+- Profile photos are visible to all users
+- You can hide your profile by contacting support

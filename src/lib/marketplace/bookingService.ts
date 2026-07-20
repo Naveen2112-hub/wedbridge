@@ -27,3 +27,7 @@ export async function listAllBookings(max = 100): Promise<VendorBookingDocument[
   if (!db) return [];
   try { const snap = await getDocs(query(collection(db, collections.vendorBookings), orderBy("createdAt", "desc"), limit(max))); return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<VendorBookingDocument, "id">) })); } catch { return []; }
 }
+export async function hasUserBookedVendor(uid: string, vendorId: string): Promise<boolean> {
+  if (!db) return false;
+  try { const snap = await getDocs(query(collection(db, collections.vendorBookings), where("userId", "==", uid), where("vendorId", "==", vendorId), limit(1))); return !snap.empty; } catch { return false; }
+}

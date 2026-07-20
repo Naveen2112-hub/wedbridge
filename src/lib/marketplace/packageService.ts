@@ -1,4 +1,4 @@
-import { collection, query, where, getDocs, orderBy, limit, doc, addDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { collection, query, where, getDocs, orderBy, limit, doc, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { collections, type VendorPackageDocument, type VendorGalleryDocument, type VendorReviewDocument } from "@/firebase/schema";
 import { sanitizeText } from "@/lib/utils";

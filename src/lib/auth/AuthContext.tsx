@@ -5,12 +5,7 @@ import { auth, db } from "@/firebase/config";
 import { doc, getDoc } from "firebase/firestore";
 import { collections, type AppUser } from "@/firebase/schema";
 
-interface AuthContextType {
-  user: User | null;
-  appUser: AppUser | null;
-  loading: boolean;
-}
-
+interface AuthContextType { user: User | null; appUser: AppUser | null; loading: boolean; }
 const AuthContext = createContext<AuthContextType>({ user: null, appUser: null, loading: true });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -23,11 +18,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u);
       if (u && db) {
-        try {
-          const snap = await getDoc(doc(db, collections.users, u.uid));
-          if (snap.exists()) setAppUser({ uid: u.uid, ...(snap.data() as Omit<AppUser, "uid">) });
-          else setAppUser(null);
-        } catch { setAppUser(null); }
+        try { const snap = await getDoc(doc(db, collections.users, u.uid)); setAppUser(snap.exists() ? { uid: u.uid, ...(snap.data() as Omit<AppUser, "uid">) } : null); } catch { setAppUser(null); }
       } else { setAppUser(null); }
       setLoading(false);
     });
@@ -36,5 +27,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return <AuthContext.Provider value={{ user, appUser, loading }}>{children}</AuthContext.Provider>;
 }
-
 export function useAuth() { return useContext(AuthContext); }

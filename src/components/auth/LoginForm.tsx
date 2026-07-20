@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Heart, Mail, Lock, Loader as Loader2, Eye, EyeOff } from "lucide-react";
 import { loginUser, loginWithGoogle } from "@/lib/auth/authService";
 import { useToast } from "@/components/ui/Toast";
@@ -9,6 +9,7 @@ import { validateEmail } from "@/lib/utils";
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,7 +24,7 @@ export function LoginForm() {
     setLoading(true);
     const res = await loginUser(email, password);
     setLoading(false);
-    if (res.ok) { toast("Welcome back!", "success"); router.push("/search"); }
+    if (res.ok) { toast("Welcome back!", "success"); const redirect = searchParams.get("redirect"); router.push(redirect ?? "/search"); }
     else toast(res.error ?? "Login failed", "error");
   };
 
@@ -37,11 +38,7 @@ export function LoginForm() {
 
   return (
     <div className="card p-8">
-      <div className="text-center">
-        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-600 text-white"><Heart className="h-7 w-7" /></span>
-        <h1 className="heading-md mt-4">Welcome Back</h1>
-        <p className="text-lead mt-2 text-sm">Sign in to continue your journey</p>
-      </div>
+      <div className="text-center"><span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary-700 text-white"><Heart className="h-7 w-7" /></span><h1 className="heading-md mt-4">Welcome Back</h1><p className="text-lead mt-2 text-sm">Sign in to continue your journey</p></div>
       <form onSubmit={submit} className="mt-6 space-y-4">
         <div><label className="label" htmlFor="email">Email</label><div className="relative"><Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" /><input id="email" type="email" required autoComplete="email" className="input pl-10" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" /></div></div>
         <div><label className="label" htmlFor="password">Password</label><div className="relative"><Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" /><input id="password" type={showPass ? "text" : "password"} required autoComplete="current-password" className="input pl-10 pr-10" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" /><button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted" aria-label={showPass ? "Hide password" : "Show password"}>{showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button></div></div>

@@ -3,11 +3,6 @@ import { db } from "@/firebase/config";
 import { collections, type NotificationDocument } from "@/firebase/schema";
 import { sanitizeText } from "@/lib/utils";
 
-export async function createNotification(data: Omit<NotificationDocument, "id" | "createdAt" | "sentBy">): Promise<void> {
-  if (!db) return;
-  try { await addDoc(collection(db, collections.notifications), { ...data, title: sanitizeText(data.title), message: sanitizeText(data.message), sentBy: "system", createdAt: serverTimestamp() } as Omit<NotificationDocument, "id">); } catch { /* ignore */ }
-}
-
 export async function broadcastNotification(input: { title: string; message: string; target: "all" | "premium" | "free" | "vendors" }): Promise<void> {
   if (!db) return;
   try { await addDoc(collection(db, collections.notifications), { ...input, title: sanitizeText(input.title), message: sanitizeText(input.message), sentBy: "admin", createdAt: serverTimestamp() } as Omit<NotificationDocument, "id">); } catch { /* ignore */ }

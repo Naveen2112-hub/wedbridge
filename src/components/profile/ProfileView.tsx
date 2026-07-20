@@ -16,23 +16,14 @@ export function ProfileView() {
     (async () => {
       if (!user) { setLoading(false); return; }
       const p = await getProfileByUserId(user.uid);
-      setProfile(p);
-      setLoading(false);
+      setProfile(p); setLoading(false);
     })();
   }, [user]);
 
   if (loading) return <div className="px-4 py-16"><div className="skeleton h-64 w-full rounded-2xl" /></div>;
-
-  if (!profile) {
-    return (
-      <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <User className="mx-auto h-12 w-12 text-primary-300" />
-        <h1 className="heading-md mt-4">No Profile Yet</h1>
-        <p className="text-lead mt-2 text-sm">Create your profile to start finding matches.</p>
-        <Link href="/profile/edit" className="btn-primary mt-6">Create Profile</Link>
-      </div>
-    );
-  }
+  if (!profile) return (
+    <div className="mx-auto max-w-2xl px-4 py-16 text-center"><User className="mx-auto h-12 w-12 text-primary-300" /><h1 className="heading-md mt-4">No Profile Yet</h1><p className="text-lead mt-2 text-sm">Create your profile to start finding matches.</p><Link href="/profile/edit" className="btn-primary mt-6">Create Profile</Link></div>
+  );
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:px-8">
@@ -41,10 +32,7 @@ export function ProfileView() {
         <div className="px-6 pb-6">
           <div className="-mt-12 flex items-end gap-4">
             <div className="h-24 w-24 overflow-hidden rounded-2xl border-4 border-white bg-primary-100">{profile.photoURL && <img src={profile.photoURL} alt={profile.name} className="h-full w-full object-cover" />}</div>
-            <div className="flex-1 pb-2">
-              <div className="flex items-center gap-2"><h1 className="heading-md">{profile.name}</h1>{profile.verified && <BadgeCheck className="h-5 w-5 text-green-600" />}{profile.premium && <Crown className="h-5 w-5 text-secondary-500" />}{profile.featured && <Star className="h-5 w-5 text-amber-500" />}</div>
-              <p className="text-sm text-muted">{profile.religion} · {profile.caste ?? ""}</p>
-            </div>
+            <div className="flex-1 pb-2"><div className="flex items-center gap-2"><h1 className="heading-md">{profile.name}</h1>{profile.verified && <BadgeCheck className="h-5 w-5 text-green-600" />}{profile.premium && <Crown className="h-5 w-5 text-secondary-500" />}{profile.featured && <Star className="h-5 w-5 text-amber-500" />}</div><p className="text-sm text-muted">{profile.religion} · {profile.caste ?? ""}</p></div>
             <Link href="/profile/edit" className="btn-outline mb-2 text-sm">Edit Profile</Link>
           </div>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">

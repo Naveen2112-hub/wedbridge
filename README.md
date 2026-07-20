@@ -1,61 +1,59 @@
-# WedBridge
+# WedBridge - Tamil Nadu Matrimony & Wedding Marketplace
 
-Tamil Nadu's premier matrimony and wedding marketplace platform. Find your perfect life partner with AI-powered matching, and book trusted wedding vendors across 20+ categories.
+AI-powered matrimony platform connecting Tamil Nadu families with verified profiles, plus a full wedding vendor marketplace.
 
 ## Features
 
-### Matrimony
-- User registration and authentication (email/password + Google)
-- Profile creation with detailed preferences
-- AI-powered compatibility matching
-- Advanced search with filters (religion, caste, city, education, etc.)
-- Interest system (send, accept, reject)
-- Membership plans (Premium & Gold)
-
-### Wedding Marketplace
-- 20+ wedding service categories
-- Vendor profiles with gallery, packages, and reviews
-- Booking system with date/time/guest management
-- Vendor dashboard for managing bookings and packages
-- My Bookings page for customers
-
-### Super Admin Panel
-- Admin authentication with role-based access
-- Dashboard with real-time analytics
-- User management (block, activate, verify, delete)
-- Profile management (approve, reject, feature, verify)
-- Bulk CSV upload with duplicate detection
-- OCR import for documents (PDF, JPG, PNG)
-- Payment verification and refunds
-- Revenue reports (daily, weekly, monthly, yearly)
-- Broadcast notifications to targeted segments
-- Site settings management
-- Audit logging for all admin actions
+- **AI Matchmaking** - Compatibility scoring based on religion, caste, mother tongue, location, education, and more
+- **Profile Search** - Cursor-based pagination with filters for religion, district, verified status
+- **Wedding Marketplace** - 20 vendor categories (halls, photographers, catering, decorators, etc.)
+- **Vendor Bookings** - Request quotes, book services, manage bookings
+- **Razorpay Payments** - Premium (₹999) and Gold (₹1999) membership plans
+- **Profile Photos** - Firebase Storage upload with 5MB limit
+- **Admin Panel** - Full CRUD for users, profiles, vendors, bookings, payments, settings
+- **Bulk Upload** - CSV import with duplicate detection
+- **Notifications** - Broadcast system for announcements
+- **PWA** - Installable app with service worker, manifest, offline support
+- **SEO** - sitemap.xml, robots.txt, JSON-LD, Open Graph, Twitter Cards
+- **Accessibility** - Skip link, ARIA labels, focus-visible, reduced-motion support
+- **Security** - Firestore rules with owner-verified writes, input sanitization, audit logging
 
 ## Tech Stack
 
-- **Frontend**: Next.js 15 (App Router), React 19, TypeScript
-- **Styling**: Tailwind CSS with custom design system
-- **Backend**: Firebase (Authentication, Firestore, Storage)
-- **Icons**: Lucide React
-- **PWA**: Manifest, offline support, app icons
+- Next.js 15 (App Router) + React 19 + TypeScript (strict)
+- Firebase (Auth, Firestore, Storage) with IndexedDB persistence
+- Tailwind CSS with custom wedding theme (maroon + gold + sage)
+- Razorpay checkout for payments
+- next/font (Inter + Playfair Display)
 
-## Quick Start
+## Getting Started
 
-1. Clone the repository
-2. Copy `.env.example` to `.env.local` and fill in Firebase credentials
-3. Run `npm install`
-4. Run `npm run dev` to start the development server
-5. Open `http://localhost:3000`
+1. Install dependencies: `npm install`
+2. Copy `.env.example` to `.env.local` and fill in Firebase + Razorpay credentials
+3. Run dev server: `npm run dev`
+4. Open http://localhost:3000
 
-## Documentation
+## Scripts
 
-- [Installation Guide](INSTALL.md)
-- [Deployment Guide](DEPLOYMENT.md)
-- [Admin Guide](ADMIN_GUIDE.md)
-- [User Guide](USER_GUIDE.md)
-- [Firebase Setup](FIREBASE_SETUP.md)
+- `npm run dev` - Start dev server
+- `npm run build` - Production build
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
+- `npm run typecheck` - Run TypeScript compiler check
+
+## Project Structure
+
+```
+src/
+  app/              # Next.js App Router pages
+  components/       # React components (admin, auth, layout, marketplace, etc.)
+  firebase/         # Firebase config + schema types
+  lib/              # Service layers (auth, profile, matching, membership, etc.)
+public/
+  sw.js             # Service worker for PWA
+firestore.rules     # Firestore security rules
+```
 
 ## License
 
-Proprietary. All rights reserved.
+Proprietary - WedBridge 2024

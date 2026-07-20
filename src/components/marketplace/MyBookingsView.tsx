@@ -4,8 +4,7 @@ import { Calendar, Loader as Loader2, Package } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthContext";
 import { getUserBookings } from "@/lib/marketplace/bookingService";
 import type { VendorBookingDocument } from "@/firebase/schema";
-import { formatCurrency, formatDate } from "@/lib/utils";
-import { cn } from "@/lib/utils";
+import { formatCurrency, formatDate, cn } from "@/lib/utils";
 
 export function MyBookingsView() {
   const { user } = useAuth();

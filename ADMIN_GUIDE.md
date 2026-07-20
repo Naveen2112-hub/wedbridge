@@ -1,96 +1,75 @@
-# Admin Guide
+# WedBridge Admin Guide
 
 ## Accessing the Admin Panel
 
 1. Navigate to `/admin/login`
-2. Sign in with an admin account (users with `role = "admin"` in Firestore)
-3. Non-admin users are automatically redirected to the login page
+2. Login with an admin-credential email
+3. Your Firestore `users` document must have `role: "admin"`
 
-## Dashboard
+## Admin Features
 
-The dashboard provides an overview of:
-- Total Users, Male/Female Profiles
-- Premium/Gold Members
-- Verified Profiles, Wedding Vendors
-- Today's Registrations, Interests, Revenue
-- Monthly Revenue
-- Quick Analytics (New Users, Profile Views, AI Matches, Interests Sent, Premium Sales, Vendor Revenue)
+### Dashboard
+- Platform overview: total users, profiles, vendors, bookings, revenue
+- Today's activity: registrations, interests, revenue
+- Revenue overview: monthly, premium sales, vendor revenue
 
-## User Management
+### Users
+- View all registered users
+- Search by name or email
+- Toggle premium membership tier
+- Toggle verified status
+- Delete users
 
-### Actions Available
-- **Search**: Filter by name or email
-- **Filter**: All, Active, Blocked, Verified, Unverified
-- **View**: See user details in a modal
-- **Block/Activate**: Toggle user status
-- **Verify**: Mark user as verified
-- **Reset Password**: Trigger password reset
-- **Delete**: Permanently remove user
+### Profiles
+- View all matrimony profiles
+- Search by name or religion
+- Toggle verified status
+- Toggle featured status
+- Delete profiles
 
-## Profile Management
+### Bulk Upload
+- Upload CSV file to import profiles
+- Columns: name, gender, dob, religion, caste, education, occupation, city, phone
+- Duplicate detection by phone number
+- Preview before import
 
-### Actions Available
-- **Approve**: Move profile from pending to approved
-- **Reject**: Mark profile as rejected
-- **Hide/Show**: Toggle profile visibility
-- **Mark Premium**: Toggle premium status
-- **Verify**: Toggle verified badge
-- **Feature**: Toggle featured status
-- **Delete**: Permanently remove profile
+### Payments
+- View all payment transactions
+- Summary: total, verified, total amount
+- Payment ID, plan, status, date
 
-## Bulk Upload
+### Reports
+- Daily, weekly, monthly, yearly reports
+- Revenue, users, interests breakdown
 
-1. Prepare a CSV file with columns: `name, gender, religion, caste, education, occupation, phone, district, dob`
-2. Upload the file
-3. Preview the data with duplicate detection (highlighted by phone number)
-4. Click "Import" to save all profiles
-5. Click "Rollback" to clear the preview before saving
+### Analytics
+- Deep-dive metrics
+- Verification rate, profile distribution
 
-## OCR Upload
+### Notifications
+- Broadcast notifications to all users
+- Target: all, premium, free, or vendors
+- View recent broadcasts
 
-1. Upload a PDF, JPG, or PNG document
-2. The system extracts: Name, DOB, Religion, Caste, Education, Occupation, Phone, District
-3. Review and edit the extracted data
-4. Click "Save Profile" to create the profile with `createdBy = "admin"`
+### Vendors
+- View all wedding service vendors
+- Toggle verification status
+- View rating, pricing, location
 
-## Payments
+### Bookings
+- View all vendor bookings
+- Status: pending, confirmed, completed, cancelled
 
-- View all transactions
-- Search by user or plan
-- Filter by status (Pending, Verified, Refunded, Failed)
-- Verify pending payments
-- Refund verified payments
-- View total revenue
+### Settings
+- Website name, logo, banner
+- Support contact info
+- Membership pricing
+- Social media links
 
-## Reports
+## Audit Logging
 
-- View revenue reports by period (Daily, Weekly, Monthly, Yearly)
-- Bar chart visualization of revenue breakdown
-- Summary cards for total revenue, period, and record count
-
-## Notifications
-
-- Broadcast notifications to targeted segments:
-  - All Users
-  - Premium Members
-  - Free Members
-  - Vendors
-- Enter title and message
-- Click "Send Broadcast"
-
-## Settings
-
-- **General**: Website name, logo URL, banner URL
-- **Support**: Support phone and email
-- **Social Links**: Facebook, Instagram, Twitter, YouTube
-- **Membership Pricing**: Premium and Gold plan prices
-- **Homepage Banners**: Add/remove banner URLs
-
-## Audit Log
-
-Every admin action is automatically logged to the `auditLog` Firestore collection, including:
+All admin actions (create, update, delete) are logged to the `auditLog` collection with:
 - Admin UID and email
 - Action type
 - Target document ID
 - Timestamp
-- Additional details (JSON)

@@ -1,7 +1,8 @@
 "use client";
 import { useEffect, useState, use } from "react";
 import { Star, MapPin, BadgeCheck, Phone, Mail, Globe, Clock, Loader as Loader2, Calendar, Package, Image as ImageIcon, Heart } from "lucide-react";
-import { getVendor, getPackages, getGallery, getReviews } from "@/lib/marketplace/vendorService";
+import { getVendor } from "@/lib/marketplace/vendorService";
+import { getPackages, getGallery, getReviews } from "@/lib/marketplace/packageService";
 import type { VendorDocument, VendorPackageDocument, VendorGalleryDocument, VendorReviewDocument } from "@/firebase/schema";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { useAuth } from "@/lib/auth/AuthContext";
@@ -65,11 +66,9 @@ export function VendorDetailView({ idPromise }: { idPromise: Promise<{ id: strin
           </div>
         </div>
       </div>
-
       <div className="mt-6 flex gap-2 overflow-x-auto">
-        {tabs.map((t) => <button key={t.id} type="button" onClick={() => setTab(t.id)} className={`rounded-full px-4 py-2 text-sm font-medium transition ${tab === t.id ? "bg-primary-600 text-white" : "bg-white text-muted ring-1 ring-primary-100 hover:text-primary-700"}`}>{t.label}</button>)}
+        {tabs.map((t) => <button key={t.id} type="button" onClick={() => setTab(t.id)} className={`rounded-full px-4 py-2 text-sm font-medium transition ${tab === t.id ? "bg-primary-700 text-white" : "bg-white text-muted ring-1 ring-primary-100 hover:text-primary-700"}`}>{t.label}</button>)}
       </div>
-
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           {tab === "about" && <div className="card p-6"><h2 className="heading-sm">About</h2><p className="mt-3 text-sm text-muted">{vendor.about || "No description available."}</p><div className="mt-4 space-y-2 text-sm">{vendor.phone && <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-primary-600" />{vendor.phone}</p>}{vendor.email && <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary-600" />{vendor.email}</p>}{vendor.website && <p className="flex items-center gap-2"><Globe className="h-4 w-4 text-primary-600" /><a href={vendor.website} target="_blank" rel="noopener noreferrer" className="text-primary-700 hover:underline">{vendor.website}</a></p>}{vendor.businessHours && <p className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary-600" />{vendor.businessHours.days}: {vendor.businessHours.hours}</p>}</div></div>}
@@ -77,7 +76,6 @@ export function VendorDetailView({ idPromise }: { idPromise: Promise<{ id: strin
           {tab === "gallery" && <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">{gallery.length === 0 ? <p className="text-muted">No images.</p> : gallery.map((g) => <div key={g.id} className="aspect-square overflow-hidden rounded-xl bg-primary-100"><img src={g.imageURL} alt={g.caption ?? ""} className="h-full w-full object-cover" loading="lazy" /></div>)}</div>}
           {tab === "reviews" && <div className="space-y-3">{reviews.length === 0 ? <p className="text-muted">No reviews yet.</p> : reviews.map((r) => <div key={r.id} className="card p-4"><div className="flex items-center justify-between"><p className="font-medium text-primary-900">{r.userName}</p><span className="flex items-center gap-0.5">{Array.from({ length: 5 }).map((_, i) => <Star key={i} className={`h-3.5 w-3.5 ${i < r.rating ? "text-secondary-500" : "text-primary-100"}`} fill="currentColor" />)}</span></div><p className="mt-2 text-sm text-muted">{r.review}</p></div>)}</div>}
         </div>
-
         <div className="lg:col-span-1">
           <div className="card sticky top-20 p-6">
             <h2 className="heading-sm flex items-center gap-2"><Calendar className="h-5 w-5 text-primary-600" />Book Now</h2>

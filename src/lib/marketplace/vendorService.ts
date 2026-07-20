@@ -3,7 +3,6 @@ import { db } from "@/firebase/config";
 import { collections, type VendorDocument, type VendorCategory, type VendorStatus } from "@/firebase/schema";
 
 export const PAGE_SIZE = 9;
-
 export interface VendorFilters { category?: VendorCategory; city?: string; district?: string; state?: string; minPrice?: number; maxPrice?: number; minRating?: number; verifiedOnly?: boolean; }
 export interface VendorListResult { vendors: VendorDocument[]; cursor: QueryDocumentSnapshot<DocumentData> | null; hasMore: boolean; }
 
@@ -19,7 +18,7 @@ export async function getFeaturedVendors(max = 8): Promise<VendorDocument[]> {
 }
 export async function getVendor(id: string): Promise<VendorDocument | null> {
   if (!db) return null;
-  try { const snap = await getDoc(doc(db, collections.vendors, id)); if (!snap.exists()) return null; return { id: snap.id, ...(snap.data() as Omit<VendorDocument, "id">) }; } catch { return null; }
+  try { const snap = await getDoc(doc(db, collections.vendors, id)); return snap.exists() ? { id: snap.id, ...(snap.data() as Omit<VendorDocument, "id">) } : null; } catch { return null; }
 }
 export async function searchVendors(filters: VendorFilters, cursor?: QueryDocumentSnapshot<DocumentData> | null): Promise<VendorListResult> {
   if (!db) return { vendors: [], cursor: null, hasMore: false };

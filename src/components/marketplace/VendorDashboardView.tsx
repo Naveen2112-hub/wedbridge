@@ -20,25 +20,15 @@ export function VendorDashboardView() {
       if (!user) { setLoading(false); return; }
       const v = await getVendorByOwner(user.uid);
       setVendor(v);
-      if (v) {
-        const [b, p] = await Promise.all([getVendorBookings(v.id), getPackages(v.id)]);
-        setBookings(b); setPackages(p);
-      }
+      if (v) { const [b, p] = await Promise.all([getVendorBookings(v.id), getPackages(v.id)]); setBookings(b); setPackages(p); }
       setLoading(false);
     })();
   }, [user]);
 
   if (loading) return <div className="px-4 py-8"><div className="skeleton h-64 w-full rounded-2xl" /></div>;
-
-  if (!vendor) {
-    return (
-      <div className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <Store className="mx-auto h-12 w-12 text-primary-300" />
-        <h1 className="heading-md mt-4">No Vendor Profile</h1>
-        <p className="text-lead mt-2 text-sm">You don&apos;t have a vendor profile yet.</p>
-      </div>
-    );
-  }
+  if (!vendor) return (
+    <div className="mx-auto max-w-2xl px-4 py-16 text-center"><Store className="mx-auto h-12 w-12 text-primary-300" /><h1 className="heading-md mt-4">No Vendor Profile</h1><p className="text-lead mt-2 text-sm">You don&apos;t have a vendor profile yet.</p></div>
+  );
 
   const revenue = bookings.filter((b) => b.status === "completed").reduce((s, b) => s + b.amount, 0);
   const pending = bookings.filter((b) => b.status === "pending").length;
@@ -52,7 +42,6 @@ export function VendorDashboardView() {
         <Stat icon={Package} label="Pending" value={String(pending)} color="text-amber-600 bg-amber-50" />
         <Stat icon={Star} label="Rating" value={vendor.rating.toFixed(1)} color="text-secondary-600 bg-secondary-50" />
       </div>
-
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <div className="card p-6"><h2 className="heading-sm">Recent Bookings</h2>{bookings.length === 0 ? <p className="mt-3 text-sm text-muted">No bookings yet.</p> : <div className="mt-3 space-y-2">{bookings.slice(0, 5).map((b) => <div key={b.id} className="flex items-center justify-between border-b border-primary-50 pb-2"><div><p className="text-sm font-medium text-primary-900">{b.userName}</p><p className="text-xs text-muted">{formatDate(b.preferredDate as unknown as string)}</p></div><p className="text-sm font-semibold">{formatCurrency(b.amount)}</p></div>)}</div>}</div>
         <div className="card p-6"><h2 className="heading-sm">Packages</h2>{packages.length === 0 ? <p className="mt-3 text-sm text-muted">No packages yet.</p> : <div className="mt-3 space-y-2">{packages.map((p) => <div key={p.id} className="flex items-center justify-between border-b border-primary-50 pb-2"><div><p className="text-sm font-medium text-primary-900">{p.name}</p><p className="text-xs text-muted">{p.description}</p></div><p className="text-sm font-semibold">{formatCurrency(p.price)}</p></div>)}</div>}</div>

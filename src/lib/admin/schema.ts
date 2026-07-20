@@ -1,4 +1,4 @@
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, getDocs, query, orderBy, limit } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { collections, type AuditLogEntry } from "@/firebase/schema";
 
@@ -9,9 +9,5 @@ export async function logAdminAction(entry: Omit<AuditLogEntry, "id" | "createdA
 
 export async function getAuditLogs(max = 100): Promise<AuditLogEntry[]> {
   if (!db) return [];
-  try {
-    const { getDocs, query, orderBy, limit } = await import("firebase/firestore");
-    const snap = await getDocs(query(collection(db, collections.auditLog), orderBy("createdAt", "desc"), limit(max)));
-    return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<AuditLogEntry, "id">) }));
-  } catch { return []; }
+  try { const snap = await getDocs(query(collection(db, collections.auditLog), orderBy("createdAt", "desc"), limit(max))); return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<AuditLogEntry, "id">) })); } catch { return []; }
 }

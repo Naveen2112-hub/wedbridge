@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { Mail, Loader as Loader2, ArrowLeft, CircleCheck as CheckCircle2 } from "lucide-react";
+import { Mail, Loader as Loader2, ArrowLeft, CheckCircle2 } from "lucide-react";
 import { resetPassword } from "@/lib/auth/authService";
 import { useToast } from "@/components/ui/Toast";
 import { validateEmail } from "@/lib/utils";
@@ -22,16 +22,9 @@ export function ForgotPasswordForm() {
     else toast(res.error ?? "Failed to send reset link", "error");
   };
 
-  if (sent) {
-    return (
-      <div className="card p-8 text-center">
-        <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100 text-green-600"><CheckCircle2 className="h-7 w-7" /></span>
-        <h1 className="heading-md mt-4">Check Your Email</h1>
-        <p className="text-lead mt-2 text-sm">We&apos;ve sent a password reset link to <strong>{email}</strong></p>
-        <Link href="/login" className="btn-primary mt-6">Back to Login</Link>
-      </div>
-    );
-  }
+  if (sent) return (
+    <div className="card p-8 text-center"><span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100 text-green-600"><CheckCircle2 className="h-7 w-7" /></span><h1 className="heading-md mt-4">Check Your Email</h1><p className="text-lead mt-2 text-sm">We&apos;ve sent a password reset link to <strong>{email}</strong></p><Link href="/login" className="btn-primary mt-6">Back to Login</Link></div>
+  );
 
   return (
     <div className="card p-8">
