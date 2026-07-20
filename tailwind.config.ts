@@ -29,10 +29,6 @@ const config: Config = {
           50: "#FEF2F2", 100: "#FEE2E2", 200: "#FECACA", 300: "#FCA5A5", 400: "#F87171",
           500: "#EF4444", 600: "#DC2626", 700: "#B91C1C", 800: "#991B1B", 900: "#7F1D1D",
         },
-        ink: "#1A1416",
-        muted: "#6B5E62",
-        background: "#FFFDF7",
-        card: "#FFFFFF",
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
@@ -49,13 +45,6 @@ const config: Config = {
         xl: "0.875rem",
         "2xl": "1.25rem",
         "3xl": "1.5rem",
-      },
-      boxShadow: {
-        soft: "0 2px 12px -4px rgba(122, 16, 34, 0.08)",
-        card: "0 4px 24px -8px rgba(122, 16, 34, 0.12)",
-        elevated: "0 12px 48px -12px rgba(122, 16, 34, 0.18)",
-        glow: "0 0 32px -4px rgba(201, 162, 39, 0.35)",
-        "inner-glow": "inset 0 1px 0 0 rgba(255, 255, 255, 0.15)",
       },
       backgroundImage: {
         "hero-texture": "radial-gradient(circle at 20% 20%, rgba(201,162,39,0.10), transparent 40%), radial-gradient(circle at 80% 80%, rgba(122,16,34,0.08), transparent 45%)",
