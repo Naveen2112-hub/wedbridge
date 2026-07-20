@@ -13,9 +13,35 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
     match /profiles/{uid} {
-      allow read: if isOwner(uid) || isAdmin();
+      allow read: if isOwner(uid) || isAdmin() || resource.data.profileVisibility == 'visible';
       allow create, update: if isOwner(uid);
       allow delete: if isOwner(uid) || isAdmin();
+    }
+    match /interests/{id} {
+      allow read: if isSignedIn() && (resource.data.senderUid == request.auth.uid || resource.data.receiverUid == request.auth.uid || isAdmin());
+      allow create: if isSignedIn() && request.resource.data.senderUid == request.auth.uid;
+      allow update: if isSignedIn() && (resource.data.receiverUid == request.auth.uid || isAdmin());
+      allow delete: if isSignedIn() && (resource.data.senderUid == request.auth.uid || isAdmin());
+    }
+    match /notifications/{id} {
+      allow read: if isOwner(resource.data.uid) || isAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if isOwner(resource.data.uid) || isAdmin();
+    }
+    match /profileViews/{id} {
+      allow read: if isOwner(resource.data.profileUid) || isAdmin();
+      allow create: if isSignedIn() && request.resource.data.viewerUid == request.auth.uid;
+      allow delete: if isAdmin();
+    }
+    match /searchHistory/{id} {
+      allow read: if isOwner(resource.data.uid);
+      allow create: if isOwner(request.resource.data.uid);
+      allow delete: if isOwner(resource.data.uid);
+    }
+    match /recentlyViewed/{id} {
+      allow read: if isOwner(resource.data.uid);
+      allow create: if isOwner(request.resource.data.uid);
+      allow delete: if isOwner(resource.data.uid);
     }
   }
 }

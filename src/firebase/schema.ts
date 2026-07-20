@@ -3,6 +3,9 @@ export const collections = {
   profiles: "profiles",
   interests: "interests",
   notifications: "notifications",
+  profileViews: "profileViews",
+  searchHistory: "searchHistory",
+  recentlyViewed: "recentlyViewed",
 } as const;
 
 export const storagePaths = {
@@ -23,6 +26,7 @@ export type YesNo = "yes" | "no";
 export type ProfileVisibility = "visible" | "hidden";
 export type AccountStatus = "active" | "deactivated";
 export type VerificationStatus = "unverified" | "pending" | "verified" | "rejected";
+export type MembershipTier = "free" | "premium" | "elite";
 
 export interface UserDocument {
   uid: string;
@@ -84,8 +88,34 @@ export interface ProfileDocument {
   verificationStatus: VerificationStatus;
   completedFieldsCount?: number;
   completionPercentage?: number;
+  viewCount?: number;
+  online?: boolean;
+  lastActiveAt?: unknown;
+  membership?: MembershipTier;
   createdAt: unknown;
   updatedAt: unknown;
+}
+
+export interface ProfileViewDocument {
+  id: string;
+  viewerUid: string;
+  profileUid: string;
+  viewedAt: unknown;
+}
+
+export interface SearchHistoryDocument {
+  id: string;
+  uid: string;
+  query: string;
+  filters: Record<string, unknown>;
+  searchedAt: unknown;
+}
+
+export interface RecentlyViewedDocument {
+  id: string;
+  uid: string;
+  profileUid: string;
+  viewedAt: unknown;
 }
 
 export const FREE_PLAN_LIMITS = {

@@ -11,3 +11,12 @@ export function formatRelativeTime(date: Date | string | number): string {
   if (day < 30) return `${day}d ago`;
   return d.toLocaleDateString();
 }
+
+export function calculateAge(dob: string | Date): number {
+  const birth = typeof dob === "string" ? new Date(dob) : dob;
+  const now = new Date();
+  let age = now.getFullYear() - birth.getFullYear();
+  const m = now.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < birth.getDate())) age--;
+  return age;
+}
