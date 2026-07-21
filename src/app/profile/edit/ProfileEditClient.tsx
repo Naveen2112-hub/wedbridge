@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader as Loader2, CircleAlert as AlertCircle, CircleCheck as CheckCircle2, User, Phone, MapPin, Calendar, Shield, Users, GraduationCap, Briefcase, IndianRupee, HeartHandshake, Ruler, BookOpen, Leaf, Cigarette, Wine, Star, Sparkles } from "lucide-react";
+import { Loader as Loader2, CircleAlert as AlertCircle, CircleAlert as AlertTriangle, CircleCheck as CheckCircle2, User, Phone, MapPin, Calendar, Shield, Users, GraduationCap, Briefcase, IndianRupee, HeartHandshake, Ruler, BookOpen, Leaf, Cigarette, Wine, Star, Sparkles } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { AuthGuard } from "@/components/auth/AuthGuard";
@@ -14,7 +14,8 @@ import { OCRUploader } from "@/components/profile/OCRUploader";
 import { CompletionCard } from "@/components/profile/CompletionCard";
 import { getProfile, saveProfile } from "@/lib/profile/profileService";
 import type { ProfileDocument } from "@/firebase/schema";
-import type { PartialProfile } from "@/lib/profile/ocrTypes";
+import type { PartialProfile, ProfileWithConfidence } from "@/lib/profile/ocrTypes";
+import { reviewFields } from "@/lib/profile/ocrTypes";
 import { cn } from "@/lib/cn";
 
 const INDIAN_STATES = ["Tamil Nadu", "Kerala", "Karnataka", "Andhra Pradesh", "Telangana", "Puducherry"];
@@ -35,6 +36,7 @@ function ProfileEditContent() {
   const [photoURL, setPhotoURL] = useState("");
   const [gallery, setGallery] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [ocrReview, setOcrReview] = useState<{ key: string; value: string; confidence: number }[] | null>(null);
 
   const { register, handleSubmit, watch, setValue, reset, formState: { errors, isSubmitting } } = useForm<ProfileValues>({ resolver: zodResolver(profileSchema), defaultValues: { name: "", gender: "male", dateOfBirth: "", religion: "", caste: "", motherTongue: "", district: "", state: "Tamil Nadu", country: "India", phone: "", email: "", photoURL: "", contactVisibility: "after_accept", maritalStatus: "never_married", height: "", education: "", occupation: "", annualIncome: "", profileVisibility: "visible" } as ProfileValues });
 
@@ -62,6 +64,11 @@ function ProfileEditContent() {
     if (data.phone) setValue("phone", data.phone);
   };
 
+  const onOCRConfidence = (data: ProfileWithConfidence) => {
+    const review = reviewFields(data).map(({ key, field }) => ({ key, value: field.value, confidence: field.confidence }));
+    setOcrReview(review.length > 0 ? review : null);
+  };
+
   return (
     <div className="space-y-6">
       <div><h1 className="heading-md">{t("profile.edit")}</h1><p className="text-lead mt-2">Update your information and preferences.</p></div>
@@ -73,7 +80,13 @@ function ProfileEditContent() {
         <div className="space-y-6 lg:col-span-2">
           <Card title={t("profile.basic")}>
             <div className="mb-5"><PhotoUploader uid={user!.uid} value={photoURL} onChange={setPhotoURL} /></div>
-            <div className="mb-5"><OCRUploader onExtract={onOCR} /></div>
+            <div className="mb-5"><OCRUploader onExtract={onOCR} onConfidence={onOCRConfidence} /></div>
+            {ocrReview && ocrReview.length > 0 && (
+              <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                <p className="flex items-center gap-2 text-sm font-semibold text-amber-800"><AlertTriangle className="h-4 w-4" />{ocrReview.length} field(s) need review</p>
+                <ul className="mt-2 space-y-1 text-xs text-amber-700">{ocrReview.map((r) => (<li key={r.key}><span className="font-medium">{r.key}</span>: {r.value} <span className="text-amber-500">({Math.round(r.confidence * 100)}%)</span></li>))}</ul>
+              </div>
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label={t("auth.complete.name")} icon={User} error={errors.name && t("auth.error.required")}><input className="auth-input pl-10" {...register("name")} /></Field>
               <Field label={t("auth.complete.dob")} icon={Calendar} error={errors.dateOfBirth && t("auth.error.required")}><input type="date" className="auth-input pl-10" {...register("dateOfBirth")} /></Field>

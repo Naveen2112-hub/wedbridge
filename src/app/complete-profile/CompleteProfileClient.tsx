@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Heart, CircleAlert as AlertCircle, User, Phone, MapPin, Calendar, Shield, Users, GraduationCap, Briefcase, IndianRupee, HeartHandshake, Ruler } from "lucide-react";
+import { Heart, CircleAlert as AlertCircle, CircleAlert as AlertTriangle, User, Phone, MapPin, Calendar, Shield, Users, GraduationCap, Briefcase, IndianRupee, HeartHandshake, Ruler } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { completeProfileSchema, type CompleteProfileValues, mapAuthError } from "@/lib/auth/validations";
@@ -15,7 +15,8 @@ import { PhotoUploader } from "@/components/profile/PhotoUploader";
 import { OCRUploader } from "@/components/profile/OCRUploader";
 import { CompletionCard } from "@/components/profile/CompletionCard";
 import { saveProfile } from "@/lib/profile/profileService";
-import type { PartialProfile } from "@/lib/profile/ocrTypes";
+import type { PartialProfile, ProfileWithConfidence } from "@/lib/profile/ocrTypes";
+import { reviewFields } from "@/lib/profile/ocrTypes";
 import { cn } from "@/lib/cn";
 
 const INDIAN_STATES = ["Tamil Nadu", "Kerala", "Karnataka", "Andhra Pradesh", "Telangana", "Puducherry"];
@@ -29,6 +30,7 @@ export default function CompleteProfilePage() {
   const router = useRouter();
   const [authError, setAuthError] = useState<string | null>(null);
   const [photoURL, setPhotoURL] = useState("");
+  const [ocrReview, setOcrReview] = useState<{ key: string; value: string; confidence: number }[] | null>(null);
   const { register, handleSubmit, watch, setValue, formState: { errors, isSubmitting } } = useForm<CompleteProfileValues>({ resolver: zodResolver(completeProfileSchema), defaultValues: { name: user?.displayName ?? "", gender: "male", dateOfBirth: "", religion: "", caste: "", motherTongue: "", district: "", state: "Tamil Nadu", country: "India", phone: "", email: "", photoURL: "", contactVisibility: "after_accept", maritalStatus: "never_married", height: "", education: "", occupation: "", annualIncome: "" } });
 
   useEffect(() => { if (loading) return; if (!user) router.replace("/login"); }, [user, loading, router]);
@@ -61,6 +63,11 @@ export default function CompleteProfilePage() {
     if (data.phone) setValue("phone", data.phone);
   };
 
+  const onOCRConfidence = (data: ProfileWithConfidence) => {
+    const review = reviewFields(data).map(({ key, field }) => ({ key, value: field.value, confidence: field.confidence }));
+    setOcrReview(review.length > 0 ? review : null);
+  };
+
   const visibilityOptions: { value: ContactVisibility; labelKey: "profile.visibility.visible" | "auth.complete.visibility.afterAccept" | "auth.complete.visibility.premiumOnly" }[] = [
     { value: "everyone", labelKey: "profile.visibility.visible" }, { value: "after_accept", labelKey: "auth.complete.visibility.afterAccept" }, { value: "premium_only", labelKey: "auth.complete.visibility.premiumOnly" },
   ];
@@ -79,7 +86,14 @@ export default function CompleteProfilePage() {
             {authError && <p className="mb-4 flex items-center gap-2 rounded-xl bg-accent-50 p-3 text-sm text-accent-800"><AlertCircle className="h-4 w-4" />{t(authError as never)}</p>}
 
             <div className="mb-6"><PhotoUploader uid={user.uid} value={photoURL} onChange={setPhotoURL} /></div>
-            <div className="mb-8"><OCRUploader onExtract={onOCR} /></div>
+            <div className="mb-8"><OCRUploader onExtract={onOCR} onConfidence={onOCRConfidence} /></div>
+
+            {ocrReview && ocrReview.length > 0 && (
+              <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                <p className="flex items-center gap-2 text-sm font-semibold text-amber-800"><AlertTriangle className="h-4 w-4" />{ocrReview.length} field(s) need review</p>
+                <ul className="mt-2 space-y-1 text-xs text-amber-700">{ocrReview.map((r) => (<li key={r.key}><span className="font-medium">{r.key}</span>: {r.value} <span className="text-amber-500">({Math.round(r.confidence * 100)}%)</span></li>))}</ul>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid gap-4 sm:grid-cols-2">
