@@ -3,11 +3,42 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from "firebase/auth";
 import { auth, db } from "@/firebase/config";
-import { doc, getDoc } from "firebase/firestore";
-import { collections, type AppUser } from "@/firebase/schema";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { collections, type AppUser, type UserRole, type ContactVisibility, type Language } from "@/firebase/schema";
 
 interface AdminAuthContextType { user: User | null; adminUser: AppUser | null; loading: boolean; login: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>; logout: () => Promise<void>; }
 const AdminAuthContext = createContext<AdminAuthContextType>({ user: null, adminUser: null, loading: true, login: async () => ({ ok: false }), logout: async () => {} });
+
+function readLanguage(): Language { if (typeof window === "undefined") return "en"; return window.localStorage.getItem("wedbridge:lang") === "ta" ? "ta" : "en"; }
+
+function friendlyAuthError(e: unknown): string {
+  const code = (e as { code?: string })?.code ?? "";
+  const map: Record<string, string> = {
+    "auth/invalid-credential": "Invalid email or password. Please check your credentials.",
+    "auth/wrong-password": "Wrong password. Please try again.",
+    "auth/user-not-found": "No account found with this email.",
+    "auth/user-disabled": "This account has been disabled. Contact support.",
+    "auth/too-many-requests": "Too many failed attempts. Try again later.",
+    "auth/network-request-failed": "Network error. Check your internet connection.",
+    "auth/invalid-email": "Please enter a valid email address.",
+    "auth/missing-password": "Please enter your password.",
+    "auth/internal-error": "An internal error occurred. Please try again.",
+  };
+  return map[code] ?? (e instanceof Error ? e.message : "Login failed. Please try again.");
+}
+
+async function ensureUserDoc(user: User): Promise<AppUser | null> {
+  if (!db) return null;
+  const ref = doc(db, collections.users, user.uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    const payload = { uid: user.uid, role: "user" as UserRole, name: user.displayName ?? "", email: user.email ?? "", phone: user.phoneNumber ?? "", gender: null, profileCompleted: false, photoURL: user.photoURL ?? "", contactVisibility: "after_accept" as ContactVisibility, language: readLanguage(), createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+    await setDoc(ref, payload);
+    return { uid: user.uid, email: user.email ?? "", displayName: user.displayName ?? "", role: "user", status: "active", verified: false } as AppUser;
+  }
+  const data = snap.data() as Omit<AppUser, "uid">;
+  return { uid: user.uid, ...data };
+}
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -24,16 +55,11 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     const unsub = onAuthStateChanged(auth, async (u) => {
       if (!u) { setUser(null); setAdminUser(null); settle(); return; }
       setUser(u);
-      if (db) {
-        try {
-          const snap = await getDoc(doc(db, collections.users, u.uid));
-          if (snap.exists()) {
-            const data = snap.data() as Omit<AppUser, "uid">;
-            if (data.role !== "admin") { setAdminUser(null); if (auth) await signOut(auth); }
-            else setAdminUser({ uid: u.uid, ...data });
-          } else setAdminUser(null);
-        } catch { setAdminUser(null); }
-      } else { setAdminUser(null); }
+      try {
+        const appUser = await ensureUserDoc(u);
+        if (appUser && appUser.role === "admin") setAdminUser(appUser);
+        else { setAdminUser(null); if (auth) await signOut(auth); }
+      } catch { setAdminUser(null); }
       settle();
     });
 
@@ -42,13 +68,20 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    if (!auth || !db) return { ok: false, error: "Authentication not configured." };
+    if (!auth) return { ok: false, error: "Authentication is not configured." };
+    if (!db) return { ok: false, error: "Database is unavailable. Please try again later." };
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password);
-      const snap = await getDoc(doc(db, collections.users, cred.user.uid));
-      if (!snap.exists() || (snap.data() as { role: string }).role !== "admin") { await signOut(auth); return { ok: false, error: "Access denied. Admin role required." }; }
-      return { ok: true };
-    } catch (e) { return { ok: false, error: e instanceof Error ? e.message : "Login failed" }; }
+      try {
+        const appUser = await ensureUserDoc(cred.user);
+        if (!appUser || appUser.role !== "admin") { await signOut(auth); return { ok: false, error: "Access denied. Administrator account required." }; }
+        setAdminUser(appUser);
+        return { ok: true };
+      } catch {
+        await signOut(auth);
+        return { ok: false, error: "Unable to verify admin permissions. Check your connection and try again." };
+      }
+    } catch (e) { return { ok: false, error: friendlyAuthError(e) }; }
   };
   const logout = async () => { if (auth) await signOut(auth); setAdminUser(null); router.push("/admin/login"); };
 
