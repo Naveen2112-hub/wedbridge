@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Heart, Sparkles, ShieldCheck, Search, Store, Crown, BadgeCheck, Users, ArrowRight, Star, Quote } from "lucide-react";
+import { Heart, Sparkles, ShieldCheck, Search, Store, Crown, BadgeCheck, Users, ArrowRight, Star, Quote, Lock } from "lucide-react";
+import { Reveal } from "@/components/ui/Reveal";
 
 export default function HomePage() {
   const features = [
@@ -132,6 +133,23 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Admin Portal */}
+      <Reveal className="container-page">
+        <section className="mx-auto max-w-2xl rounded-2xl border border-primary-100 bg-primary-50/40 px-6 py-10 text-center sm:py-12">
+          <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-100 text-primary-700">
+            <Lock className="h-5 w-5" />
+          </span>
+          <h2 className="font-display mt-5 text-2xl font-bold text-primary-800 sm:text-3xl">Admin Portal</h2>
+          <p className="mx-auto mt-3 max-w-md text-sm text-gray-600 sm:text-base">Restricted access for WedBridge administrators only.</p>
+          <Link
+            href="/admin/login"
+            className="btn-primary mt-6 inline-flex items-center gap-2 text-sm"
+          >
+            Admin Login <ArrowRight className="h-4 w-4" />
+          </Link>
+        </section>
+      </Reveal>
     </div>
   );
 }
