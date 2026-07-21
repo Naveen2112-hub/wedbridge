@@ -17,18 +17,38 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!auth) { setLoading(false); return; }
+
+    let settled = false;
+    const settle = () => { if (!settled) { settled = true; setLoading(false); } };
+
     const unsub = onAuthStateChanged(auth, async (u) => {
-      if (!u) { setUser(null); setAdminUser(null); setLoading(false); return; }
+      if (!u) { setUser(null); setAdminUser(null); settle(); return; }
       setUser(u);
-      if (db) { try { const snap = await getDoc(doc(db, collections.users, u.uid)); if (snap.exists()) { const data = snap.data() as Omit<AppUser, "uid">; if (data.role !== "admin") { setAdminUser(null); if (auth) await signOut(auth); } else setAdminUser({ uid: u.uid, ...data }); } else setAdminUser(null); } catch { setAdminUser(null); } }
-      setLoading(false);
+      if (db) {
+        try {
+          const snap = await getDoc(doc(db, collections.users, u.uid));
+          if (snap.exists()) {
+            const data = snap.data() as Omit<AppUser, "uid">;
+            if (data.role !== "admin") { setAdminUser(null); if (auth) await signOut(auth); }
+            else setAdminUser({ uid: u.uid, ...data });
+          } else setAdminUser(null);
+        } catch { setAdminUser(null); }
+      } else { setAdminUser(null); }
+      settle();
     });
-    return () => unsub();
+
+    const timeout = setTimeout(() => settle(), 3000);
+    return () => { unsub(); clearTimeout(timeout); };
   }, []);
 
   const login = async (email: string, password: string) => {
     if (!auth || !db) return { ok: false, error: "Authentication not configured." };
-    try { const cred = await signInWithEmailAndPassword(auth, email, password); const snap = await getDoc(doc(db, collections.users, cred.user.uid)); if (!snap.exists() || (snap.data() as { role: string }).role !== "admin") { await signOut(auth); return { ok: false, error: "Access denied. Admin role required." }; } return { ok: true }; } catch (e) { return { ok: false, error: e instanceof Error ? e.message : "Login failed" }; }
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      const snap = await getDoc(doc(db, collections.users, cred.user.uid));
+      if (!snap.exists() || (snap.data() as { role: string }).role !== "admin") { await signOut(auth); return { ok: false, error: "Access denied. Admin role required." }; }
+      return { ok: true };
+    } catch (e) { return { ok: false, error: e instanceof Error ? e.message : "Login failed" }; }
   };
   const logout = async () => { if (auth) await signOut(auth); setAdminUser(null); router.push("/admin/login"); };
 

@@ -21,10 +21,10 @@ const nav = [
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const { adminUser, loading, logout } = useAdminAuth();
+  const { adminUser, logout } = useAdminAuth();
 
-  if (loading) return <div className="flex min-h-screen items-center justify-center"><div className="skeleton h-8 w-8 rounded-full" /></div>;
-  if (!adminUser) { router.push("/admin/login"); return null; }
+  const isLoginRoute = pathname === "/admin/login";
+  if (isLoginRoute) return <>{children}</>;
 
   const handleLogout = async () => { await logout(); router.push("/admin/login"); };
 
