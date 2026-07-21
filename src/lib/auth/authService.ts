@@ -24,6 +24,7 @@ export async function loginWithGoogle(): Promise<{ ok: boolean; error?: string }
   if (!auth || !db) return { ok: false, error: "Authentication not configured." };
   try {
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
     const cred = await signInWithPopup(auth, provider);
     const userDoc = await getDoc(doc(db, collections.users, cred.user.uid));
     if (!userDoc.exists()) { const userData: Omit<AppUser, "uid" | "createdAt"> = { email: cred.user.email ?? "", displayName: cred.user.displayName ?? "", role: "user", status: "active", verified: false, membershipTier: "free" }; await setDoc(doc(db, collections.users, cred.user.uid), { ...userData, createdAt: serverTimestamp() }); }

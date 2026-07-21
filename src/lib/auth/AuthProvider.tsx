@@ -20,6 +20,7 @@ export interface AuthContextValue {
 }
 const AuthContext = createContext<AuthContextValue | null>(null);
 const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
 
 function readLanguage(): Language { if (typeof window === "undefined") return "en"; return window.localStorage.getItem("wedbridge:lang") === "ta" ? "ta" : "en"; }
 
