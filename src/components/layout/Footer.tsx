@@ -1,12 +1,12 @@
 "use client";
 import Link from "next/link";
-import { Heart, Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, Lock } from "lucide-react";
+import { Heart, Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin } from "lucide-react";
 import { useState } from "react";
 
 const cols = [
   { title: "Matrimony", links: [{ href: "/search", label: "Find Matches" }, { href: "/matches", label: "AI Matches" }, { href: "/membership", label: "Membership" }, { href: "/register", label: "Register" }] },
   { title: "Marketplace", links: [{ href: "/services", label: "Wedding Services" }, { href: "/vendor-dashboard", label: "Vendor Dashboard" }, { href: "/my-bookings", label: "My Bookings" }] },
-  { title: "Account", links: [{ href: "/profile", label: "My Profile" }, { href: "/notifications", label: "Notifications" }, { href: "/settings", label: "Settings" }, { href: "/login", label: "Login" }] },
+  { title: "Account", links: [{ href: "/profile", label: "My Profile" }, { href: "/notifications", label: "Notifications" }, { href: "/settings", label: "Settings" }, { href: "/login", label: "Login" }, { href: "/admin/login", label: "Admin Login" }] },
 ];
 
 export function Footer() {
@@ -50,21 +50,6 @@ export function Footer() {
           ))}
 
           <div>
-            {/* Administrator Access */}
-            <div className="mb-6 rounded-xl border border-primary-200/70 bg-white p-4 shadow-sm">
-              <div className="flex items-center gap-2">
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-700">
-                  <Lock className="h-4 w-4" />
-                </span>
-                <h3 className="font-display text-sm font-bold uppercase tracking-wider text-primary-800">Administrator Access</h3>
-              </div>
-              <p className="mt-3 text-xs text-gray-500">Restricted access for WedBridge administrators only.</p>
-              <Link href="/admin/login" className="btn-primary mt-3 inline-flex w-full items-center justify-center gap-1.5 text-xs">
-                <Lock className="h-3.5 w-3.5" />
-                Admin Login
-              </Link>
-            </div>
-
             <h3 className="font-display text-sm font-bold uppercase tracking-wider text-gray-900">Stay Updated</h3>
             <p className="mt-4 text-sm text-gray-500">Get matchmaking tips and exclusive offers.</p>
             <form onSubmit={subscribe} className="mt-4 flex gap-2">
