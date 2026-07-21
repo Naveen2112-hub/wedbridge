@@ -50,6 +50,21 @@ export function Footer() {
           ))}
 
           <div>
+            {/* Administrator Access */}
+            <div className="mb-6 rounded-xl border border-primary-200/70 bg-white p-4 shadow-sm">
+              <div className="flex items-center gap-2">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-100 text-primary-700">
+                  <Lock className="h-4 w-4" />
+                </span>
+                <h3 className="font-display text-sm font-bold uppercase tracking-wider text-primary-800">Administrator Access</h3>
+              </div>
+              <p className="mt-3 text-xs text-gray-500">Restricted access for WedBridge administrators only.</p>
+              <Link href="/admin/login" className="btn-primary mt-3 inline-flex w-full items-center justify-center gap-1.5 text-xs">
+                <Lock className="h-3.5 w-3.5" />
+                Admin Login
+              </Link>
+            </div>
+
             <h3 className="font-display text-sm font-bold uppercase tracking-wider text-gray-900">Stay Updated</h3>
             <p className="mt-4 text-sm text-gray-500">Get matchmaking tips and exclusive offers.</p>
             <form onSubmit={subscribe} className="mt-4 flex gap-2">
@@ -73,17 +88,6 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Admin Login */}
-        <div className="mt-8 flex flex-col items-center gap-2 border-t border-primary-100/60 pt-6 text-center">
-          <span className="text-xs font-medium uppercase tracking-wider text-gray-400">Administrator</span>
-          <Link
-            href="/admin/login"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-primary-200/70 bg-white px-4 py-1.5 text-xs font-semibold text-primary-700 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:border-primary-400 hover:bg-primary-50 hover:text-primary-800 hover:shadow"
-          >
-            <Lock className="h-3.5 w-3.5" />
-            Admin Login
-          </Link>
-        </div>
       </div>
     </footer>
   );
