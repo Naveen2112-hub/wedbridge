@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Heart, Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin } from "lucide-react";
+import { Heart, Facebook, Twitter, Instagram, Youtube, Mail, Phone, MapPin, Lock } from "lucide-react";
 import { useState } from "react";
 
 const cols = [
@@ -71,6 +71,18 @@ export function Footer() {
             <Link href="/terms" className="hover:text-primary-700">Terms of Service</Link>
             <Link href="/cookies" className="hover:text-primary-700">Cookie Policy</Link>
           </div>
+        </div>
+
+        {/* Admin Login */}
+        <div className="mt-8 flex flex-col items-center gap-2 border-t border-primary-100/60 pt-6 text-center">
+          <span className="text-xs font-medium uppercase tracking-wider text-gray-400">Administrator</span>
+          <Link
+            href="/admin/login"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-primary-200/70 bg-white px-4 py-1.5 text-xs font-semibold text-primary-700 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:border-primary-400 hover:bg-primary-50 hover:text-primary-800 hover:shadow"
+          >
+            <Lock className="h-3.5 w-3.5" />
+            Admin Login
+          </Link>
         </div>
       </div>
     </footer>
