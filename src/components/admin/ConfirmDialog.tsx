@@ -1,7 +1,7 @@
 "use client";
 import { useState, type ReactNode } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertTriangle, X } from "lucide-react";
+import { TriangleAlert as AlertTriangle, X } from "lucide-react";
 
 interface ConfirmDialogProps {
   open: boolean;

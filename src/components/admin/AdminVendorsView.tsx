@@ -1,11 +1,7 @@
 "use client";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Store, Search, Plus, Edit, Trash2, Check, X, Star, RefreshCw,
-  CheckCircle, XCircle, Clock, Award, Layers, Loader as Loader2,
-  ChevronDown, ChevronUp,
-} from "lucide-react";
+import { Store, Search, Plus, CreditCard as Edit, Trash2, Check, X, Star, RefreshCw, CircleCheck as CheckCircle, Circle as XCircle, Clock, Award, Layers, Loader as Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import {
   getAllVendors, getVendorAnalytics, filterVendors, searchVendors,
   approveVendor, rejectVendor, deleteVendor, toggleFeatured, toggleActive,
