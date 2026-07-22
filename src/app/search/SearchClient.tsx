@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
 import { AuthGuard } from "@/components/auth/AuthGuard";
+import { AiSearchBar } from "@/components/ai/AiSearchBar";
 import type { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 
 export default function SearchClient() {
@@ -44,6 +45,7 @@ export default function SearchClient() {
       <div className="space-y-6">
         <div><h1 className="heading-lg">{t("search.title")}</h1><p className="text-lead mt-2">{t("search.subtitle")}</p></div>
         <SearchHistory onPick={(f) => setFilters(f as FilterState)} />
+        <AiSearchBar onFiltersParsed={(f) => { setFilters(f as FilterState); runSearch(true); }} className="mb-4" />
         <SearchFiltersPanel filters={filters} onChange={setFilters} onSearch={() => runSearch(true)} onReset={handleReset} sort={sort} onSortChange={setSort} loading={loading} />
         {searched && <p className="text-sm text-gray-500">{t("search.showing")} {profiles.length} {t("search.of")} {t("search.results")}</p>}
         <ProfileGrid profiles={profiles} loading={loading} hasMore={hasMore} onLoadMore={() => runSearch(false)} />

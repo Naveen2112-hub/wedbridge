@@ -2,6 +2,7 @@ import { collection, query, where, getDocs, orderBy, limit, doc, addDoc, getDoc,
 import { db } from "@/firebase/config";
 import { collections, type ProfileDocument, type AiMatchDocument, type MatchHistoryDocument, type MembershipTier } from "@/firebase/schema";
 import { calculateAge } from "@/lib/format";
+import { calculateCompatibility, type CompatibilityResult } from "@/lib/ai/compatibilityEngine";
 
 export const FREE_DAILY_LIMIT = 20;
 export const REFRESH_HOURS = 24;
@@ -24,6 +25,7 @@ export interface ScoredMatch {
   score: number;
   reasons: string[];
   insights: string[];
+  compatibility?: CompatibilityResult;
 }
 
 interface FactorWeights {
@@ -55,104 +57,19 @@ function matchScore(a: string | undefined | null, b: string | undefined | null):
   return a.toLowerCase() === b.toLowerCase() ? 1 : 0;
 }
 
-export function calculateAiScore(user: ProfileDocument, candidate: ProfileDocument): { score: number; reasons: string[]; insights: string[] } {
-  let weighted = 0;
-  const reasons: string[] = [];
-  const insights: string[] = [];
+export function calculateAiScore(user: ProfileDocument, candidate: ProfileDocument): { score: number; reasons: string[]; insights: string[]; compatibility: CompatibilityResult } {
+  const compatibility = calculateCompatibility(user, candidate);
+  const { overallScore, strengths, weaknesses, conversationStarters } = compatibility;
 
-  const userAge = user.dateOfBirth ? calculateAge(user.dateOfBirth) : null;
-  const candAge = candidate.dateOfBirth ? calculateAge(candidate.dateOfBirth) : null;
+  const reasons: string[] = strengths.map((s) => s);
+  const insights: string[] = weaknesses.map((w) => w);
 
-  const relScore = matchScore(user.religion, candidate.religion);
-  weighted += relScore * WEIGHTS.religion;
-  if (relScore > 0) reasons.push("sameReligion");
-
-  const casteScore = matchScore(user.caste, candidate.caste);
-  weighted += casteScore * WEIGHTS.caste;
-  if (casteScore > 0) reasons.push("sameCaste");
-
-  if (userAge !== null && candAge !== null) {
-    const aScore = ageDiffScore(userAge, candAge);
-    weighted += aScore * WEIGHTS.age;
-    if (aScore >= 0.8) { reasons.push("preferredAge"); insights.push("idealAge"); }
+  // Map conversation starters to insights
+  if (conversationStarters.length > 0) {
+    insights.push(...conversationStarters);
   }
 
-  const eduScore = matchScore(user.education, candidate.education);
-  weighted += eduScore * WEIGHTS.education;
-  if (eduScore > 0) { reasons.push("similarEducation"); insights.push("educationPref"); }
-
-  const occScore = matchScore(user.occupation, candidate.occupation);
-  weighted += occScore * WEIGHTS.occupation;
-  if (occScore > 0) reasons.push("matchingOccupation");
-
-  const distScore = matchScore(user.district, candidate.district);
-  weighted += distScore * WEIGHTS.district;
-  if (distScore > 0) reasons.push("sameDistrict");
-
-  const mtScore = matchScore(user.motherTongue, candidate.motherTongue);
-  weighted += mtScore * WEIGHTS.motherTongue;
-  if (mtScore > 0) reasons.push("sameMotherTongue");
-
-  const lifeScore = matchScore(user.lifestyle, candidate.lifestyle);
-  weighted += lifeScore * WEIGHTS.lifestyle;
-  if (lifeScore > 0) reasons.push("matchingLifestyle");
-
-  const foodScore = matchScore(user.foodPreference, candidate.foodPreference);
-  weighted += foodScore * WEIGHTS.food;
-  if (foodScore > 0) reasons.push("sameFood");
-
-  const msScore = matchScore(user.maritalStatus, candidate.maritalStatus);
-  weighted += msScore * WEIGHTS.maritalStatus;
-  if (msScore > 0) reasons.push("sameMaritalStatus");
-
-  const stateScore = matchScore(user.state, candidate.state);
-  weighted += stateScore * WEIGHTS.state;
-  if (stateScore > 0) reasons.push("sameState");
-
-  const countryScore = matchScore(user.country, candidate.country);
-  weighted += countryScore * WEIGHTS.country;
-  if (countryScore > 0) reasons.push("sameCountry");
-
-  const incomeScore = matchScore(user.annualIncome, candidate.annualIncome);
-  weighted += incomeScore * WEIGHTS.income;
-  if (incomeScore > 0) reasons.push("matchingIncome");
-
-  const heightScore = matchScore(user.height, candidate.height);
-  weighted += heightScore * WEIGHTS.height;
-
-  const smokeScore = matchScore(user.smoking, candidate.smoking);
-  weighted += smokeScore * WEIGHTS.smoking;
-  const drinkScore = matchScore(user.drinking, candidate.drinking);
-  weighted += drinkScore * WEIGHTS.drinking;
-
-  const starScore = matchScore(user.star, candidate.star);
-  weighted += starScore * WEIGHTS.star;
-  if (starScore > 0) reasons.push("sameStar");
-
-  const rasiScore = matchScore(user.rasi, candidate.rasi);
-  weighted += rasiScore * WEIGHTS.rasi;
-  if (rasiScore > 0) reasons.push("sameRasi");
-
-  const manglikScore = matchScore(user.manglik, candidate.manglik);
-  weighted += manglikScore * WEIGHTS.manglik;
-  if (manglikScore > 0) reasons.push("sameManglik");
-
-  const horoMatch = (user.horoscope === "yes" && candidate.horoscope === "yes") ? 1 : 0;
-  weighted += horoMatch * WEIGHTS.horoscope;
-  if (horoMatch > 0) reasons.push("matchingHoroscope");
-
-  let partnerScore = 0;
-  if (user.partnerPreference && candidate.partnerPreference) {
-    const userPrefs = user.partnerPreference.toLowerCase();
-    const candPrefs = candidate.partnerPreference.toLowerCase();
-    const overlap = userPrefs.split(/\s+/).filter((w) => w.length > 3 && candPrefs.includes(w)).length;
-    partnerScore = Math.min(overlap / 5, 1);
-    weighted += partnerScore * WEIGHTS.partnerPref;
-    if (partnerScore > 0.4) { reasons.push("partnerPrefMatch"); insights.push("partnerPrefMatch"); }
-  }
-
-  const score = Math.round((weighted / TOTAL_WEIGHT) * 100);
-  return { score, reasons, insights };
+  return { score: overallScore, reasons, insights, compatibility };
 }
 
 function isProfileSearchable(p: ProfileDocument): boolean {
@@ -174,7 +91,7 @@ export async function generateAiMatches(user: ProfileDocument, max = 50): Promis
     const snap = await getDocs(q);
     const candidates: ProfileDocument[] = [];
     snap.forEach((d) => { if (d.id !== user.uid) { const p = { uid: d.id, ...(d.data() as Omit<ProfileDocument, "uid">) }; if (isProfileSearchable(p)) candidates.push(p); } });
-    const scored = candidates.map((c) => { const { score, reasons, insights } = calculateAiScore(user, c); return { profile: c, score, reasons, insights }; });
+    const scored = candidates.map((c) => { const { score, reasons, insights, compatibility } = calculateAiScore(user, c); return { profile: c, score, reasons, insights, compatibility }; });
     scored.sort((a, b) => b.score - a.score);
     return scored.slice(0, max);
   } catch {
@@ -204,7 +121,7 @@ export async function getCachedMatches(uid: string): Promise<ScoredMatch[] | nul
       const pSnap = await getDoc(doc(db, collections.profiles, data.profileUid));
       if (pSnap.exists()) {
         const profile = { uid: pSnap.id, ...(pSnap.data() as Omit<ProfileDocument, "uid">) };
-        if (isProfileSearchable(profile)) matches.push({ profile, score: data.score, reasons: data.reasons ?? [], insights: data.insights ?? [] });
+        if (isProfileSearchable(profile)) matches.push({ profile, score: data.score, reasons: data.reasons ?? [], insights: data.insights ?? [], compatibility: data.breakdown ? { overallScore: data.score, breakdown: data.breakdown, strengths: data.strengths ?? [], weaknesses: data.weaknesses ?? [], conversationStarters: data.conversationStarters ?? [] } : undefined });
       }
     }
     return matches;
@@ -221,7 +138,9 @@ export async function saveCachedMatches(uid: string, matches: ScoredMatch[]): Pr
     await Promise.all(existing.docs.map((d) => deleteDoc(d.ref)));
     const now = serverTimestamp();
     await Promise.all(matches.map((m) => addDoc(collection(database, collections.aiMatches), {
-      uid, profileUid: m.profile.uid, score: m.score, reasons: m.reasons, insights: m.insights, generatedAt: now,
+      uid, profileUid: m.profile.uid, score: m.score, reasons: m.reasons, insights: m.insights,
+      breakdown: m.compatibility?.breakdown, strengths: m.compatibility?.strengths, weaknesses: m.compatibility?.weaknesses, conversationStarters: m.compatibility?.conversationStarters,
+      generatedAt: now,
     } as Omit<AiMatchDocument, "id">)));
   } catch { /* ignore */ }
 }

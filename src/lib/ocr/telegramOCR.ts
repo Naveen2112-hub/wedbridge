@@ -8,6 +8,7 @@ import { confidenceLevel } from "@/lib/profile/ocrTypes";
 import { extractWithGemini, isGeminiConfigured } from "@/lib/ocr/geminiVision";
 import { validateAndCorrect, calculateAge } from "@/lib/ocr/fieldValidator";
 import { analyzeFile, isValidMime, isSafeFile, type FileAnalysis } from "@/lib/ocr/fileTypeDetection";
+import { analyzeLayout, cropToBiodataRegion, preprocessForOCR } from "@/lib/ocr/layoutDetection";
 
 export interface TelegramOCRResult {
   text: string;
@@ -87,7 +88,18 @@ export async function processBiodataFile(
   if (fileAnalysis.type === "pdf" && !fileAnalysis.isScanned) {
     result = await runOCRPdf(fileBuffer);
   } else {
-    result = await runOCRImage(fileBuffer, fileAnalysis.mimeType);
+    // Layout detection: crop to biodata region, remove decorations
+    let imageBuffer = fileBuffer;
+    try {
+      const layout = await analyzeLayout(fileBuffer, fileAnalysis.mimeType);
+      if (layout.biodataRegion) {
+        imageBuffer = await cropToBiodataRegion(fileBuffer, layout.biodataRegion);
+      }
+      imageBuffer = await preprocessForOCR(imageBuffer);
+    } catch {
+      // If layout detection fails, use original image
+    }
+    result = await runOCRImage(imageBuffer, fileAnalysis.mimeType);
   }
 
   const { data, withConfidence, corrections } = validateAndCorrect(

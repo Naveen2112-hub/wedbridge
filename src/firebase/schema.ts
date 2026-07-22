@@ -25,6 +25,12 @@ export const collections = {
   broadcasts: "broadcasts",
   notificationTemplates: "notification_templates",
   ocrImports: "ocr_imports",
+  compatibilityCache: "compatibility_cache",
+  searchAssistant: "search_assistant",
+  chatAssistant: "chat_assistant",
+  recommendations: "recommendations",
+  weddingPlanner: "wedding_planner",
+  fraudDetection: "fraud_detection",
 } as const;
 
 export type UserRole = "user" | "admin" | "vendor";
@@ -41,7 +47,7 @@ export type InterestStatus = "pending" | "accepted" | "rejected" | "cancelled" |
 
 export type PaymentStatus = "pending" | "paid" | "verified" | "refunded" | "failed" | "cancelled";
 
-export type PaymentGateway = "razorpay" | "manual" | "stripe";
+export type PaymentGateway = "razorpay" | "manual" | "stripe" | "upi" | "phonepe" | "googlepay" | "paytm";
 
 export type NotificationType =
   | "interest_received"
@@ -245,6 +251,11 @@ export interface ProfileDocument {
   photoURL?: string;
   photoURLs?: string[];
   gallery?: string[];
+  fatherName?: string;
+  motherName?: string;
+  nativePlace?: string;
+  hobbies?: string;
+  interests?: string;
   status: "pending" | "approved" | "rejected" | "hidden";
   premium?: boolean;
   verified?: boolean;
@@ -358,6 +369,10 @@ export interface AiMatchDocument {
   score: number;
   reasons?: string[];
   insights?: string[];
+  breakdown?: { factor: string; label: string; score: number; maxScore: number; matched: boolean; detail: string }[];
+  strengths?: string[];
+  weaknesses?: string[];
+  conversationStarters?: string[];
   generatedAt: unknown;
 }
 
