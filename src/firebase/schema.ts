@@ -24,6 +24,7 @@ export const collections = {
   telegramQueue: "telegram_queue",
   broadcasts: "broadcasts",
   notificationTemplates: "notification_templates",
+  ocrImports: "ocr_imports",
 } as const;
 
 export type UserRole = "user" | "admin" | "vendor";
@@ -81,6 +82,7 @@ export interface AppUser {
   profileCompleted?: boolean;
   contactVisibility?: ContactVisibility;
   language?: Language;
+  telegramChatId?: string;
   createdAt: unknown;
   updatedAt?: unknown;
 }
