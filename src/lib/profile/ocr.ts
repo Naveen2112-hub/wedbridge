@@ -2,6 +2,7 @@
 import type { PartialProfile, ProfileWithConfidence } from "./ocrTypes";
 import { preprocessImage, type PreprocessProgress } from "./ocrPreprocess";
 import { parseBiodata, withConfidenceToProfile } from "./ocrParser";
+import { sendNotification } from "@/lib/telegram-notifications";
 
 export type OCRProgress = (step: string, progress: number) => void;
 
@@ -53,6 +54,7 @@ export async function runOCR(
 
   report("Autofilling profile", 0.95);
   report("Done", 1);
+  void sendNotification("ocr_completed").catch(() => {});
   return { text, data, withConfidence };
 }
 

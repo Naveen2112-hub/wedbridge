@@ -2,6 +2,7 @@ import { collection, query, where, getDocs, orderBy, limit, doc, addDoc, updateD
 import { db } from "@/firebase/config";
 import { collections, type InterestDocument, type InterestStatus, type MembershipTier } from "@/firebase/schema";
 import { createNotification } from "@/lib/notifications/notificationService";
+import { sendNotification } from "@/lib/telegram-notifications";
 
 export const FREE_DAILY_INTEREST_LIMIT = 20;
 const EXPIRY_DAYS = 30;
@@ -64,6 +65,7 @@ export async function sendInterest(senderId: string, senderName: string, receive
       type: "interest_received",
       metadata: { interestId: ref.id, senderId },
     });
+    void sendNotification("interest_received").catch(() => {});
   } catch (e) {
     if (e instanceof InterestLimitError) throw e;
   }
@@ -74,13 +76,14 @@ export async function updateInterestStatus(interestId: string, status: InterestS
   const database = db;
   try {
     await updateDoc(doc(database, collections.interests, interestId), { status, updatedAt: serverTimestamp() });
-    if (senderId && receiverName && (status === "accepted" || status === "rejected")) {
+      if (senderId && receiverName && (status === "accepted" || status === "rejected")) {
       await createNotification(senderId, {
         title: status === "accepted" ? "Interest Accepted" : "Interest Rejected",
         message: status === "accepted" ? `${receiverName} accepted your interest.` : `${receiverName} declined your interest.`,
         type: status === "accepted" ? "interest_accepted" : "interest_rejected",
         metadata: { interestId },
       });
+      if (status === "accepted") void sendNotification("interest_accepted").catch(() => {});
     }
   } catch { /* ignore */ }
 }

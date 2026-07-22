@@ -2,6 +2,7 @@ import { collection, doc, addDoc, getDoc, getDocs, query, where, updateDoc, serv
 import { db } from "@/firebase/config";
 import { collections, type SubscriptionDocument, type MembershipTier, type PaymentDocument, type PlanInfo } from "@/firebase/schema";
 import { PLANS } from "@/lib/membership/planConfig";
+import { sendNotification } from "@/lib/telegram-notifications";
 
 export { PLANS };
 export type { PlanInfo };
@@ -48,6 +49,7 @@ export async function activateSubscription(uid: string, plan: MembershipTier, pa
     const ref = await addDoc(collection(db, collections.subscriptions), {
       uid, plan, status: "active", startDate, endDate, paymentId, autoRenew: false, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
     } as Omit<SubscriptionDocument, "id">);
+    void sendNotification("membership_purchased").catch(() => {});
     return { id: ref.id, uid, plan, status: "active", startDate, endDate, paymentId, autoRenew: false, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
   } catch { return null; }
 }

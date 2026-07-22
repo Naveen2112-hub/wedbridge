@@ -19,6 +19,11 @@ export const collections = {
   profileViews: "profileViews",
   recentlyViewed: "recentlyViewed",
   searchHistory: "searchHistory",
+  telegramSettings: "telegram_settings",
+  telegramLogs: "telegram_logs",
+  telegramQueue: "telegram_queue",
+  broadcasts: "broadcasts",
+  notificationTemplates: "notification_templates",
 } as const;
 
 export type UserRole = "user" | "admin" | "vendor";

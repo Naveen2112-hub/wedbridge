@@ -2,6 +2,7 @@ import { collection, query, where, getDocs, orderBy, limit, doc, addDoc, updateD
 import { db } from "@/firebase/config";
 import { collections, type VendorBookingDocument, type BookingStatus } from "@/firebase/schema";
 import { sanitizeText } from "@/lib/utils";
+import { sendNotification } from "@/lib/telegram-notifications";
 
 export interface CreateBookingInput { vendorId: string; vendorName: string; userId: string; userName: string; userEmail: string; packageId?: string; preferredDate: string; time: string; guestCount: number; specialNotes?: string; amount: number; }
 
@@ -9,6 +10,7 @@ export async function createBooking(input: CreateBookingInput): Promise<string> 
   if (!db) throw new Error("db-not-configured");
   const sanitized = { ...input, specialNotes: input.specialNotes ? sanitizeText(input.specialNotes) : "" };
   const ref = await addDoc(collection(db, collections.vendorBookings), { ...sanitized, status: "pending" as BookingStatus, createdAt: serverTimestamp(), updatedAt: serverTimestamp() } as Omit<VendorBookingDocument, "id">);
+  void sendNotification("vendor_booking", { vendorName: input.vendorName }).catch(() => {});
   return ref.id;
 }
 export async function updateBookingStatus(id: string, status: BookingStatus): Promise<void> {

@@ -3,6 +3,7 @@ import { auth, db } from "@/firebase/config";
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { collections, type AppUser } from "@/firebase/schema";
 import { sanitizeText } from "@/lib/utils";
+import { sendNotification } from "@/lib/telegram-notifications";
 
 export async function registerUser(email: string, password: string, displayName: string): Promise<{ ok: boolean; error?: string }> {
   if (!auth || !db) return { ok: false, error: "Authentication not configured." };
@@ -11,13 +12,14 @@ export async function registerUser(email: string, password: string, displayName:
     await updateProfile(cred.user, { displayName });
     const userData: Omit<AppUser, "uid" | "createdAt"> = { email, displayName: sanitizeText(displayName), role: "user", status: "active", verified: false, membershipTier: "free" };
     await setDoc(doc(db, collections.users, cred.user.uid), { ...userData, createdAt: serverTimestamp() });
+    void sendNotification("welcome").catch(() => {});
     return { ok: true };
   } catch (e) { return { ok: false, error: e instanceof Error ? e.message : "Registration failed" }; }
 }
 
 export async function loginUser(email: string, password: string): Promise<{ ok: boolean; error?: string }> {
   if (!auth) return { ok: false, error: "Authentication not configured." };
-  try { await signInWithEmailAndPassword(auth, email, password); return { ok: true }; } catch (e) { return { ok: false, error: e instanceof Error ? e.message : "Login failed" }; }
+  try { await signInWithEmailAndPassword(auth, email, password); void sendNotification("login").catch(() => {}); return { ok: true }; } catch (e) { return { ok: false, error: e instanceof Error ? e.message : "Login failed" }; }
 }
 
 export async function loginWithGoogle(): Promise<{ ok: boolean; error?: string }> {
@@ -34,7 +36,7 @@ export async function loginWithGoogle(): Promise<{ ok: boolean; error?: string }
 
 export async function resetPassword(email: string): Promise<{ ok: boolean; error?: string }> {
   if (!auth) return { ok: false, error: "Authentication not configured." };
-  try { await sendPasswordResetEmail(auth, email); return { ok: true }; } catch (e) { return { ok: false, error: e instanceof Error ? e.message : "Reset failed" }; }
+  try { await sendPasswordResetEmail(auth, email); void sendNotification("password_reset").catch(() => {}); return { ok: true }; } catch (e) { return { ok: false, error: e instanceof Error ? e.message : "Reset failed" }; }
 }
 
 export async function logoutUser(): Promise<void> { if (auth) await signOut(auth); }
