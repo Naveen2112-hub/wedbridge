@@ -144,30 +144,53 @@ export function getCategoryName(id: VendorCategory): string {
 
 export type VendorStatus = "pending" | "approved" | "rejected" | "suspended";
 
+export interface VendorSocialLinks {
+  website?: string;
+  facebook?: string;
+  instagram?: string;
+  youtube?: string;
+}
+
 export interface VendorDocument {
   id: string;
   ownerUid: string;
+  ownerName?: string;
   businessName: string;
   category: VendorCategory;
   logoURL: string;
   coverURL: string;
   about: string;
+  services?: string[];
   city: string;
   district: string;
   state: string;
+  address?: string;
+  pincode?: string;
   location: { lat: number; lng: number } | null;
   phone: string;
   email: string;
+  whatsapp?: string;
   website?: string;
+  gstNumber?: string;
+  pan?: string;
   businessHours?: { days: string; hours: string };
   startingPrice: number;
   experienceYears: number;
+  paymentMethods?: string[];
+  socialLinks?: VendorSocialLinks;
+  galleryImages?: string[];
   rating: number;
   reviewCount: number;
   featured: boolean;
+  active?: boolean;
   status: VendorStatus;
   verificationStatus: VerificationStatus;
   contactVisibility: ContactVisibility;
+  approvedBy?: string;
+  approvedAt?: unknown;
+  rejectionReason?: string;
+  createdBy?: string;
+  updatedBy?: string;
   createdAt: unknown;
   updatedAt: unknown;
 }
