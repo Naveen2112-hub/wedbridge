@@ -9,11 +9,11 @@ export interface ExtractedField {
 
 export type FieldKey =
   | "name" | "dateOfBirth" | "age" | "height" | "weight"
-  | "education" | "occupation" | "annualIncome"
+  | "education" | "occupation" | "company" | "annualIncome"
   | "fatherName" | "motherName" | "siblings"
   | "religion" | "caste" | "subCaste" | "gothram" | "star" | "rasi" | "dosham"
   | "nativePlace" | "district" | "state" | "country"
-  | "phone" | "email" | "address"
+  | "phone" | "whatsapp" | "email" | "address"
   | "expectations" | "hobbies" | "partnerPreference";
 
 export type PartialProfile = Partial<Record<FieldKey, string>>;

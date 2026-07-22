@@ -1,5 +1,6 @@
 /**
  * Biodata import service: download from Telegram, dedup, store in Firestore.
+ * Enhanced with multi-field duplicate detection, analytics, security, auto-calculate.
  */
 import { db } from "@/firebase/config";
 import {
@@ -7,6 +8,8 @@ import {
 } from "firebase/firestore";
 import { collections, type AppUser } from "@/firebase/schema";
 import { processBiodataFile, stripHoroscopeFields, type TelegramOCRResult } from "@/lib/ocr/telegramOCR";
+import { calculateCompletion, getMissingFields, calculateAge } from "@/lib/ocr/fieldValidator";
+import { isValidMime, isSafeFile } from "@/lib/ocr/fileTypeDetection";
 import { escapeMarkdown } from "@/lib/telegram-client";
 
 const TELEGRAM_API_BASE = "https://api.telegram.org/bot";
@@ -30,13 +33,28 @@ export interface OcrImportRecord {
   reviewedBy?: string;
   reviewedAt?: unknown;
   duplicateOf?: string;
+  duplicateSimilarity?: number;
+  duplicateMatchedFields?: string[];
+  corrections?: string[];
+  completionPercentage?: number;
+  missingFields?: string[];
+  processingTimeMs?: number;
+  ocrSource?: string;
+  fileAnalysis?: {
+    type: string;
+    isScanned: boolean;
+    quality: string;
+    needsPreprocessing: boolean;
+    width: number;
+    height: number;
+  };
 }
 
 export interface DuplicateCheckResult {
   isDuplicate: boolean;
   duplicateId?: string;
   similarity: number;
-  matchedField?: string;
+  matchedFields: string[];
 }
 
 /**
@@ -70,23 +88,32 @@ export async function downloadTelegramFile(
     ext === "pdf" ? "application/pdf" :
     ext === "jpg" || ext === "jpeg" ? "image/jpeg" :
     ext === "png" ? "image/png" :
+    ext === "webp" ? "image/webp" :
     "application/octet-stream";
 
   return { buffer, fileName, mimeType, fileSize: fileSize ?? buffer.length };
 }
 
 /**
- * Check for duplicate profiles by comparing phone, email, DOB, and name.
+ * Multi-field duplicate detection comparing phone, email, DOB, name, native, education, occupation.
  */
 export async function checkDuplicate(
   extractedData: Record<string, string>,
 ): Promise<DuplicateCheckResult> {
-  if (!db) return { isDuplicate: false, similarity: 0 };
+  if (!db) return { isDuplicate: false, similarity: 0, matchedFields: [] };
 
-  const phone = extractedData.phone?.trim();
-  const email = extractedData.email?.trim();
-  const name = extractedData.name?.trim().toLowerCase();
-  const dob = extractedData.dateOfBirth?.trim() || extractedData.dob?.trim();
+  const fields = {
+    phone: extractedData.phone?.trim(),
+    whatsapp: extractedData.whatsapp?.trim(),
+    email: extractedData.email?.trim().toLowerCase(),
+    name: extractedData.name?.trim().toLowerCase(),
+    dateOfBirth: extractedData.dateOfBirth?.trim() || extractedData.dob?.trim(),
+    nativePlace: extractedData.nativePlace?.trim().toLowerCase(),
+    education: extractedData.education?.trim().toLowerCase(),
+    occupation: extractedData.occupation?.trim().toLowerCase(),
+    fatherName: extractedData.fatherName?.trim().toLowerCase(),
+    motherName: extractedData.motherName?.trim().toLowerCase(),
+  };
 
   try {
     const importsRef = collection(db, collections.ocrImports);
@@ -98,34 +125,103 @@ export async function checkDuplicate(
       const exData = existing.extractedData ?? {};
       let matches = 0;
       let totalFields = 0;
-      let matchedField = "";
+      const matchedFields: string[] = [];
 
-      if (phone && exData.phone?.trim() === phone) { matches++; totalFields++; matchedField = "phone"; }
-      else if (phone) totalFields++;
+      // Phone (high weight)
+      if (fields.phone && exData.phone?.trim() === fields.phone) {
+        matches += 2; totalFields += 2; matchedFields.push("phone");
+      } else if (fields.phone) totalFields += 2;
 
-      if (email && exData.email?.trim() === email) { matches++; totalFields++; matchedField = matchedField || "email"; }
-      else if (email) totalFields++;
+      // WhatsApp
+      if (fields.whatsapp && exData.whatsapp?.trim() === fields.whatsapp) {
+        matches += 2; totalFields += 2; matchedFields.push("whatsapp");
+      } else if (fields.whatsapp) totalFields += 2;
 
-      if (dob && (exData.dateOfBirth?.trim() === dob || exData.dob?.trim() === dob)) { matches++; totalFields++; matchedField = matchedField || "dob"; }
-      else if (dob) totalFields++;
+      // Email (high weight)
+      if (fields.email && exData.email?.trim().toLowerCase() === fields.email) {
+        matches += 2; totalFields += 2; matchedFields.push("email");
+      } else if (fields.email) totalFields += 2;
 
-      if (name && exData.name?.trim().toLowerCase() === name) { matches++; totalFields++; matchedField = matchedField || "name"; }
-      else if (name) totalFields++;
+      // Name (fuzzy)
+      if (fields.name && exData.name?.trim().toLowerCase() === fields.name) {
+        matches += 2; totalFields += 2; matchedFields.push("name");
+      } else if (fields.name) {
+        const similarity = stringSimilarity(fields.name, exData.name?.trim().toLowerCase() ?? "");
+        if (similarity > 0.85) { matches += 1; matchedFields.push("name(fuzzy)"); }
+        totalFields += 2;
+      }
+
+      // DOB
+      if (fields.dateOfBirth && (exData.dateOfBirth?.trim() === fields.dateOfBirth || exData.dob?.trim() === fields.dateOfBirth)) {
+        matches += 2; totalFields += 2; matchedFields.push("dob");
+      } else if (fields.dateOfBirth) totalFields += 2;
+
+      // Native place
+      if (fields.nativePlace && exData.nativePlace?.trim().toLowerCase() === fields.nativePlace) {
+        matches += 1; totalFields += 1; matchedFields.push("nativePlace");
+      } else if (fields.nativePlace) totalFields += 1;
+
+      // Education
+      if (fields.education && exData.education?.trim().toLowerCase() === fields.education) {
+        matches += 1; totalFields += 1; matchedFields.push("education");
+      } else if (fields.education) totalFields += 1;
+
+      // Occupation
+      if (fields.occupation && exData.occupation?.trim().toLowerCase() === fields.occupation) {
+        matches += 1; totalFields += 1; matchedFields.push("occupation");
+      } else if (fields.occupation) totalFields += 1;
+
+      // Father's name
+      if (fields.fatherName && exData.fatherName?.trim().toLowerCase() === fields.fatherName) {
+        matches += 1; totalFields += 1; matchedFields.push("fatherName");
+      } else if (fields.fatherName) totalFields += 1;
+
+      // Mother's name
+      if (fields.motherName && exData.motherName?.trim().toLowerCase() === fields.motherName) {
+        matches += 1; totalFields += 1; matchedFields.push("motherName");
+      } else if (fields.motherName) totalFields += 1;
 
       if (totalFields === 0) continue;
       const similarity = matches / totalFields;
-      if (similarity >= 0.9 && matches >= 2) {
-        return { isDuplicate: true, duplicateId: docSnap.id, similarity, matchedField };
-      }
-      if (similarity >= 0.9 && matches >= 1 && totalFields === 1) {
-        return { isDuplicate: true, duplicateId: docSnap.id, similarity, matchedField };
+      if (similarity >= 0.9) {
+        return { isDuplicate: true, duplicateId: docSnap.id, similarity, matchedFields };
       }
     }
   } catch {
     // best-effort
   }
 
-  return { isDuplicate: false, similarity: 0 };
+  return { isDuplicate: false, similarity: 0, matchedFields: [] };
+}
+
+/**
+ * Simple string similarity using Levenshtein distance.
+ */
+function stringSimilarity(a: string, b: string): number {
+  if (!a || !b) return 0;
+  if (a === b) return 1;
+  const maxLen = Math.max(a.length, b.length);
+  if (maxLen === 0) return 1;
+  const dist = levenshtein(a, b);
+  return 1 - dist / maxLen;
+}
+
+function levenshtein(a: string, b: string): number {
+  const m = a.length, n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+  const dp = new Array(n + 1);
+  for (let j = 0; j <= n; j++) dp[j] = j;
+  for (let i = 1; i <= m; i++) {
+    let prev = dp[0];
+    dp[0] = i;
+    for (let j = 1; j <= n; j++) {
+      const tmp = dp[j];
+      dp[j] = Math.min(dp[j] + 1, dp[j - 1] + 1, prev + (a[i - 1] === b[j - 1] ? 0 : 1));
+      prev = tmp;
+    }
+  }
+  return dp[n];
 }
 
 /**
@@ -143,7 +239,7 @@ export async function storeImport(
 }
 
 /**
- * Full pipeline: download, OCR, clean, dedup, store, reply.
+ * Full pipeline: download, validate, OCR, clean, dedup, store, reply.
  */
 export async function processBiodataImport(
   token: string,
@@ -162,52 +258,93 @@ export async function processBiodataImport(
     // Step 1-2: Download file
     const { buffer, fileName, mimeType, fileSize } = await downloadTelegramFile(token, fileId);
 
-    // Step 3-5: OCR + AI cleaning (horoscope/border removal handled in preprocess)
+    // Step 18: Security validation
+    if (!isValidMime(mimeType, fileName)) {
+      await sendText(token, chatId, "❌ Unsupported file type. Please send a PDF, JPG, or PNG file.");
+      return { success: false, status: "failed_ocr", error: "Invalid MIME type" };
+    }
+    if (!isSafeFile(buffer, mimeType)) {
+      await sendText(token, chatId, "❌ File failed security validation. Please send a valid biodata file.");
+      return { success: false, status: "failed_ocr", error: "Security validation failed" };
+    }
+
+    // Steps 3-10: OCR + AI cleaning + validation
     const ocrResult = await processBiodataFile(buffer, mimeType, fileName);
     const cleanedData = stripHoroscopeFields(ocrResult.data);
 
-    // Step 8: Duplicate detection
-    const dupCheck = await checkDuplicate(cleanedData as Record<string, string>);
+    // Step 9: Auto-calculate age
+    const dataWithAge = { ...cleanedData };
+    if (dataWithAge.dateOfBirth && !dataWithAge.age) {
+      const age = calculateAge(dataWithAge.dateOfBirth);
+      if (age !== null) dataWithAge.age = String(age);
+    }
+
+    // Step 11-12: Duplicate detection
+    const dupCheck = await checkDuplicate(dataWithAge as Record<string, string>);
     if (dupCheck.isDuplicate) {
-      // Store as duplicate
       const { id } = await storeImport({
         telegramChatId: chatId,
         telegramUserId,
         fileName,
         fileType: mimeType,
         fileSize,
-        extractedData: cleanedData as Record<string, string>,
+        extractedData: dataWithAge as Record<string, string>,
         ocrConfidence: ocrResult.confidence,
         ocrText: ocrResult.text,
         status: "duplicate",
         duplicateOf: dupCheck.duplicateId,
+        duplicateSimilarity: dupCheck.similarity,
+        duplicateMatchedFields: dupCheck.matchedFields,
+        corrections: ocrResult.corrections,
+        completionPercentage: calculateCompletion(dataWithAge as Record<string, string>),
+        missingFields: getMissingFields(dataWithAge as Record<string, string>),
+        processingTimeMs: ocrResult.processingTimeMs,
+        ocrSource: ocrResult.source,
+        fileAnalysis: {
+          type: ocrResult.fileAnalysis.type,
+          isScanned: ocrResult.fileAnalysis.isScanned,
+          quality: ocrResult.fileAnalysis.quality,
+          needsPreprocessing: ocrResult.fileAnalysis.needsPreprocessing,
+          width: ocrResult.fileAnalysis.width,
+          height: ocrResult.fileAnalysis.height,
+        },
       });
 
-      // Notify admin
       await notifyAdminDuplicate(token, chatId, id, dupCheck);
-
       return { success: false, importId: id, status: "duplicate", ocrResult, duplicateInfo: dupCheck };
     }
 
-    // Step 9: Store
+    // Step 13: Store import
     const { id } = await storeImport({
       telegramChatId: chatId,
       telegramUserId,
       fileName,
       fileType: mimeType,
       fileSize,
-      extractedData: cleanedData as Record<string, string>,
+      extractedData: dataWithAge as Record<string, string>,
       ocrConfidence: ocrResult.confidence,
       ocrText: ocrResult.text,
       status: "pending_review",
+      corrections: ocrResult.corrections,
+      completionPercentage: calculateCompletion(dataWithAge as Record<string, string>),
+      missingFields: getMissingFields(dataWithAge as Record<string, string>),
+      processingTimeMs: ocrResult.processingTimeMs,
+      ocrSource: ocrResult.source,
+      fileAnalysis: {
+        type: ocrResult.fileAnalysis.type,
+        isScanned: ocrResult.fileAnalysis.isScanned,
+        quality: ocrResult.fileAnalysis.quality,
+        needsPreprocessing: ocrResult.fileAnalysis.needsPreprocessing,
+        width: ocrResult.fileAnalysis.width,
+        height: ocrResult.fileAnalysis.height,
+      },
     });
 
     // Step 10-11: Reply to user
-    await sendImportReply(token, chatId, id, ocrResult.confidence, cleanedData);
+    await sendImportReply(token, chatId, id, ocrResult.confidence, dataWithAge as Record<string, string>);
 
     return { success: true, importId: id, status: "pending_review", ocrResult };
   } catch (e) {
-    // Store failed import
     try {
       await storeImport({
         telegramChatId: chatId,
@@ -250,6 +387,7 @@ async function sendImportReply(
   lines.push(escapeMarkdown("✅ Biodata Imported"));
   lines.push("");
   lines.push(escapeMarkdown(`Completion: ${completionPct}%`));
+  lines.push(escapeMarkdown(`Confidence: ${confidencePct}%`));
   if (needsReview) {
     lines.push("");
     lines.push(escapeMarkdown("⚠ Some fields need manual review."));
@@ -288,7 +426,7 @@ async function notifyAdminDuplicate(
   const text = [
     escapeMarkdown("⚠ Duplicate Profile Detected"),
     "",
-    escapeMarkdown(`Matched on: ${dupInfo.matchedField ?? "unknown"}`),
+    escapeMarkdown(`Matched on: ${dupInfo.matchedFields.join(", ")}`),
     escapeMarkdown(`Similarity: ${Math.round(dupInfo.similarity * 100)}%`),
     escapeMarkdown(`Import ID: ${importId}`),
   ].join("\n");
@@ -298,23 +436,6 @@ async function notifyAdminDuplicate(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ chat_id: chatId, text }),
   });
-}
-
-/**
- * Calculate profile completion percentage based on filled fields.
- */
-function calculateCompletion(data: Record<string, string>): number {
-  const importantFields = [
-    "name", "dateOfBirth", "age", "height", "religion", "caste",
-    "education", "occupation", "phone", "email", "address",
-    "fatherName", "motherName", "siblings", "nativePlace",
-  "subCaste", "annualIncome",
-  ];
-  let filled = 0;
-  for (const field of importantFields) {
-    if (data[field] && data[field].trim()) filled++;
-  }
-  return (filled / importantFields.length) * 100;
 }
 
 /**
@@ -337,19 +458,22 @@ export async function getImports(
 }
 
 /**
- * Update import status (approve/reject).
+ * Update import status (approve/reject) and optionally edit extracted data.
  */
 export async function updateImportStatus(
   importId: string,
   status: ImportStatus,
   reviewedBy: string,
+  extractedData?: Record<string, string>,
 ): Promise<void> {
   if (!db) return;
-  await updateDoc(doc(db, collections.ocrImports, importId), {
+  const update: Record<string, unknown> = {
     status,
     reviewedBy,
     reviewedAt: serverTimestamp(),
-  });
+  };
+  if (extractedData) update.extractedData = extractedData;
+  await updateDoc(doc(db, collections.ocrImports, importId), update);
 }
 
 /**
@@ -390,5 +514,17 @@ export async function findUserByChatId(
     return snap.docs[0].data() as AppUser;
   } catch {
     return null;
+  }
+}
+
+async function sendText(token: string, chatId: string, text: string): Promise<void> {
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text }),
+    });
+  } catch {
+    // best-effort
   }
 }
