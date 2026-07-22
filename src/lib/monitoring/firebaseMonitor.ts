@@ -26,40 +26,24 @@ export function trackFirebaseError(error: unknown, operation: string, collection
   const code = (error as { code?: string })?.code ?? "unknown";
   const message = error instanceof Error ? error.message : String(error);
   const event: FirebaseErrorEvent = { code, message, operation, collection, timestamp: new Date().toISOString(), userId };
-
   errorBuffer.push(event);
   if (errorBuffer.length > MAX_EVENTS) errorBuffer.shift();
-
   const key = `${operation}:${code}`;
   errorCounts.set(key, (errorCounts.get(key) ?? 0) + 1);
-
   const category = classifyErrorCode(code);
   logger.error(`Firebase ${category} error in ${operation}`, { code, message, collection }, userId);
-
   return event;
 }
 
 export function getErrorSummary(): { total: number; byCategory: Record<string, number>; topErrors: { key: string; count: number }[] } {
   const byCategory: Record<string, number> = {};
-  for (const event of errorBuffer) {
-    const cat = classifyErrorCode(event.code);
-    byCategory[cat] = (byCategory[cat] ?? 0) + 1;
-  }
-  const topErrors = Array.from(errorCounts.entries())
-    .map(([key, count]) => ({ key, count }))
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 10);
+  for (const event of errorBuffer) { const cat = classifyErrorCode(event.code); byCategory[cat] = (byCategory[cat] ?? 0) + 1; }
+  const topErrors = Array.from(errorCounts.entries()).map(([key, count]) => ({ key, count })).sort((a, b) => b.count - a.count).slice(0, 10);
   return { total: errorBuffer.length, byCategory, topErrors };
 }
 
-export function getRecentErrors(): FirebaseErrorEvent[] {
-  return [...errorBuffer].reverse();
-}
-
-export function clearErrorBuffer() {
-  errorBuffer.length = 0;
-  errorCounts.clear();
-}
+export function getRecentErrors(): FirebaseErrorEvent[] { return [...errorBuffer].reverse(); }
+export function clearErrorBuffer() { errorBuffer.length = 0; errorCounts.clear(); }
 
 export function isRetryableError(code: string): boolean {
   const category = classifyErrorCode(code);
@@ -69,9 +53,7 @@ export function isRetryableError(code: string): boolean {
 export async function withFirebaseRetry<T>(fn: () => Promise<T>, operation: string, retries = 2, collection?: string, userId?: string): Promise<T> {
   let lastError: unknown;
   for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
+    try { return await fn(); } catch (error) {
       lastError = error;
       const code = (error as { code?: string })?.code ?? "unknown";
       if (attempt < retries && isRetryableError(code)) {

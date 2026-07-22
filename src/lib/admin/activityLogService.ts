@@ -1,4 +1,4 @@
-import { collection, addDoc, getDocs, query, orderBy, limit, where, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, orderBy, limit, serverTimestamp } from "firebase/firestore";
 import { db } from "@/firebase/config";
 import { collections } from "@/firebase/schema";
 import { logger } from "@/lib/monitoring/logger";
@@ -13,23 +13,10 @@ export interface AdminActivityLog {
   createdAt: unknown;
 }
 
-export async function logAdminActivity(
-  adminUid: string,
-  adminEmail: string,
-  action: string,
-  target: string,
-  details?: string,
-): Promise<void> {
+export async function logAdminActivity(adminUid: string, adminEmail: string, action: string, target: string, details?: string): Promise<void> {
   if (!db) return;
   try {
-    await addDoc(collection(db, collections.auditLog), {
-      adminUid,
-      adminEmail,
-      action,
-      target,
-      details: details ?? "",
-      createdAt: serverTimestamp(),
-    });
+    await addDoc(collection(db, collections.auditLog), { adminUid, adminEmail, action, target, details: details ?? "", createdAt: serverTimestamp() });
     logger.info("Admin activity logged", { action, target, adminUid });
   } catch (e) {
     logger.error("Failed to log admin activity", { error: e instanceof Error ? e.message : String(e) });
@@ -39,13 +26,9 @@ export async function logAdminActivity(
 export async function getAdminActivityLogs(max = 50): Promise<AdminActivityLog[]> {
   if (!db) return [];
   try {
-    const snap = await getDocs(
-      query(collection(db, collections.auditLog), orderBy("createdAt", "desc"), limit(max)),
-    );
+    const snap = await getDocs(query(collection(db, collections.auditLog), orderBy("createdAt", "desc"), limit(max)));
     return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<AdminActivityLog, "id">) }));
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 }
 
 export function formatLogAction(action: string): { label: string; color: string } {

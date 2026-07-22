@@ -13,9 +13,7 @@ function escapeCSV(value: string | number | undefined | null): string {
 }
 
 function toCSV(headers: string[], rows: (string | number | undefined | null)[][]): string {
-  const headerLine = headers.map(escapeCSV).join(",");
-  const dataLines = rows.map((row) => row.map(escapeCSV).join(","));
-  return [headerLine, ...dataLines].join("\n");
+  return [headers.map(escapeCSV).join(","), ...rows.map((r) => r.map(escapeCSV).join(","))].join("\n");
 }
 
 function downloadFile(content: string, filename: string, mimeType: string) {
@@ -23,20 +21,15 @@ function downloadFile(content: string, filename: string, mimeType: string) {
   const blob = new Blob([content], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  link.href = url; link.download = filename;
+  document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url);
 }
 
 function downloadHTMLAsPDF(htmlContent: string) {
   if (typeof window === "undefined") return;
   const win = window.open("", "_blank");
   if (!win) return;
-  win.document.write(htmlContent);
-  win.document.close();
+  win.document.write(htmlContent); win.document.close();
   setTimeout(() => win.print(), 500);
 }
 
@@ -48,14 +41,12 @@ export async function exportUsers(format: ExportFormat, max = 1000): Promise<voi
     const profiles = await getDocs(query(collection(db, collections.profiles), limit(max)));
     const profileMap = new Map<string, ProfileDocument>();
     profiles.docs.forEach((d) => { const p = d.data() as ProfileDocument; if (p.uid) profileMap.set(p.uid, p); });
-
     const headers = ["UID", "Name", "Email", "Phone", "Role", "Gender", "Membership", "Verified", "Status", "Religion", "Caste", "City", "Created At"];
     const rows = users.map((u) => {
       const p = profileMap.get(u.uid);
       const ts = (u.createdAt as { toMillis?: () => number } | undefined)?.toMillis?.();
       return [u.uid, u.name ?? u.displayName ?? "", u.email ?? "", u.phone ?? "", u.role, u.gender ?? "", u.membershipTier ?? "free", u.verified ? "Yes" : "No", u.status, p?.religion ?? "", p?.caste ?? "", p?.city ?? "", ts ? new Date(ts).toLocaleDateString("en-IN") : ""];
     });
-
     const ts = new Date().toISOString().slice(0, 10);
     if (format === "csv") downloadFile(toCSV(headers, rows), `users-${ts}.csv`, "text/csv");
     else if (format === "excel") downloadFile(`<table><thead><tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${c ?? ""}</td>`).join("")}</tr>`).join("")}</tbody></table>`, `users-${ts}.xls`, "application/vnd.ms-excel");
@@ -71,13 +62,11 @@ export async function exportVendors(format: ExportFormat, max = 1000): Promise<v
   try {
     const snap = await getDocs(query(collection(db, collections.vendors), limit(max)));
     const vendors = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<VendorDocument, "id">) }));
-
     const headers = ["ID", "Business Name", "Category", "City", "District", "State", "Phone", "Email", "Starting Price", "Rating", "Review Count", "Status", "Featured", "Created At"];
     const rows = vendors.map((v) => {
       const ts = (v.createdAt as { toMillis?: () => number } | undefined)?.toMillis?.();
       return [v.id, v.businessName, v.category, v.city, v.district, v.state, v.phone, v.email, v.startingPrice, v.rating, v.reviewCount, v.status, v.featured ? "Yes" : "No", ts ? new Date(ts).toLocaleDateString("en-IN") : ""];
     });
-
     const ts = new Date().toISOString().slice(0, 10);
     if (format === "csv") downloadFile(toCSV(headers, rows), `vendors-${ts}.csv`, "text/csv");
     else if (format === "excel") downloadFile(`<table><thead><tr>${headers.map((h) => `<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.map((r) => `<tr>${r.map((c) => `<td>${c ?? ""}</td>`).join("")}</tr>`).join("")}</tbody></table>`, `vendors-${ts}.xls`, "application/vnd.ms-excel");

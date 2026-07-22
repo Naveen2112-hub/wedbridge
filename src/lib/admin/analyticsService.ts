@@ -29,33 +29,18 @@ export async function getAnalytics(): Promise<AdminAnalytics> {
       getDocs(query(collection(database, collections.interests), limit(1000))).catch(() => ({ docs: [] })),
       getDocs(query(collection(database, collections.interests), where("createdAt", ">=", todayStart), orderBy("createdAt", "desc"), limit(500))).catch(() => ({ docs: [] })),
     ]);
-
     const todayRevenue = (todayPaymentsSnap as { docs: { data: () => Record<string, unknown> }[] }).docs.reduce((s, d) => s + Number(d.data().amount ?? 0), 0);
     const monthlyRevenue = (monthPaymentsSnap as { docs: { data: () => Record<string, unknown> }[] }).docs.reduce((s, d) => s + Number(d.data().amount ?? 0), 0);
     const allPayments = (monthPaymentsSnap as { docs: { data: () => Record<string, unknown> }[] }).docs;
-
     const ts = (v: unknown) => (v as { toMillis?: () => number } | undefined)?.toMillis?.() ?? 0;
     const isToday = (v: unknown) => ts(v) >= todayStart.getTime();
     const users = usersSnap.docs.map((d) => d.data() as Record<string, unknown>);
-
     return {
-      totalUsers: usersSnap.docs.length,
-      maleProfiles: maleSnap.docs.length,
-      femaleProfiles: femaleSnap.docs.length,
-      premiumMembers: premiumSnap.docs.length,
-      goldMembers: goldSnap.docs.length,
-      verifiedProfiles: verifiedSnap.docs.length,
-      weddingVendors: vendorsSnap.docs.length,
-      todayRegistrations: users.filter((u) => isToday(u.createdAt)).length,
-      todayInterests: todayInterestsSnap.docs.length,
-      todayRevenue,
-      monthlyRevenue,
-      newUsers: usersSnap.docs.length,
-      profileViews: 0,
-      aiMatchCount: 0,
-      interestsSent: interestsSnap.docs.length,
-      premiumSales: allPayments.length,
-      vendorRevenue: 0,
+      totalUsers: usersSnap.docs.length, maleProfiles: maleSnap.docs.length, femaleProfiles: femaleSnap.docs.length,
+      premiumMembers: premiumSnap.docs.length, goldMembers: goldSnap.docs.length, verifiedProfiles: verifiedSnap.docs.length,
+      weddingVendors: vendorsSnap.docs.length, todayRegistrations: users.filter((u) => isToday(u.createdAt)).length,
+      todayInterests: todayInterestsSnap.docs.length, todayRevenue, monthlyRevenue, newUsers: usersSnap.docs.length,
+      profileViews: 0, aiMatchCount: 0, interestsSent: interestsSnap.docs.length, premiumSales: allPayments.length, vendorRevenue: 0,
     };
   } catch (e) {
     logger.error("Analytics fetch failed", { error: e instanceof Error ? e.message : String(e) });
@@ -77,16 +62,11 @@ export async function getReport(period: "daily" | "weekly" | "monthly" | "yearly
   } catch { return []; }
 }
 
-export interface AnalyticsTrend {
-  label: string;
-  current: number;
-  previous: number;
-  change: number;
-  changePercent: number;
-}
+export interface AnalyticsTrend { label: string; current: number; previous: number; change: number; changePercent: number; }
 
 export async function getAnalyticsTrends(): Promise<{ users: AnalyticsTrend; revenue: AnalyticsTrend; interests: AnalyticsTrend }> {
-  if (!db) return { users: { label: "Users", current: 0, previous: 0, change: 0, changePercent: 0 }, revenue: { label: "Revenue", current: 0, previous: 0, change: 0, changePercent: 0 }, interests: { label: "Interests", current: 0, previous: 0, change: 0, changePercent: 0 } };
+  const empty = { users: { label: "Users", current: 0, previous: 0, change: 0, changePercent: 0 }, revenue: { label: "Revenue", current: 0, previous: 0, change: 0, changePercent: 0 }, interests: { label: "Interests", current: 0, previous: 0, change: 0, changePercent: 0 } };
+  if (!db) return empty;
   const database = db;
   const now = new Date();
   const thisWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);
@@ -100,15 +80,11 @@ export async function getAnalyticsTrends(): Promise<{ users: AnalyticsTrend; rev
     ]);
     const thisWeekRev = (thisWeekPayments as { docs: { data: () => Record<string, unknown> }[] }).docs.reduce((s, d) => s + Number(d.data().amount ?? 0), 0);
     const lastWeekRev = (lastWeekPayments as { docs: { data: () => Record<string, unknown> }[] }).docs.reduce((s, d) => s + Number(d.data().amount ?? 0), 0);
-    const thisWeekInt = thisWeekInterests.docs.length;
-    const lastWeekInt = lastWeekInterests.docs.length;
     const calcChange = (curr: number, prev: number) => ({ change: curr - prev, changePercent: prev > 0 ? Math.round(((curr - prev) / prev) * 100) : 0 });
     return {
       users: { label: "New Users", current: 0, previous: 0, ...calcChange(0, 0) },
       revenue: { label: "Revenue", current: thisWeekRev, previous: lastWeekRev, ...calcChange(thisWeekRev, lastWeekRev) },
-      interests: { label: "Interests", current: thisWeekInt, previous: lastWeekInt, ...calcChange(thisWeekInt, lastWeekInt) },
+      interests: { label: "Interests", current: thisWeekInterests.docs.length, previous: lastWeekInterests.docs.length, ...calcChange(thisWeekInterests.docs.length, lastWeekInterests.docs.length) },
     };
-  } catch {
-    return { users: { label: "Users", current: 0, previous: 0, change: 0, changePercent: 0 }, revenue: { label: "Revenue", current: 0, previous: 0, change: 0, changePercent: 0 }, interests: { label: "Interests", current: 0, previous: 0, change: 0, changePercent: 0 } };
-  }
+  } catch { return empty; }
 }

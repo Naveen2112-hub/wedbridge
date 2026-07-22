@@ -27,10 +27,7 @@ function shouldLog(level: LogLevel): boolean {
 
 function getContext(): Partial<LogEntry> {
   if (!isClient) return {};
-  return {
-    path: window.location.pathname,
-    userAgent: navigator.userAgent.slice(0, 200),
-  };
+  return { path: window.location.pathname, userAgent: navigator.userAgent.slice(0, 200) };
 }
 
 function formatEntry(entry: LogEntry): string {
@@ -45,14 +42,7 @@ function addToBuffer(entry: LogEntry) {
 
 export function log(level: LogLevel, message: string, context?: Record<string, unknown>, userId?: string) {
   if (!shouldLog(level)) return;
-  const entry: LogEntry = {
-    level,
-    message,
-    timestamp: new Date().toISOString(),
-    context,
-    userId,
-    ...getContext(),
-  };
+  const entry: LogEntry = { level, message, timestamp: new Date().toISOString(), context, userId, ...getContext() };
   addToBuffer(entry);
   const formatted = formatEntry(entry);
   if (level === "error" || level === "fatal") console.error(formatted);
@@ -68,10 +58,5 @@ export const logger = {
   fatal: (msg: string, ctx?: Record<string, unknown>, uid?: string) => log("fatal", msg, ctx, uid),
 };
 
-export function getLogBuffer(): LogEntry[] {
-  return [...logBuffer];
-}
-
-export function clearLogBuffer() {
-  logBuffer.length = 0;
-}
+export function getLogBuffer(): LogEntry[] { return [...logBuffer]; }
+export function clearLogBuffer() { logBuffer.length = 0; }

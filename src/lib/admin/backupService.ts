@@ -20,48 +20,24 @@ export interface BackupProgress {
 }
 
 const BACKUP_COLLECTIONS = [
-  collections.users,
-  collections.profiles,
-  collections.vendors,
-  collections.vendorBookings,
-  collections.vendorReviews,
-  collections.payments,
-  collections.subscriptions,
-  collections.interests,
-  collections.notifications,
-  collections.auditLog,
-  collections.favourites,
-  collections.aiMatches,
-  collections.profileViews,
-  collections.recentlyViewed,
-  collections.searchHistory,
-  collections.ocrImports,
-  collections.broadcasts,
-  collections.vendorPackages,
-  collections.vendorGallery,
-  collections.vendorCategories,
+  collections.users, collections.profiles, collections.vendors, collections.vendorBookings,
+  collections.vendorReviews, collections.payments, collections.subscriptions, collections.interests,
+  collections.notifications, collections.auditLog, collections.favourites, collections.aiMatches,
+  collections.profileViews, collections.recentlyViewed, collections.searchHistory, collections.ocrImports,
+  collections.broadcasts, collections.vendorPackages, collections.vendorGallery, collections.vendorCategories,
 ] as const;
 
-export async function createBackup(
-  adminUid: string,
-  adminEmail: string,
-  onProgress?: (progress: BackupProgress) => void,
-): Promise<BackupResult> {
-  if (!db) {
-    return { success: false, collections: [], totalDocuments: 0, timestamp: new Date().toISOString(), error: "Database not configured" };
-  }
-
+export async function createBackup(adminUid: string, adminEmail: string, onProgress?: (p: BackupProgress) => void): Promise<BackupResult> {
+  if (!db) return { success: false, collections: [], totalDocuments: 0, timestamp: new Date().toISOString(), error: "Database not configured" };
   const results: { name: string; count: number }[] = [];
   let totalDocuments = 0;
   const timestamp = new Date().toISOString();
-
   for (const colName of BACKUP_COLLECTIONS) {
     try {
       onProgress?.({ collection: colName, current: 0, total: BACKUP_COLLECTIONS.length, status: "reading" });
       const snap = await getDocs(query(collection(db, colName), limit(10000)));
-      const count = snap.docs.length;
-      results.push({ name: colName, count });
-      totalDocuments += count;
+      results.push({ name: colName, count: snap.docs.length });
+      totalDocuments += snap.docs.length;
       onProgress?.({ collection: colName, current: results.length, total: BACKUP_COLLECTIONS.length, status: "complete" });
     } catch (e) {
       logger.warn(`Backup: failed to read collection ${colName}`, { error: e instanceof Error ? e.message : String(e) });
@@ -69,10 +45,8 @@ export async function createBackup(
       onProgress?.({ collection: colName, current: results.length, total: BACKUP_COLLECTIONS.length, status: "error" });
     }
   }
-
   await logAdminActivity(adminUid, adminEmail, "backup", "database", `Backed up ${totalDocuments} documents across ${results.length} collections`);
   logger.info("Backup completed", { totalDocuments, collections: results.length });
-
   return { success: true, collections: results, totalDocuments, timestamp };
 }
 
@@ -80,8 +54,7 @@ export async function exportCollectionAsJSON(colName: string): Promise<string> {
   if (!db) return "[]";
   try {
     const snap = await getDocs(query(collection(db, colName), limit(10000)));
-    const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    return JSON.stringify(data, null, 2);
+    return JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() })), null, 2);
   } catch (e) {
     logger.error(`Export failed for ${colName}`, { error: e instanceof Error ? e.message : String(e) });
     return "[]";

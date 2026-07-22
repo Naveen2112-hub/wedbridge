@@ -25,9 +25,7 @@ export async function getMaintenanceState(): Promise<MaintenanceState> {
     const snap = await getDoc(doc(db, collections.settings, SETTINGS_DOC_ID));
     if (!snap.exists()) return defaultState;
     return snap.data() as MaintenanceState;
-  } catch {
-    return defaultState;
-  }
+  } catch { return defaultState; }
 }
 
 export async function setMaintenanceState(state: Partial<MaintenanceState>, adminUid?: string): Promise<void> {
