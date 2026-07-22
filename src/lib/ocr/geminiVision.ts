@@ -106,23 +106,13 @@ export async function extractPdfWithGemini(
   if (!apiKey) return null;
 
   try {
-    const pdfjs = await import("pdfjs-dist");
-    const data = new Uint8Array(pdfBuffer);
-    const doc = await pdfjs.getDocument({ data }).promise;
-    const numPages = Math.min(doc.numPages, 3);
+    const pdfParseModule = await import("pdf-parse");
+    const pdfParse = (pdfParseModule as unknown as { default: (buf: Buffer) => Promise<{ text: string }> }).default;
+    const pdfData = await pdfParse(pdfBuffer);
+    const rawText = pdfData.text ?? "";
 
-    let combinedData: PartialProfile = {};
-    let combinedConfidence: ProfileWithConfidence = {};
-    let rawText = "";
-
-    for (let i = 1; i <= numPages; i++) {
-      const page = await doc.getPage(i);
-      const content = await page.getTextContent();
-      const pageText = content.items
-        .map((item: unknown) => (item as { str?: string }).str ?? "")
-        .join(" ");
-      rawText += pageText + "\n";
-    }
+    const combinedData: PartialProfile = {};
+    const combinedConfidence: ProfileWithConfidence = {};
 
     const data2 = parseGeminiResponse(rawText);
     const withConfidence = geminiDataToConfidence(data2);

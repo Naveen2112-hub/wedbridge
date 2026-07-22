@@ -159,7 +159,7 @@ export async function runOCRImage(
 }
 
 /**
- * Run OCR on a PDF buffer using pdfjs-dist text extraction.
+ * Run OCR on a PDF buffer using pdf-parse text extraction.
  */
 export async function runOCRPdf(
   pdfBuffer: Buffer,
@@ -175,21 +175,10 @@ export async function runOCRPdf(
   let ocrConfidence = 0.5;
 
   try {
-    const pdfjs = await import("pdfjs-dist");
-    const data = new Uint8Array(pdfBuffer);
-    const doc = await pdfjs.getDocument({ data }).promise;
-    const numPages = doc.numPages;
-    for (let i = 1; i <= numPages; i++) {
-      const page = await doc.getPage(i);
-      const content = await page.getTextContent();
-      const pageText = content.items
-        .map((item: unknown) => {
-          const str = (item as { str?: string }).str;
-          return typeof str === "string" ? str : "";
-        })
-        .join(" ");
-      combinedText += pageText + "\n";
-    }
+    const pdfParseModule = await import("pdf-parse");
+    const pdfParse = (pdfParseModule as unknown as { default: (buf: Buffer) => Promise<{ text: string }> }).default;
+    const pdfData = await pdfParse(pdfBuffer);
+    combinedText = pdfData.text ?? "";
     ocrConfidence = combinedText.trim().length > 50 ? 0.7 : 0.4;
   } catch {
     combinedText = "";
