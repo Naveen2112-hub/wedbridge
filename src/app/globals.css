@@ -15,6 +15,27 @@ html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-fo
 
 body { font-family: var(--font-inter); background-color: #FFFDF7; color: #1A1416; line-height: 1.6; }
 
+.dark body { background-color: #1A1416; color: #F5F0F1; }
+.dark .card { @apply bg-gray-800 border-gray-700; }
+.dark .card-flat { @apply bg-gray-800 border-gray-700; }
+.dark .input { @apply bg-gray-800 border-gray-600 text-gray-100; }
+.dark .textarea { @apply bg-gray-800 border-gray-600 text-gray-100; }
+.dark .select { @apply bg-gray-800 border-gray-600 text-gray-100; }
+.dark .btn-outline { @apply bg-gray-800 border-gray-600 text-gray-200 hover:bg-gray-700; }
+.dark .btn-ghost { @apply text-gray-300 hover:bg-gray-700 hover:text-white; }
+.dark .label { @apply text-gray-200; }
+.dark .heading-xl { @apply text-white; }
+.dark .heading-lg { @apply text-white; }
+.dark .heading-md { @apply text-white; }
+.dark .heading-sm { @apply text-white; }
+.dark .heading-xs { @apply text-white; }
+.dark .text-lead { @apply text-gray-400; }
+.dark .text-body { @apply text-gray-300; }
+.dark .text-caption { @apply text-gray-500; }
+.dark .glass { @apply bg-gray-900/80; }
+.dark ::-webkit-scrollbar-track { background: #1A1416; }
+.dark ::-webkit-scrollbar-thumb { background: #4A3038; }
+
 /* ========== Accessibility ========== */
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
