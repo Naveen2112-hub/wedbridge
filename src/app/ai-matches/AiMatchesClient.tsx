@@ -41,7 +41,8 @@ export default function AiMatchesClient() {
     } finally { setRefreshing(false); setLoading(false); }
   }, [user?.uid]);
 
-  useEffect(() => { loadMatches(false); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { loadMatches(false); }, [user?.uid]);
 
   const handleRefresh = () => loadMatches(true);
   const handleReset = () => { setFilters({}); };

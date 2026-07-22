@@ -7,6 +7,8 @@ import { ToastProvider } from "@/components/ui/Toast";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { ServiceWorkerRegister } from "@/components/ui/ServiceWorkerRegister";
+import { MaintenanceGuard } from "@/components/admin/MaintenanceGuard";
+import { ErrorBoundary } from "@/components/ui/ErrorBoundary";
 
 export function Providers({ children }: { children: ReactNode }) {
   return (
@@ -14,9 +16,13 @@ export function Providers({ children }: { children: ReactNode }) {
       <LanguageProvider>
         <ToastProvider>
           <AuthProvider>
-            <Navbar />
-            <main className="min-h-[60vh]">{children}</main>
-            <Footer />
+            <ErrorBoundary>
+              <MaintenanceGuard>
+                <Navbar />
+                <main className="min-h-[60vh]">{children}</main>
+                <Footer />
+              </MaintenanceGuard>
+            </ErrorBoundary>
           </AuthProvider>
         </ToastProvider>
         <ServiceWorkerRegister />

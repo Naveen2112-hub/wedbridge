@@ -36,7 +36,8 @@ export default function SearchClient() {
     } finally { setLoading(false); }
   }, [filters, sort, lastVisible, user?.uid]);
 
-  useEffect(() => { runSearch(true); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { runSearch(true); }, []);
 
   const handleReset = () => { setFilters({}); setSort("newest"); setProfiles([]); setSearched(false); };
 

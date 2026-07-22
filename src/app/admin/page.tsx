@@ -1,14 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Users, CircleUser as UserCircle, Crown, Gem, BadgeCheck, Store, CalendarPlus, Heart, IndianRupee, TrendingUp, Eye, Sparkles, Send } from "lucide-react";
-import { getAnalytics, type AdminAnalytics } from "@/lib/admin/analyticsService";
+import { Users, CircleUser as UserCircle, Crown, Gem, BadgeCheck, Store, CalendarPlus, Heart, IndianRupee, TrendingUp, TrendingDown, Eye, Sparkles, Send, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { getAnalytics, getAnalyticsTrends, type AdminAnalytics, type AnalyticsTrend } from "@/lib/admin/analyticsService";
 import { cn } from "@/lib/utils";
 
 export default function AdminDashboardPage() {
   const [data, setData] = useState<AdminAnalytics | null>(null);
+  const [trends, setTrends] = useState<{ users: AnalyticsTrend; revenue: AnalyticsTrend; interests: AnalyticsTrend } | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { getAnalytics().then((d) => { setData(d); setLoading(false); }).catch(() => setLoading(false)); }, []);
+  useEffect(() => {
+    Promise.all([getAnalytics(), getAnalyticsTrends()]).then(([d, t]) => { setData(d); setTrends(t); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
 
   if (loading) return <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">{Array.from({ length: 8 }).map((_, i) => <div key={i} className="skeleton h-28 w-full rounded-2xl" />)}</div>;
   if (!data) return null;
@@ -33,6 +36,15 @@ export default function AdminDashboardPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {cards.map((c) => <Card key={c.label} {...c} />)}
       </div>
+
+      {trends && (
+        <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <TrendCard label="Revenue (This Week)" current={trends.revenue.current} previous={trends.revenue.previous} change={trends.revenue.change} changePercent={trends.revenue.changePercent} formatINR />
+          <TrendCard label="Interests (This Week)" current={trends.interests.current} previous={trends.interests.previous} change={trends.interests.change} changePercent={trends.interests.changePercent} />
+          <TrendCard label="New Users (This Week)" current={trends.users.current} previous={trends.users.previous} change={trends.users.change} changePercent={trends.users.changePercent} />
+        </div>
+      )}
+
       <div className="mt-8 grid gap-4 lg:grid-cols-2">
         <div className="card p-5">
           <h2 className="heading-sm">Quick Analytics</h2>
@@ -56,4 +68,20 @@ function Card({ label, value, icon: Icon, color }: { label: string; value: strin
 
 function MiniStat({ icon: Icon, label, value }: { icon: React.ComponentType<{ className?: string }>; label: string; value: string | number }) {
   return <div className="flex items-center justify-between"><span className="flex items-center gap-2 text-sm text-gray-500"><Icon className="h-4 w-4" />{label}</span><span className="font-semibold text-primary-900">{value}</span></div>;
+}
+
+function TrendCard({ label, current, previous, change, changePercent, formatINR }: { label: string; current: number; previous: number; change: number; changePercent: number; formatINR?: boolean }) {
+  const isUp = change >= 0;
+  const fmt = (v: number) => formatINR ? `₹${v.toLocaleString()}` : v.toLocaleString();
+  return (
+    <div className="card p-5">
+      <p className="text-sm text-gray-500">{label}</p>
+      <p className="mt-2 font-display text-2xl font-bold text-primary-900">{fmt(current)}</p>
+      <div className="mt-2 flex items-center gap-1 text-sm">
+        {isUp ? <ArrowUpRight className="h-4 w-4 text-green-600" /> : <ArrowDownRight className="h-4 w-4 text-red-600" />}
+        <span className={isUp ? "text-green-600" : "text-red-600"}>{isUp ? "+" : ""}{changePercent}%</span>
+        <span className="text-gray-400">vs last week ({fmt(previous)})</span>
+      </div>
+    </div>
+  );
 }
