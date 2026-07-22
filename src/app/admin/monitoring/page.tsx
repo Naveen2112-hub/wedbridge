@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Activity, AlertTriangle, RefreshCw, ShieldCheck } from "lucide-react";
+import { Activity, TriangleAlert as AlertTriangle, RefreshCw, ShieldCheck } from "lucide-react";
 import { getErrorSummary, getRecentErrors, clearErrorBuffer, type FirebaseErrorEvent } from "@/lib/monitoring/firebaseMonitor";
 
 export default function MonitoringPage() {

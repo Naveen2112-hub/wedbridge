@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Database, Download, RefreshCw, CheckCircle, XCircle } from "lucide-react";
+import { Database, Download, RefreshCw, CircleCheck as CheckCircle, Circle as XCircle } from "lucide-react";
 import { createBackup, exportCollectionAsJSON, type BackupResult, type BackupProgress } from "@/lib/admin/backupService";
 import { useAdminAuth } from "@/lib/admin/AdminAuthContext";
 
