@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Shield, Power, AlertTriangle, Clock } from "lucide-react";
+import { Shield, Power, TriangleAlert as AlertTriangle, Clock } from "lucide-react";
 import { getMaintenanceState, enableMaintenance, disableMaintenance, type MaintenanceState } from "@/lib/admin/maintenanceService";
 import { useAdminAuth } from "@/lib/admin/AdminAuthContext";
 import { logAdminActivity } from "@/lib/admin/activityLogService";

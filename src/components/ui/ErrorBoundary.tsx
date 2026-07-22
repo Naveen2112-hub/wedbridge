@@ -1,6 +1,6 @@
 "use client";
 import { Component, type ReactNode } from "react";
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import { TriangleAlert as AlertTriangle, RefreshCw } from "lucide-react";
 import { logger } from "@/lib/monitoring/logger";
 
 interface Props { children: ReactNode; }
