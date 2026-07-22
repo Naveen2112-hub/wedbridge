@@ -1,6 +1,6 @@
 import { collection, addDoc, getDocs, query, orderBy, limit, where, serverTimestamp } from "firebase/firestore";
 import { db } from "@/firebase/config";
-import { collections, type AuditLogEntry } from "@/firebase/schema";
+import { collections } from "@/firebase/schema";
 import { logger } from "@/lib/monitoring/logger";
 
 export interface AdminActivityLog {
@@ -10,7 +10,6 @@ export interface AdminActivityLog {
   action: string;
   target: string;
   details?: string;
-  ipAddress?: string;
   createdAt: unknown;
 }
 
@@ -42,23 +41,6 @@ export async function getAdminActivityLogs(max = 50): Promise<AdminActivityLog[]
   try {
     const snap = await getDocs(
       query(collection(db, collections.auditLog), orderBy("createdAt", "desc"), limit(max)),
-    );
-    return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<AdminActivityLog, "id">) }));
-  } catch {
-    return [];
-  }
-}
-
-export async function getAdminActivityByUser(adminUid: string, max = 20): Promise<AdminActivityLog[]> {
-  if (!db) return [];
-  try {
-    const snap = await getDocs(
-      query(
-        collection(db, collections.auditLog),
-        where("adminUid", "==", adminUid),
-        orderBy("createdAt", "desc"),
-        limit(max),
-      ),
     );
     return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<AdminActivityLog, "id">) }));
   } catch {

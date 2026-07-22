@@ -57,7 +57,6 @@ export function log(level: LogLevel, message: string, context?: Record<string, u
   const formatted = formatEntry(entry);
   if (level === "error" || level === "fatal") console.error(formatted);
   else if (level === "warn") console.warn(formatted);
-  else if (isClient) console.log(formatted);
   else console.log(formatted);
 }
 

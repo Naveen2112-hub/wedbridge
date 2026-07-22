@@ -9,7 +9,6 @@ export interface BackupResult {
   collections: { name: string; count: number }[];
   totalDocuments: number;
   timestamp: string;
-  downloadUrl?: string;
   error?: string;
 }
 
@@ -72,15 +71,9 @@ export async function createBackup(
   }
 
   await logAdminActivity(adminUid, adminEmail, "backup", "database", `Backed up ${totalDocuments} documents across ${results.length} collections`);
-
   logger.info("Backup completed", { totalDocuments, collections: results.length });
 
-  return {
-    success: true,
-    collections: results,
-    totalDocuments,
-    timestamp,
-  };
+  return { success: true, collections: results, totalDocuments, timestamp };
 }
 
 export async function exportCollectionAsJSON(colName: string): Promise<string> {
@@ -93,14 +86,4 @@ export async function exportCollectionAsJSON(colName: string): Promise<string> {
     logger.error(`Export failed for ${colName}`, { error: e instanceof Error ? e.message : String(e) });
     return "[]";
   }
-}
-
-export function formatBackupSummary(result: BackupResult): string {
-  const lines = result.collections.map((c) => `${c.name}: ${c.count} docs`);
-  return [
-    `Backup Summary - ${result.timestamp}`,
-    `Total Documents: ${result.totalDocuments}`,
-    "",
-    ...lines,
-  ].join("\n");
 }
