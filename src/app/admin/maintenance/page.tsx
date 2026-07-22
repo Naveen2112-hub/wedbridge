@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Shield, Power, TriangleAlert as AlertTriangle, Clock } from "lucide-react";
+import { Shield, Power, AlertTriangle, Clock } from "lucide-react";
 import { getMaintenanceState, enableMaintenance, disableMaintenance, type MaintenanceState } from "@/lib/admin/maintenanceService";
 import { useAdminAuth } from "@/lib/admin/AdminAuthContext";
 import { logAdminActivity } from "@/lib/admin/activityLogService";
@@ -14,11 +14,7 @@ export default function MaintenancePage() {
   const [estimatedEnd, setEstimatedEnd] = useState("");
 
   useEffect(() => {
-    getMaintenanceState().then((s) => {
-      setState(s);
-      if (s.message) setMessage(s.message);
-      setLoading(false);
-    });
+    getMaintenanceState().then((s) => { setState(s); if (s.message) setMessage(s.message); setLoading(false); });
   }, []);
 
   const handleToggle = async () => {
@@ -46,7 +42,6 @@ export default function MaintenancePage() {
         <h1 className="heading-md flex items-center gap-2"><Shield className="h-6 w-6 text-primary-700" />Maintenance Mode</h1>
         <p className="text-lead mt-1 text-sm">Toggle maintenance mode to temporarily disable access to the platform.</p>
       </div>
-
       <div className={`card mb-6 p-6 ${state?.enabled ? "border-amber-300 bg-amber-50" : "border-green-300 bg-green-50"}`}>
         <div className="flex items-center gap-3">
           {state?.enabled ? <AlertTriangle className="h-8 w-8 text-amber-600" /> : <Power className="h-8 w-8 text-green-600" />}
@@ -56,7 +51,6 @@ export default function MaintenancePage() {
           </div>
         </div>
       </div>
-
       <div className="card p-6">
         <h2 className="heading-sm mb-4">Configuration</h2>
         <div className="space-y-4">
