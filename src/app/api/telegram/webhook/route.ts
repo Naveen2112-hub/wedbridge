@@ -2,68 +2,127 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/firebase/config";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { collections } from "@/firebase/schema";
+import { processBiodataImport } from "@/lib/ocr/biodataImport";
 
 export const runtime = "nodejs";
+export const maxDuration = 300;
 
 /**
- * Telegram webhook handler for bot commands.
+ * Telegram webhook handler.
+ * Handles: document, photo, image uploads + /start, /help commands.
+ * Ignores all other text messages.
  * Set webhook to: https://yourdomain.com/api/telegram/webhook
  */
 export async function POST(req: NextRequest) {
   try {
     const update = await req.json();
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    if (!token) return NextResponse.json({ ok: true });
 
     const message = update.message;
-    if (!message || !message.text) {
-      return NextResponse.json({ ok: true });
-    }
+    if (!message) return NextResponse.json({ ok: true });
 
     const chatId = String(message.chat.id);
-    const text = message.text as string;
-    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const fromUser = message.from;
+    const telegramUserId = fromUser?.id;
 
-    if (!token) {
+    // Handle text commands
+    if (message.text) {
+      const text = message.text as string;
+      if (text.startsWith("/start")) {
+        const name = fromUser?.first_name ? ` ${fromUser.first_name}` : "";
+        await sendText(token, chatId, [
+          `🎉 Welcome${name} to WedBridge Bot!`,
+          "",
+          "Your Chat ID is: " + chatId,
+          "",
+          "📸 Send me a Matrimony Biodata PDF or Image and I'll extract the details for you.",
+          "",
+          "Supported formats: PDF, JPG, PNG",
+        ].join("\n"));
+      } else if (text.startsWith("/help")) {
+        await sendText(token, chatId, [
+          "📖 WedBridge Bot Help",
+          "",
+          "How to use:",
+          "1. Send a Matrimony Biodata as a PDF or photo",
+          "2. I'll extract the details automatically",
+          "3. You'll get a link to complete your profile",
+          "",
+          "Commands:",
+          "/start - Get started",
+          "/help - Show this help",
+        ].join("\n"));
+      }
+      // Ignore all other text messages
       return NextResponse.json({ ok: true });
     }
 
-    let responseText = "";
+    // Handle document uploads (PDF, images sent as files)
+    if (message.document) {
+      const doc = message.document;
+      const fileId = doc.file_id as string;
+      const fileName = (doc.file_name ?? "document").toLowerCase();
+      const mime = doc.mime_type ?? "";
 
-    if (text.startsWith("/start")) {
-      responseText = "🎉 Welcome to WedBridge Bot! Your Chat ID is: " + chatId + ". Enter this in your WedBridge settings to connect.";
-    } else if (text.startsWith("/help")) {
-      responseText = "Available commands:\n/start - Get started\n/help - Show this help\n/profile - View your profile\n/membership - View membership\n/interests - View interests\n/matches - View matches\n/settings - Manage settings\n/contact - Contact support";
-    } else if (text.startsWith("/profile")) {
-      responseText = "View your profile at https://wedbridge.app/profile";
-    } else if (text.startsWith("/membership")) {
-      responseText = "View your membership at https://wedbridge.app/membership";
-    } else if (text.startsWith("/interests")) {
-      responseText = "View your interests at https://wedbridge.app/interests";
-    } else if (text.startsWith("/matches")) {
-      responseText = "View your AI matches at https://wedbridge.app/ai-matches";
-    } else if (text.startsWith("/settings")) {
-      responseText = "Manage settings at https://wedbridge.app/settings";
-    } else if (text.startsWith("/contact")) {
-      responseText = "Contact support: support@wedbridge.app";
-    } else {
-      responseText = "Unknown command. Type /help to see available commands.";
+      const isSupported =
+        mime === "application/pdf" ||
+        mime.startsWith("image/") ||
+        fileName.endsWith(".pdf") ||
+        fileName.endsWith(".jpg") ||
+        fileName.endsWith(".jpeg") ||
+        fileName.endsWith(".png");
+
+      if (!isSupported) {
+        await sendText(token, chatId, "❌ Unsupported file type. Please send a PDF, JPG, or PNG file.");
+        return NextResponse.json({ ok: true });
+      }
+
+      await sendText(token, chatId, "📥 Received your biodata. Processing... This may take a moment.");
+
+      // Process asynchronously
+      processBiodataImport(token, chatId, fileId, telegramUserId)
+        .then(async (result) => {
+          if (!result.success && result.status === "failed_ocr") {
+            await sendText(token, chatId, "❌ Sorry, I couldn't process the file. Please ensure it's a clear biodata PDF or image.");
+          }
+        })
+        .catch(async () => {
+          await sendText(token, chatId, "❌ Processing failed. Please try again with a clearer file.");
+        });
+
+      return NextResponse.json({ ok: true });
     }
 
-    // Send response
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text: responseText }),
-    });
+    // Handle photo uploads (images sent as photos)
+    if (message.photo && Array.isArray(message.photo) && message.photo.length > 0) {
+      // Get the largest photo size
+      const largest = message.photo[message.photo.length - 1];
+      const fileId = largest.file_id as string;
 
-    // Log the webhook event
+      await sendText(token, chatId, "📥 Received your biodata photo. Processing... This may take a moment.");
+
+      processBiodataImport(token, chatId, fileId, telegramUserId)
+        .then(async (result) => {
+          if (!result.success && result.status === "failed_ocr") {
+            await sendText(token, chatId, "❌ Sorry, I couldn't process the photo. Please ensure it's a clear biodata image.");
+          }
+        })
+        .catch(async () => {
+          await sendText(token, chatId, "❌ Processing failed. Please try again with a clearer photo.");
+        });
+
+      return NextResponse.json({ ok: true });
+    }
+
+    // Log unhandled message types
     if (db) {
       try {
         await addDoc(collection(db, collections.telegramLogs), {
           userId: "bot",
           chatId,
-          messageType: "command",
+          messageType: "unhandled",
           status: "success",
-          command: text,
           createdAt: serverTimestamp(),
         });
       } catch {
@@ -74,5 +133,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ ok: true });
+  }
+}
+
+async function sendText(token: string, chatId: string, text: string): Promise<void> {
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, text }),
+    });
+  } catch {
+    // best-effort
   }
 }
