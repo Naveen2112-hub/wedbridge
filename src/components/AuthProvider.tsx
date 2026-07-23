@@ -35,6 +35,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
     const unsub = onAuthStateChanged(auth, (u) => {
       setUser(u);
       setLoading(false);
@@ -48,18 +52,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   const signIn = useCallback(async (email: string, password: string) => {
+    if (!auth) throw new Error("Firebase not initialized");
     await signInWithEmailAndPassword(auth, email, password);
   }, []);
 
   const signUp = useCallback(async (email: string, password: string) => {
+    if (!auth) throw new Error("Firebase not initialized");
     await createUserWithEmailAndPassword(auth, email, password);
   }, []);
 
   const signInWithGoogle = useCallback(async () => {
+    if (!auth) throw new Error("Firebase not initialized");
     await signInWithPopup(auth, googleProvider);
   }, []);
 
   const logout = useCallback(async () => {
+    if (!auth) return;
     await signOut(auth);
   }, []);
 
