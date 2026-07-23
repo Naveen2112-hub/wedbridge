@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Users, FileText, Upload, CreditCard, BarChart3, Bell, Settings, LogOut, Store, Calendar, Send, Download, Database, History, Activity, Shield, CircleUser } from "lucide-react";
+import { LayoutDashboard, Users, FileText, Upload, CreditCard, BarChart3, Bell, Settings, LogOut, Store, Calendar, Send, Download, Database, History, Activity, Shield } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin/AdminAuthContext";
 
 const nav = [
@@ -22,7 +22,6 @@ const nav = [
   { href: "/admin/monitoring", label: "Monitoring", icon: Activity },
   { href: "/admin/maintenance", label: "Maintenance", icon: Shield },
   { href: "/admin/settings", label: "Settings", icon: Settings },
-  { href: "/admin/profile", label: "Admin Profile", icon: CircleUser },
 ];
 
 export function AdminLayout({ children }: { children: React.ReactNode }) {
