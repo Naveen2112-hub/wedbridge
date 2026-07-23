@@ -8,7 +8,9 @@ import { VendorCard } from "@/components/marketplace/VendorCard";
 
 export default function CategoryPage() {
   const params = useParams<{ category: string }>();
-  const category = (params?.category ?? "all") as VendorCategory | "all";
+  const rawCategory = params?.category ?? "all";
+  const matchedCategory = VENDOR_CATEGORIES.find((c) => c.id === rawCategory.toLowerCase())?.id ?? "all";
+  const category = matchedCategory as VendorCategory | "all";
   const [vendors, setVendors] = useState<VendorDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<VendorFilters>({});

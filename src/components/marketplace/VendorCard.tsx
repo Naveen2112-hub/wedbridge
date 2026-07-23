@@ -1,11 +1,11 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, BadgeCheck, Star, IndianRupee, Briefcase } from "lucide-react";
+import { MapPin, BadgeCheck, Star, IndianRupee, Briefcase, Phone, MessageCircle, ListChecks } from "lucide-react";
 import type { VendorDocument } from "@/firebase/schema";
 import { getCategoryName } from "@/firebase/schema";
 import { StarRating } from "@/components/marketplace/StarRating";
-import { cn } from "@/lib/cn";
+import { cn } from "@/lib/utils";
 
 export function VendorCard({ vendor }: { vendor: VendorDocument }) {
   return (
@@ -33,8 +33,15 @@ export function VendorCard({ vendor }: { vendor: VendorDocument }) {
             <p className="text-xs text-gray-500">{getCategoryName(vendor.category)}</p>
           </div>
         </div>
+        {vendor.about && <p className="mt-3 line-clamp-2 text-sm text-gray-500">{vendor.about}</p>}
+        {vendor.services && vendor.services.length > 0 && (
+          <div className="mt-3">
+            <p className="flex items-center gap-1 text-xs font-semibold text-gray-700"><ListChecks className="h-3.5 w-3.5 text-primary-600" />Services</p>
+            <p className="mt-1 line-clamp-2 text-xs text-gray-500">{vendor.services.join(" · ")}</p>
+          </div>
+        )}
         <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
-          <MapPin className="h-3.5 w-3.5" /><span className="truncate">{vendor.city}, {vendor.state}</span>
+          <MapPin className="h-3.5 w-3.5" /><span className="truncate">{[vendor.address, vendor.city, vendor.state].filter(Boolean).join(", ")}</span>
         </div>
         <div className="mt-2 flex items-center gap-3">
           <div className="flex items-center gap-1"><StarRating rating={vendor.rating} /><span className="text-xs font-medium text-gray-900/70">{vendor.rating > 0 ? vendor.rating.toFixed(1) : "New"}</span></div>
@@ -42,6 +49,10 @@ export function VendorCard({ vendor }: { vendor: VendorDocument }) {
         </div>
         <div className="mt-3 flex items-center justify-between">
           <p className="flex items-center text-sm font-semibold text-primary-900"><IndianRupee className="h-3.5 w-3.5" />{vendor.startingPrice.toLocaleString()}<span className="text-xs font-normal text-gray-500"> onwards</span></p>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-3 text-xs text-gray-600">
+          {vendor.phone && <span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5 text-primary-600" />{vendor.phone}</span>}
+          {vendor.whatsapp && <span className="flex items-center gap-1"><MessageCircle className="h-3.5 w-3.5 text-green-600" />{vendor.whatsapp}</span>}
         </div>
         <div className="mt-4 flex gap-2">
           <Link href={`/vendor/${vendor.id}`} className="btn-outline flex-1 text-xs">View Profile</Link>
