@@ -50,8 +50,8 @@ export interface Membership {
   orderId: string;
   amount: number;
   currency: string;
-  activatedAt: number | null; // Firestore timestamp ms
-  expiryDate: number | null; // Firestore timestamp ms
+  activatedAt: number | null;
+  expiryDate: number | null;
   createdAt: number | null;
   updatedAt: number | null;
 }

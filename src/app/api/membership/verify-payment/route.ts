@@ -33,10 +33,7 @@ export async function POST(req: Request) {
   const signature = body.razorpay_signature;
 
   if (!orderId || !paymentId || !signature) {
-    return NextResponse.json(
-      { error: "Missing payment fields" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Missing payment fields" }, { status: 400 });
   }
 
   const planId = body.plan as PlanId | undefined;
@@ -47,10 +44,7 @@ export async function POST(req: Request) {
 
   const valid = verifyPaymentSignature({ orderId, paymentId, signature });
   if (!valid) {
-    return NextResponse.json(
-      { error: "Signature verification failed" },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: "Signature verification failed" }, { status: 400 });
   }
 
   try {

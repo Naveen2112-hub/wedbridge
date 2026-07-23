@@ -43,9 +43,7 @@ interface RazorpayOptions {
     razorpay_order_id: string;
     razorpay_signature: string;
   }) => void;
-  modal?: {
-    ondismiss?: () => void;
-  };
+  modal?: { ondismiss?: () => void };
 }
 
 interface RazorpayInstance {
@@ -87,7 +85,6 @@ export function useRazorpayCheckout() {
     try {
       await loadScript();
 
-      // 1. Create the order on the server.
       const orderRes = await fetch("/api/membership/create-order", {
         method: "POST",
         headers: {
@@ -105,7 +102,6 @@ export function useRazorpayCheckout() {
 
       const order: CreateOrderResponse = await orderRes.json();
 
-      // 2. Open Razorpay Checkout.
       const paid = await new Promise<boolean>((resolve) => {
         const rzp = new window.Razorpay!({
           key_id: order.keyId,
@@ -117,7 +113,6 @@ export function useRazorpayCheckout() {
           prefill: { email: user?.email ?? undefined },
           theme: { color: "#f53e3e" },
           handler: async (response) => {
-            // 3. Verify the signature on the server.
             const verifyRes = await fetch("/api/membership/verify-payment", {
               method: "POST",
               headers: {
@@ -143,9 +138,7 @@ export function useRazorpayCheckout() {
               resolve(false);
             }
           },
-          modal: {
-            ondismiss: () => resolve(false),
-          },
+          modal: { ondismiss: () => resolve(false) },
         });
 
         rzp.on("payment.failed", () => resolve(false));

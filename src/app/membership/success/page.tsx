@@ -50,23 +50,15 @@ export default function SuccessPage() {
           Membership Activated Successfully
         </h1>
         <p className="mt-2 text-sm text-neutral-600">
-          Welcome to WedBridge {plan ? plan.name : ""}! Your membership is now
-          active.
+          Welcome to WedBridge {plan ? plan.name : ""}! Your membership is now active.
         </p>
 
         {membership && (
           <dl className="mt-6 space-y-3 rounded-xl bg-neutral-50 p-5 text-left text-sm">
             <Row label="Current Plan" value={plan?.name ?? "—"} />
             <Row label="Status" value="Active" />
-            <Row
-              label="Expiry Date"
-              value={formatDate(membership.expiryDate)}
-            />
-            <Row
-              label="Payment ID"
-              value={membership.paymentId || "—"}
-              mono
-            />
+            <Row label="Expiry Date" value={formatDate(membership.expiryDate)} />
+            <Row label="Payment ID" value={membership.paymentId || "—"} mono />
           </dl>
         )}
 
@@ -81,27 +73,11 @@ export default function SuccessPage() {
   );
 }
 
-function Row({
-  label,
-  value,
-  mono,
-}: {
-  label: string;
-  value: string;
-  mono?: boolean;
-}) {
+function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <dt className="text-xs font-medium uppercase tracking-wide text-neutral-500">
-        {label}
-      </dt>
-      <dd
-        className={
-          mono
-            ? "font-mono text-xs break-all text-neutral-900"
-            : "font-medium text-neutral-900"
-        }
-      >
+      <dt className="text-xs font-medium uppercase tracking-wide text-neutral-500">{label}</dt>
+      <dd className={mono ? "font-mono text-xs break-all text-neutral-900" : "font-medium text-neutral-900"}>
         {value}
       </dd>
     </div>

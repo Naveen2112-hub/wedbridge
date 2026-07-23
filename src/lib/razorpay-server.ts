@@ -65,7 +65,6 @@ export function verifyPaymentSignature(params: {
   const received = params.signature.trim();
   if (!received) return false;
 
-  // timingSafeEqual guards against timing-based comparisons.
   const a = Buffer.from(expected, "utf-8");
   const b = Buffer.from(received, "utf-8");
   if (a.length !== b.length) return false;
