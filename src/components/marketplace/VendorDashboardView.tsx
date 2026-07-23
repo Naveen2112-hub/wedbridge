@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Store, Loader as Loader2, Package, Calendar, Star, IndianRupee, Image as ImageIcon, BarChart3, Settings, MessageSquare, TrendingUp, CheckCircle, Plus, Edit, Save } from "lucide-react";
+import { Store, Loader as Loader2, Package, Calendar, Star, IndianRupee, Image as ImageIcon, BarChart3, Settings, MessageSquare, TrendingUp, CircleCheck as CheckCircle, Plus, CreditCard as Edit, Save } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { getVendorByOwner, updateVendor } from "@/lib/marketplace/vendorService";
 import { getVendorBookings } from "@/lib/marketplace/bookingService";
