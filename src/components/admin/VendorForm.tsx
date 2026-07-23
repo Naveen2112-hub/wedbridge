@@ -38,9 +38,9 @@ const defaultForm: VendorFormData = {
   coverURL: "",
   galleryImages: [],
   socialLinks: {},
-  status: "pending",
+  status: "approved",
   featured: false,
-  active: false,
+  active: true,
 };
 
 export function VendorForm({ initial, onSubmit, onCancel }: VendorFormProps) {
@@ -214,5 +214,4 @@ export function VendorForm({ initial, onSubmit, onCancel }: VendorFormProps) {
       </div>
     </form>
   );
-}
 }
