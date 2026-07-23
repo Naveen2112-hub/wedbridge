@@ -24,3 +24,66 @@ html.dark, html.dark body {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ===== Component Classes ===== */
+
+@layer components {
+  /* Cards */
+  .card {
+    @apply rounded-2xl border border-neutral-200 bg-white shadow-sm;
+  }
+  .dark .card {
+    @apply border-neutral-700 bg-neutral-800;
+  }
+
+  /* Headings */
+  .heading-sm { @apply text-lg font-semibold text-neutral-900; }
+  .heading-md { @apply text-2xl font-bold text-neutral-900; }
+  .heading-lg { @apply text-3xl font-bold tracking-tight text-neutral-900; }
+  .dark .heading-sm { @apply text-white; }
+  .dark .heading-md { @apply text-white; }
+  .dark .heading-lg { @apply text-white; }
+
+  /* Lead text */
+  .text-lead { @apply text-neutral-500; }
+
+  /* Buttons */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:opacity-50;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-secondary-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-secondary-700 disabled:opacity-50;
+  }
+
+  /* Form elements */
+  .input {
+    @apply w-full rounded-xl border border-neutral-200 px-3 py-2 text-sm text-neutral-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500;
+  }
+  .dark .input {
+    @apply border-neutral-600 bg-neutral-800 text-white;
+  }
+  .label {
+    @apply mb-1 block text-sm font-medium text-neutral-700;
+  }
+  .dark .label { @apply text-neutral-300; }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+
+  /* Skeleton */
+  .skeleton {
+    @apply animate-pulse rounded-xl bg-neutral-200;
+  }
+  .dark .skeleton { @apply bg-neutral-700; }
+
+  /* Font display */
+  .font-display { @apply font-bold; }
+
+  /* Grain background */
+  .bg-grain {
+    background-image: radial-gradient(circle at 1px 1px, rgba(0,0,0,0.03) 1px, transparent 0);
+    background-size: 20px 20px;
+  }
+}
