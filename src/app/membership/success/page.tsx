@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { CircleCheck as CheckCircle2, ArrowRight } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { PLANS, type Membership } from "@/lib/plans";
 import { formatDate } from "@/lib/utils";
