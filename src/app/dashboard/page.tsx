@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, User, Store, Sparkles, Bell, Crown, Heart, ArrowRight, MessageCircle, Eye, Users, CheckCircle, TrendingUp, Settings, Loader as Loader2, Star } from "lucide-react";
+import { Search, User, Store, Sparkles, Bell, Crown, Heart, ArrowRight, MessageCircle, Eye, Users, CircleCheck as CheckCircle, TrendingUp, Settings, Loader as Loader2, Star } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { getActiveSubscription, getEffectiveTier, daysUntilExpiry } from "@/lib/membership/membershipService";
 import { getUserNotifications } from "@/lib/notifications/notificationService";

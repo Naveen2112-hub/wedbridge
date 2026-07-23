@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { XCircle, ArrowRight, RotateCcw } from "lucide-react";
+import { Circle as XCircle, ArrowRight, RotateCcw } from "lucide-react";
 
 export default function PaymentFailedPage() {
   return (
