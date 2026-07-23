@@ -43,10 +43,10 @@ test("should normalize occupation 'Software Engg' to 'Software Engineer'", () =>
 });
 
 test("should normalize phone to +91 format", () => {
-  const data: PartialProfile = { phone: "9876543210" };
-  const conf: ProfileWithConfidence = { phone: { value: "9876543210", confidence: 0.9, level: "high", source: "scan" } };
+  const data: PartialProfile = { phone: "6383109341" };
+  const conf: ProfileWithConfidence = { phone: { value: "6383109341", confidence: 0.9, level: "high", source: "scan" } };
   const { data: corrected } = validateAndCorrect(data, conf);
-  assert(corrected.phone === "+919876543210", `Expected +919876543210, got ${corrected.phone}`);
+  assert(corrected.phone === "+916383109341", `Expected +916383109341, got ${corrected.phone}`);
 });
 
 test("should normalize email to lowercase", () => {
@@ -75,10 +75,10 @@ test("should identify missing fields", () => {
 });
 
 test("should track corrections", () => {
-  const data: PartialProfile = { education: "B E", phone: "9876543210" };
+  const data: PartialProfile = { education: "B E", phone: "6383109341" };
   const conf: ProfileWithConfidence = {
     education: { value: "B E", confidence: 0.8, level: "high", source: "parser" },
-    phone: { value: "9876543210", confidence: 0.9, level: "high", source: "scan" },
+    phone: { value: "6383109341", confidence: 0.9, level: "high", source: "scan" },
   };
   const { corrections } = validateAndCorrect(data, conf);
   assert(corrections.length > 0, "Should have corrections");

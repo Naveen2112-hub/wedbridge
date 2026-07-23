@@ -58,7 +58,7 @@ export function Footer() {
             </form>
             <div className="mt-6 space-y-2 text-sm text-gray-500">
               <div className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary-500" /> support@wedbridge.com</div>
-              <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-primary-500" /> +91 98765 43210</div>
+              <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-primary-500" /> <a href="tel:+916383109341" className="hover:text-primary-700">+91 63831 09341</a></div>
               <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-primary-500" /> Chennai, Tamil Nadu</div>
             </div>
           </div>

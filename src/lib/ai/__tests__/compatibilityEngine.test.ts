@@ -33,7 +33,7 @@ const baseProfile: ProfileDocument = {
   state: "Tamil Nadu",
   country: "India",
   maritalStatus: "never_married",
-  phone: "9876543210",
+  phone: "6383109341",
   email: "test@example.com",
   height: "5'9\"",
   annualIncome: "8 LPA",
