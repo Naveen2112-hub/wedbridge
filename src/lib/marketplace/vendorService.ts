@@ -10,7 +10,7 @@ function toVendor(d: QueryDocumentSnapshot<DocumentData>): VendorDocument { retu
 
 export async function getApprovedVendors(max = 100): Promise<VendorDocument[]> {
   if (!db) return [];
-  try { const snap = await getDocs(query(collection(db, collections.vendors), where("status", "==", "approved" as VendorStatus), orderBy("featured", "desc"), orderBy("rating", "desc"), limit(max))); return snap.docs.map(toVendor); } catch { return []; }
+  try { const snap = await getDocs(query(collection(db, collections.vendors), where("status", "==", "approved" as VendorStatus), orderBy("featured", "desc"), orderBy("rating", "desc"), limit(max))); return snap.docs.map(toVendor).filter((v) => v.active !== false); } catch { return []; }
 }
 export async function getFeaturedVendors(max = 8): Promise<VendorDocument[]> {
   if (!db) return [];
@@ -35,7 +35,7 @@ export async function searchVendors(filters: VendorFilters, cursor?: QueryDocume
     const docs = snap.docs;
     const hasMore = docs.length > PAGE_SIZE;
     const slice = hasMore ? docs.slice(0, PAGE_SIZE) : docs;
-    let vendors = slice.map(toVendor);
+    let vendors = slice.map(toVendor).filter((v) => v.active !== false);
     if (filters.minRating) vendors = vendors.filter((v) => v.rating >= filters.minRating!);
     if (filters.minPrice !== undefined) vendors = vendors.filter((v) => v.startingPrice >= filters.minPrice!);
     if (filters.maxPrice !== undefined) vendors = vendors.filter((v) => v.startingPrice <= filters.maxPrice!);
