@@ -5,7 +5,7 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
 import { AuthGuard } from "@/components/auth/AuthGuard";
-import { getActiveSubscription, getEffectiveTier, daysUntilExpiry, activateSubscription } from "@/lib/membership/membershipService";
+import { getActiveSubscription, getEffectiveTier, daysUntilExpiry } from "@/lib/membership/membershipService";
 import type { SubscriptionDocument } from "@/firebase/schema";
 import { createOrder, verifyPayment, openCheckout, isPaymentConfigured, updatePaymentStatus } from "@/lib/membership/paymentService";
 import { createNotification } from "@/lib/notifications/notificationService";
@@ -19,6 +19,7 @@ export default function MembershipClient() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<MembershipTier | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const configured = isPaymentConfigured();
 
   useEffect(() => {
@@ -33,30 +34,56 @@ export default function MembershipClient() {
     if (!user?.uid) return;
     if (tier === "free") return;
     setError(null);
+    setSuccess(null);
     setBusy(tier);
     try {
       const plan = MEMBERSHIP_PLANS.find((p) => p.id === tier)!;
       if (!configured) {
-        await activateSubscription(user.uid, tier, "demo-payment", plan.price, planRank(tier) > planRank(currentTier) ? "upgrade" : "renew");
-        setSub(await getActiveSubscription(user.uid));
-        await createNotification(user.uid, { title: "Premium Activated", message: `Your ${plan.name} plan is now active.`, type: "premium_activated" });
+        setError("Razorpay is not configured. Contact support.");
         return;
       }
+
+      // 1. Create a real Razorpay order on the backend
       const order = await createOrder({ uid: user.uid, plan: tier, amount: plan.price });
+
+      // 2. Open Razorpay Checkout
       const result = await openCheckout({
-        orderId: order.orderId, amount: order.amount, currency: order.currency,
-        name: "WedBridge", description: `${plan.name} Membership`,
+        orderId: order.orderId,
+        amount: order.amount,
+        currency: order.currency,
+        name: "WedBridge",
+        description: `${plan.name} Membership — 1 Year`,
         prefill: { name: user.displayName ?? "", email: user.email ?? "" },
-        keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "",
+        keyId: order.keyId,
       });
-      if (!result) { await updatePaymentStatus(order.paymentId, "cancelled"); setError(t("membershipPage.paymentCancelled")); return; }
-      const verified = await verifyPayment({ paymentId: order.paymentId, gatewayPaymentId: result.gatewayPaymentId, gatewaySignature: result.gatewaySignature });
-      if (!verified) { setError(t("membershipPage.paymentFailed")); return; }
-      await activateSubscription(user.uid, tier, order.paymentId, plan.price, planRank(tier) > planRank(currentTier) ? "upgrade" : "renew");
+
+      if (!result) {
+        await updatePaymentStatus(order.paymentId, "cancelled");
+        setError(t("membershipPage.paymentCancelled"));
+        return;
+      }
+
+      // 3. Verify signature on the server — activates membership automatically if valid
+      const verified = await verifyPayment({
+        paymentId: order.paymentId,
+        razorpayOrderId: result.gatewayOrderId || order.orderId,
+        razorpayPaymentId: result.gatewayPaymentId,
+        razorpaySignature: result.gatewaySignature,
+        uid: user.uid,
+        plan: tier,
+      });
+
+      if (!verified) {
+        setError(t("membershipPage.paymentFailed"));
+        return;
+      }
+
+      // 4. Refresh subscription state
       setSub(await getActiveSubscription(user.uid));
+      setSuccess(`Your ${plan.name} plan is now active! Valid until ${new Date(verified.expiryDate).toLocaleDateString()}.`);
       await createNotification(user.uid, { title: "Premium Activated", message: `Your ${plan.name} plan is now active.`, type: "premium_activated" });
-    } catch {
-      setError(t("membershipPage.paymentFailed"));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t("membershipPage.paymentFailed"));
     } finally { setBusy(null); }
   };
 
@@ -73,6 +100,7 @@ export default function MembershipClient() {
           </div>
         )}
         {error && <p className="flex items-center gap-2 rounded-xl bg-red-50 p-3 text-sm text-red-700"><AlertCircle className="h-4 w-4" />{error}</p>}
+        {success && <p className="flex items-center gap-2 rounded-xl bg-green-50 p-3 text-sm text-green-700"><Check className="h-4 w-4" />{success}</p>}
         {!configured && <p className="rounded-xl bg-amber-50 p-3 text-sm text-amber-700">{t("membershipPage.paymentNotConfigured")}</p>}
 
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">

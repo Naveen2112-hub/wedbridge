@@ -1,18 +1,15 @@
-import { collection, query, where, getDocs, orderBy, limit, doc, addDoc, updateDoc, serverTimestamp, onSnapshot, type Unsubscribe } from "firebase/firestore";
+import { collection, query, where, getDocs, orderBy, limit, onSnapshot, type Unsubscribe } from "firebase/firestore";
 import { db } from "@/firebase/config";
-import { collections, type PaymentDocument, type PaymentStatus, type PaymentGateway, type MembershipTier, type PlanInfo } from "@/firebase/schema";
+import { collections, type PaymentDocument, type PaymentStatus, type MembershipTier } from "@/firebase/schema";
 
-export interface RazorpayConfig {
-  keyId: string;
-  keySecret: string;
+export function isPaymentConfigured(): boolean {
+  return Boolean(process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID);
 }
 
 export interface CreateOrderInput {
   uid: string;
   plan: MembershipTier;
   amount: number;
-  currency?: string;
-  notes?: Record<string, string>;
 }
 
 export interface CreateOrderResult {
@@ -20,149 +17,62 @@ export interface CreateOrderResult {
   paymentId: string;
   amount: number;
   currency: string;
-  gateway: PaymentGateway;
-  status: PaymentStatus;
-}
-
-function getRazorpayConfig(): RazorpayConfig {
-  const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "";
-  const keySecret = process.env.RAZORPAY_KEY_SECRET ?? "";
-  if (!keyId || !keySecret) throw new Error("razorpay-not-configured");
-  return { keyId, keySecret };
-}
-
-export function isPaymentConfigured(): boolean {
-  return Boolean(process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET);
+  keyId: string;
 }
 
 export async function createOrder(input: CreateOrderInput): Promise<CreateOrderResult> {
-  if (!db) throw new Error("db-not-configured");
-  const database = db;
-  const cfg = getRazorpayConfig();
-  const currency = input.currency ?? "INR";
-  const amountInPaise = Math.round(input.amount * 100);
-  const orderId = `order_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
-  const ref = await addDoc(collection(database, collections.payments), {
-    uid: input.uid, userId: input.uid, orderId, gateway: "razorpay" as PaymentGateway, amount: amountInPaise, currency, plan: input.plan, status: "pending" as PaymentStatus, notes: input.notes ?? {}, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
-  } as Omit<PaymentDocument, "id">);
-  void cfg;
-  return { orderId, paymentId: ref.id, amount: amountInPaise, currency, gateway: "razorpay", status: "pending" };
+  const res = await fetch("/api/razorpay/create-order", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ uid: input.uid, plan: input.plan }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error ?? "Failed to create order");
+  }
+  return res.json();
 }
 
 export interface VerifyPaymentInput {
   paymentId: string;
-  gatewayPaymentId: string;
-  gatewaySignature: string;
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignature: string;
+  uid: string;
+  plan: MembershipTier;
 }
 
-export async function verifyPayment(input: VerifyPaymentInput): Promise<boolean> {
-  if (!db) throw new Error("db-not-configured");
-  const database = db;
-  try {
-    const snap = await getDocs(query(collection(database, collections.payments), where("__name__", "==", input.paymentId), limit(1)));
-    if (snap.empty) return false;
-    const payDoc = snap.docs[0];
-    const data = payDoc.data() as PaymentDocument;
-    if (data.status !== "pending") return data.status === "paid" || data.status === "verified";
-    const expected = `${data.orderId}|${input.gatewayPaymentId}`;
-    const isValid = Boolean(input.gatewaySignature && input.gatewayPaymentId && expected);
-    const status: PaymentStatus = isValid ? "paid" : "failed";
-    await updateDoc(doc(database, collections.payments, input.paymentId), { status, gatewayPaymentId: input.gatewayPaymentId, gatewaySignature: input.gatewaySignature, updatedAt: serverTimestamp() });
-    return isValid;
-  } catch {
-    return false;
+export interface VerifyPaymentResult {
+  verified: boolean;
+  membershipStatus: string;
+  paymentStatus: string;
+  membershipPlan: string;
+  paymentProvider: string;
+  paymentId: string;
+  orderId: string;
+  paymentDate: string;
+  startDate: string;
+  expiryDate: string;
+}
+
+export async function verifyPayment(input: VerifyPaymentInput): Promise<VerifyPaymentResult> {
+  const res = await fetch("/api/razorpay/verify", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.verified) {
+    throw new Error(data.error ?? "Signature verification failed");
   }
+  return data as VerifyPaymentResult;
 }
 
 export async function updatePaymentStatus(paymentId: string, status: PaymentStatus): Promise<void> {
-  if (!db) return;
-  const database = db;
-  try {
-    await updateDoc(doc(database, collections.payments, paymentId), { status, updatedAt: serverTimestamp() });
-  } catch { /* ignore */ }
-}
-
-export async function getPayment(paymentId: string): Promise<PaymentDocument | null> {
-  if (!db) return null;
-  const database = db;
-  try {
-    const snap = await getDocs(query(collection(database, collections.payments), where("__name__", "==", paymentId), limit(1)));
-    if (snap.empty) return null;
-    const d = snap.docs[0];
-    return { id: d.id, ...(d.data() as Omit<PaymentDocument, "id">) };
-  } catch {
-    return null;
-  }
-}
-
-export async function listUserPayments(uid: string, max = 20): Promise<PaymentDocument[]> {
-  if (!db) return [];
-  const database = db;
-  try {
-    const snap = await getDocs(query(collection(database, collections.payments), where("uid", "==", uid), orderBy("createdAt", "desc"), limit(max)));
-    const items: PaymentDocument[] = [];
-    snap.forEach((d) => items.push({ id: d.id, ...(d.data() as Omit<PaymentDocument, "id">) }));
-    return items;
-  } catch {
-    return [];
-  }
-}
-
-export async function listAllPayments(max = 100): Promise<PaymentDocument[]> {
-  if (!db) return [];
-  const database = db;
-  try {
-    const snap = await getDocs(query(collection(database, collections.payments), orderBy("createdAt", "desc"), limit(max)));
-    const items: PaymentDocument[] = [];
-    snap.forEach((d) => items.push({ id: d.id, ...(d.data() as Omit<PaymentDocument, "id">) }));
-    return items;
-  } catch {
-    return [];
-  }
-}
-
-export function subscribeUserPayments(uid: string, cb: (items: PaymentDocument[]) => void, max = 20): Unsubscribe {
-  if (!db) return () => {};
-  const database = db;
-  try {
-    const q = query(collection(database, collections.payments), where("uid", "==", uid), orderBy("createdAt", "desc"), limit(max));
-    return onSnapshot(q, (snap) => {
-      const items: PaymentDocument[] = [];
-      snap.forEach((d) => items.push({ id: d.id, ...(d.data() as Omit<PaymentDocument, "id">) }));
-      cb(items);
-    }, () => cb([]));
-  } catch {
-    return () => {};
-  }
-}
-
-export interface RevenueStats {
-  totalRevenue: number;
-  totalPayments: number;
-  paidCount: number;
-  pendingCount: number;
-  failedCount: number;
-  refundedCount: number;
-  byPlan: Record<string, number>;
-}
-
-export async function getRevenueStats(): Promise<RevenueStats> {
-  if (!db) return { totalRevenue: 0, totalPayments: 0, paidCount: 0, pendingCount: 0, failedCount: 0, refundedCount: 0, byPlan: {} };
-  const database = db;
-  try {
-    const snap = await getDocs(query(collection(database, collections.payments), limit(500)));
-    const stats: RevenueStats = { totalRevenue: 0, totalPayments: snap.size, paidCount: 0, pendingCount: 0, failedCount: 0, refundedCount: 0, byPlan: {} };
-    snap.forEach((d) => {
-      const p = d.data() as PaymentDocument;
-      if (p.status === "paid" || p.status === "verified") { stats.paidCount++; stats.totalRevenue += p.amount / 100; stats.byPlan[p.plan] = (stats.byPlan[p.plan] ?? 0) + p.amount / 100; }
-      else if (p.status === "pending") stats.pendingCount++;
-      else if (p.status === "failed") stats.failedCount++;
-      else if (p.status === "refunded") stats.refundedCount++;
-    });
-    return stats;
-  } catch {
-    return { totalRevenue: 0, totalPayments: 0, paidCount: 0, pendingCount: 0, failedCount: 0, refundedCount: 0, byPlan: {} };
-  }
+  // Payment status is now managed server-side during verification.
+  // This is kept for compatibility but is a no-op on the client.
+  void paymentId;
+  void status;
 }
 
 export function loadRazorpayScript(): Promise<boolean> {
@@ -188,7 +98,7 @@ export interface CheckoutOptions {
   keyId: string;
 }
 
-export async function openCheckout(opts: CheckoutOptions): Promise<{ gatewayPaymentId: string; gatewaySignature: string } | null> {
+export async function openCheckout(opts: CheckoutOptions): Promise<{ gatewayPaymentId: string; gatewayOrderId: string; gatewaySignature: string } | null> {
   const loaded = await loadRazorpayScript();
   if (!loaded) return null;
   return new Promise((resolve) => {
@@ -200,13 +110,95 @@ export async function openCheckout(opts: CheckoutOptions): Promise<{ gatewayPaym
       description: opts.description,
       order_id: opts.orderId,
       prefill: opts.prefill,
-      theme: { color: "#b8860b" },
+      theme: { color: "#a51d3c" },
       handler: (response: Record<string, unknown>) => {
-        resolve({ gatewayPaymentId: String(response.razorpay_payment_id ?? ""), gatewaySignature: String(response.razorpay_signature ?? "") });
+        resolve({
+          gatewayPaymentId: String(response.razorpay_payment_id ?? ""),
+          gatewayOrderId: String(response.razorpay_order_id ?? ""),
+          gatewaySignature: String(response.razorpay_signature ?? ""),
+        });
       },
       modal: { ondismiss: () => resolve(null) },
     });
     rzp.on("payment_failed", () => resolve(null));
     rzp.open();
   });
+}
+
+export async function getPayment(paymentId: string): Promise<PaymentDocument | null> {
+  if (!db) return null;
+  try {
+    const snap = await getDocs(query(collection(db, collections.payments), where("__name__", "==", paymentId), limit(1)));
+    if (snap.empty) return null;
+    const d = snap.docs[0];
+    return { id: d.id, ...(d.data() as Omit<PaymentDocument, "id">) };
+  } catch {
+    return null;
+  }
+}
+
+export async function listUserPayments(uid: string, max = 20): Promise<PaymentDocument[]> {
+  if (!db) return [];
+  try {
+    const snap = await getDocs(query(collection(db, collections.payments), where("uid", "==", uid), orderBy("createdAt", "desc"), limit(max)));
+    const items: PaymentDocument[] = [];
+    snap.forEach((d) => items.push({ id: d.id, ...(d.data() as Omit<PaymentDocument, "id">) }));
+    return items;
+  } catch {
+    return [];
+  }
+}
+
+export async function listAllPayments(max = 100): Promise<PaymentDocument[]> {
+  if (!db) return [];
+  try {
+    const snap = await getDocs(query(collection(db, collections.payments), orderBy("createdAt", "desc"), limit(max)));
+    const items: PaymentDocument[] = [];
+    snap.forEach((d) => items.push({ id: d.id, ...(d.data() as Omit<PaymentDocument, "id">) }));
+    return items;
+  } catch {
+    return [];
+  }
+}
+
+export function subscribeUserPayments(uid: string, cb: (items: PaymentDocument[]) => void, max = 20): Unsubscribe {
+  if (!db) return () => {};
+  try {
+    const q = query(collection(db, collections.payments), where("uid", "==", uid), orderBy("createdAt", "desc"), limit(max));
+    return onSnapshot(q, (snap) => {
+      const items: PaymentDocument[] = [];
+      snap.forEach((d) => items.push({ id: d.id, ...(d.data() as Omit<PaymentDocument, "id">) }));
+      cb(items);
+    }, () => cb([]));
+  } catch {
+    return () => {};
+  }
+}
+
+export interface RevenueStats {
+  totalRevenue: number;
+  totalPayments: number;
+  paidCount: number;
+  pendingCount: number;
+  failedCount: number;
+  refundedCount: number;
+  byPlan: Record<string, number>;
+}
+
+export async function getRevenueStats(): Promise<RevenueStats> {
+  if (!db) return { totalRevenue: 0, totalPayments: 0, paidCount: 0, pendingCount: 0, failedCount: 0, refundedCount: 0, byPlan: {} };
+  try {
+    const snap = await getDocs(query(collection(db, collections.payments), limit(500)));
+    const stats: RevenueStats = { totalRevenue: 0, totalPayments: snap.size, paidCount: 0, pendingCount: 0, failedCount: 0, refundedCount: 0, byPlan: {} };
+    snap.forEach((d) => {
+      const p = d.data() as PaymentDocument;
+      if (p.status === "paid" || p.status === "verified") { stats.paidCount++; stats.totalRevenue += p.amount / 100; stats.byPlan[p.plan] = (stats.byPlan[p.plan] ?? 0) + p.amount / 100; }
+      else if (p.status === "pending") stats.pendingCount++;
+      else if (p.status === "failed") stats.failedCount++;
+      else if (p.status === "refunded") stats.refundedCount++;
+    });
+    return stats;
+  } catch {
+    return { totalRevenue: 0, totalPayments: 0, paidCount: 0, pendingCount: 0, failedCount: 0, refundedCount: 0, byPlan: {} };
+  }
 }

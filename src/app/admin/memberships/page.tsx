@@ -1,15 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Crown, TrendingUp, CreditCard, RefreshCw, Users, CircleAlert as AlertCircle } from "lucide-react";
+import { Crown, TrendingUp, CreditCard, RefreshCw, Users } from "lucide-react";
 import { AdminPage } from "@/components/auth/AdminPage";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { listAllSubscriptions } from "@/lib/membership/membershipService";
-import { listAllPayments, getRevenueStats, updatePaymentStatus, type RevenueStats } from "@/lib/membership/paymentService";
+import { listAllPayments, getRevenueStats, type RevenueStats } from "@/lib/membership/paymentService";
 import type { SubscriptionDocument, PaymentDocument, MembershipTier } from "@/firebase/schema";
 import { cn } from "@/lib/cn";
 
 const planStyles: Record<string, string> = { free: "bg-primary-50 text-primary-800", basic: "bg-blue-50 text-blue-700", premium: "bg-secondary-100 text-secondary-800", gold: "bg-amber-100 text-amber-800" };
-const statusStyles: Record<string, string> = { pending: "bg-amber-50 text-amber-700", paid: "bg-green-50 text-green-700", failed: "bg-red-50 text-red-700", cancelled: "bg-gray-100 text-gray-500", refunded: "bg-purple-50 text-purple-700", expired: "bg-gray-100 text-gray-500" };
+const statusStyles: Record<string, string> = { pending: "bg-amber-50 text-amber-700", paid: "bg-green-50 text-green-700", verified: "bg-green-50 text-green-700", failed: "bg-red-50 text-red-700", cancelled: "bg-gray-100 text-gray-500", refunded: "bg-purple-50 text-purple-700", expired: "bg-gray-100 text-gray-500" };
 
 export default function AdminMembershipsPage() {
   const { t } = useLanguage();
@@ -17,7 +17,6 @@ export default function AdminMembershipsPage() {
   const [payments, setPayments] = useState<PaymentDocument[]>([]);
   const [stats, setStats] = useState<RevenueStats | null>(null);
   const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -25,8 +24,6 @@ export default function AdminMembershipsPage() {
       setSubs(s); setPayments(p); setStats(r); setLoading(false);
     })();
   }, []);
-
-  const handleRefund = async (id: string) => { setBusy(id); try { await updatePaymentStatus(id, "refunded"); setPayments((prev) => prev.map((p) => p.id === id ? { ...p, status: "refunded" } : p)); } finally { setBusy(null); } };
 
   return (
     <AdminPage title="Memberships" description="Manage subscriptions, payments, and revenue." icon={Crown}>
@@ -62,19 +59,20 @@ export default function AdminMembershipsPage() {
           </div>
 
           <div>
-            <h2 className="mb-3 font-display text-lg font-semibold text-primary-900">Payment Verification & Refunds</h2>
+            <h2 className="mb-3 font-display text-lg font-semibold text-primary-900">Payment History & Transaction Details</h2>
             <div className="overflow-x-auto rounded-2xl bg-white shadow-md">
               <table className="w-full text-sm">
-                <thead><tr className="border-b border-primary-50 text-left text-gray-500"><th className="p-3">Order ID</th><th className="p-3">Plan</th><th className="p-3">Amount</th><th className="p-3">Status</th><th className="p-3">Action</th></tr></thead>
+                <thead><tr className="border-b border-primary-50 text-left text-gray-500"><th className="p-3">Order ID</th><th className="p-3">Payment ID</th><th className="p-3">Plan</th><th className="p-3">Amount</th><th className="p-3">Status</th><th className="p-3">Date</th></tr></thead>
                 <tbody>
-                  {payments.length === 0 ? <tr><td colSpan={5} className="p-6 text-center text-gray-500">No payments yet.</td></tr> :
+                  {payments.length === 0 ? <tr><td colSpan={6} className="p-6 text-center text-gray-500">No payments yet.</td></tr> :
                   payments.map((p) => (
                     <tr key={p.id} className="border-b border-primary-50 last:border-0">
                       <td className="p-3 font-mono text-xs">{(p.orderId ?? p.razorpayOrderId ?? "").slice(0, 16)}…</td>
+                      <td className="p-3 font-mono text-xs">{(p.gatewayPaymentId ?? p.razorpayPaymentId ?? "").slice(0, 16)}…</td>
                       <td className="p-3"><span className={cn("badge", planStyles[p.plan])}>{p.plan}</span></td>
                       <td className="p-3">₹{(p.amount / 100).toLocaleString()}</td>
                       <td className="p-3"><span className={cn("badge", statusStyles[p.status])}>{p.status}</span></td>
-                      <td className="p-3">{p.status === "paid" && <button type="button" disabled={busy === p.id} onClick={() => handleRefund(p.id)} className="btn-outline py-1 text-xs text-red-600 hover:bg-red-50">Refund</button>}</td>
+                      <td className="p-3 text-xs text-gray-500">{p.createdAt ? new Date(p.createdAt as string).toLocaleDateString() : "—"}</td>
                     </tr>
                   ))}
                 </tbody>

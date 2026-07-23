@@ -1,57 +1,48 @@
 "use client";
-import { collection, doc, addDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "@/firebase/config";
-import { collections, type PaymentDocument, type AppUser } from "@/firebase/schema";
 import { PLANS } from "@/lib/membership/planConfig";
-import { createPayment, verifyPaymentAndActivateMembership } from "@/lib/membership/membershipService";
-import { updateDoc } from "firebase/firestore";
+import { createOrder, openCheckout, verifyPayment, isPaymentConfigured } from "@/lib/membership/paymentService";
+import type { MembershipTier } from "@/firebase/schema";
 
-declare global {
-  interface Window { Razorpay: new (options: RazorpayOptions) => RazorpayInstance; }
-}
-interface RazorpayOptions { key: string; amount: number; currency: string; name: string; description: string; order_id?: string; prefill: { name: string; email: string }; theme: { color: string }; handler: (response: RazorpayResponse) => void; modal: { ondismiss: () => void }; }
-interface RazorpayResponse { razorpay_payment_id: string; razorpay_order_id?: string; razorpay_signature?: string; }
-interface RazorpayInstance { open: () => void; }
+interface RazorpayUser { uid: string; email: string; displayName: string }
 
-const RAZORPAY_KEY = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "";
-
-function loadRazorpayScript(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (typeof window === "undefined" || window.Razorpay) { resolve(); return; }
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error("Failed to load Razorpay SDK"));
-    document.head.appendChild(script);
-  });
-}
-
-export async function startRazorpayPayment(planId: "premium" | "gold", user: { uid: string; email: string; displayName: string }, onSuccess: () => void, onError: (msg: string) => void): Promise<void> {
+export async function startRazorpayPayment(
+  planId: MembershipTier,
+  user: RazorpayUser,
+  onSuccess: (result: { plan: string; paymentId: string; expiryDate: string }) => void,
+  onError: (msg: string) => void,
+): Promise<void> {
   const plan = PLANS.find((p) => p.id === planId);
   if (!plan) { onError("Invalid plan"); return; }
-  if (!RAZORPAY_KEY) { onError("Razorpay not configured"); return; }
+  if (!isPaymentConfigured()) { onError("Razorpay not configured"); return; }
 
   try {
-    await loadRazorpayScript();
-    const paymentId = await createPayment({ userId: user.uid, userName: user.displayName, amount: plan.price, plan: plan.id });
-    if (!paymentId) { onError("Failed to create payment record"); return; }
+    // 1. Create a real Razorpay order on the backend
+    const order = await createOrder({ uid: user.uid, plan: plan.id, amount: plan.price });
 
-    const options: RazorpayOptions = {
-      key: RAZORPAY_KEY,
-      amount: plan.price * 100,
-      currency: "INR",
+    // 2. Open Razorpay Checkout
+    const result = await openCheckout({
+      orderId: order.orderId,
+      amount: order.amount,
+      currency: order.currency,
       name: "WedBridge",
-      description: `${plan.name} Membership - 1 Year`,
+      description: `${plan.name} Membership — 1 Year`,
       prefill: { name: user.displayName, email: user.email },
-      theme: { color: "#a51d3c" },
-      handler: async (response: RazorpayResponse) => {
-        await verifyPaymentAndActivateMembership(paymentId, user.uid, plan.id, response.razorpay_payment_id);
-        onSuccess();
-      },
-      modal: { ondismiss: () => onError("Payment cancelled") },
-    };
-    const rzp = new window.Razorpay(options);
-    rzp.open();
+      keyId: order.keyId,
+    });
+
+    if (!result) { onError("Payment cancelled"); return; }
+
+    // 3. Verify signature on the server (activates membership automatically if valid)
+    const verified = await verifyPayment({
+      paymentId: order.paymentId,
+      razorpayOrderId: result.gatewayOrderId || order.orderId,
+      razorpayPaymentId: result.gatewayPaymentId,
+      razorpaySignature: result.gatewaySignature,
+      uid: user.uid,
+      plan: plan.id,
+    });
+
+    onSuccess({ plan: verified.membershipPlan, paymentId: verified.paymentId, expiryDate: verified.expiryDate });
   } catch (e) {
     onError(e instanceof Error ? e.message : "Payment failed");
   }

@@ -347,9 +347,16 @@ export interface SubscriptionDocument {
   userId?: string;
   plan: MembershipTier;
   status: "active" | "expired" | "cancelled" | "pending";
+  membershipStatus?: string;
+  paymentStatus?: string;
+  membershipPlan?: MembershipTier | string;
+  paymentProvider?: string;
+  paymentId?: string;
+  orderId?: string;
+  paymentDate?: unknown;
   startDate: unknown;
   endDate?: unknown;
-  paymentId?: string;
+  expiryDate?: unknown;
   autoRenew?: boolean;
   createdAt: unknown;
   updatedAt?: unknown;

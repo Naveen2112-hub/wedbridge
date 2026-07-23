@@ -43,14 +43,14 @@ export function getPlan(tier: MembershipTier): PlanInfo | undefined {
 export async function activateSubscription(uid: string, plan: MembershipTier, paymentId: string, _amount?: number, _mode?: string, durationDays?: number): Promise<SubscriptionDocument | null> {
   if (!db) return null;
   try {
-    const days = durationDays ?? (plan === "gold" ? 365 : plan === "premium" ? 365 : 30);
+    const days = durationDays ?? 365;
     const startDate = new Date();
-    const endDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
+    const expiryDate = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
     const ref = await addDoc(collection(db, collections.subscriptions), {
-      uid, plan, status: "active", startDate, endDate, paymentId, autoRenew: false, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
+      uid, plan, status: "active", membershipStatus: "active", paymentStatus: "paid", membershipPlan: plan, paymentProvider: "Razorpay", paymentId, startDate, endDate: expiryDate, expiryDate, autoRenew: false, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
     } as Omit<SubscriptionDocument, "id">);
     void sendNotification("membership_purchased").catch(() => {});
-    return { id: ref.id, uid, plan, status: "active", startDate, endDate, paymentId, autoRenew: false, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+    return { id: ref.id, uid, plan, status: "active", membershipStatus: "active", paymentStatus: "paid", membershipPlan: plan, paymentProvider: "Razorpay", paymentId, startDate, endDate: expiryDate, expiryDate, autoRenew: false, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
   } catch { return null; }
 }
 
