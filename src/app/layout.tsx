@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { LanguageProvider } from "@/lib/i18n/LanguageProvider";
-import { AuthProvider } from "@/components/AuthProvider";
-import { ToastProvider } from "@/components/ToastProvider";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { Providers } from "@/components/Providers";
 
 export const metadata: Metadata = {
   title: "WedBridge — Tamil Nadu Matrimony & Wedding Marketplace",
@@ -20,15 +16,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <LanguageProvider>
-          <AuthProvider>
-            <ToastProvider>
-              <Navbar />
-              <main>{children}</main>
-              <Footer />
-            </ToastProvider>
-          </AuthProvider>
-        </LanguageProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

@@ -2,33 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CircleCheck as CheckCircle2, ArrowRight } from "lucide-react";
-import { useAuth } from "@/components/AuthProvider";
-import { PLANS, type Membership } from "@/lib/plans";
+import { CheckCircle2, ArrowRight } from "lucide-react";
+import { useAuth } from "@/lib/auth/AuthProvider";
+import { getActiveSubscription, getEffectiveTier } from "@/lib/membership/membershipService";
+import { MEMBERSHIP_PLANS, type SubscriptionDocument } from "@/firebase/schema";
 import { formatDate } from "@/lib/utils";
 
 export default function SuccessPage() {
-  const { user, loading, getIdToken } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
-  const [membership, setMembership] = useState<Membership | null>(null);
+  const [sub, setSub] = useState<SubscriptionDocument | null>(null);
 
   useEffect(() => {
+    if (!user?.uid) return;
     (async () => {
-      const token = await getIdToken();
-      if (!token) return;
-      try {
-        const res = await fetch("/api/membership/status", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setMembership(data.membership ?? null);
-        }
-      } catch {
-        // non-fatal
-      }
+      const s = await getActiveSubscription(user.uid);
+      setSub(s);
     })();
-  }, [getIdToken]);
+  }, [user?.uid]);
 
   if (loading || !user) {
     return (
@@ -38,7 +29,8 @@ export default function SuccessPage() {
     );
   }
 
-  const plan = membership ? PLANS[membership.plan] : null;
+  const tier = getEffectiveTier(sub);
+  const plan = MEMBERSHIP_PLANS.find((p) => p.id === tier);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-neutral-50 to-neutral-100 px-4">
@@ -50,10 +42,10 @@ export default function SuccessPage() {
           Membership Activated Successfully
         </h1>
         <p className="mt-2 text-sm text-neutral-600">
-          Welcome to WedBridge {plan ? plan.name : ""}! Your membership is now active.
+          Welcome to WedBridge {plan?.name ?? ""}! Your membership is now active.
         </p>
 
-        {membership && (
+        {sub && (
           <dl className="mt-6 space-y-3 rounded-xl bg-neutral-50 p-5 text-left text-sm">
             <div className="flex items-center justify-between gap-4">
               <dt className="text-xs font-medium uppercase tracking-wide text-neutral-500">Current Plan</dt>
@@ -65,18 +57,14 @@ export default function SuccessPage() {
             </div>
             <div className="flex items-center justify-between gap-4">
               <dt className="text-xs font-medium uppercase tracking-wide text-neutral-500">Expiry Date</dt>
-              <dd className="font-medium text-neutral-900">{formatDate(membership.expiryDate)}</dd>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <dt className="text-xs font-medium uppercase tracking-wide text-neutral-500">Payment ID</dt>
-              <dd className="font-mono text-xs break-all text-neutral-900">{membership.paymentId || "—"}</dd>
+              <dd className="font-medium text-neutral-900">{formatDate(sub.expiryDate ?? null)}</dd>
             </div>
           </dl>
         )}
 
         <button
           onClick={() => router.push("/membership")}
-          className="mt-6 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-500"
+          className="mt-6 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-rose-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-rose-500"
         >
           Back to membership <ArrowRight className="h-4 w-4" />
         </button>

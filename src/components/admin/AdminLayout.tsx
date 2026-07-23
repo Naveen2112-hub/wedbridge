@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Users, FileText, Upload, CreditCard, ChartBar as BarChart3, Bell, Settings, LogOut, Store, Calendar, Send, Download, Database, History, Activity, Shield } from "lucide-react";
+import { LayoutDashboard, Users, FileText, Upload, CreditCard, BarChart3, Bell, Settings, LogOut, Store, Calendar, Send, Download, Database, History, Activity, Shield } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin/AdminAuthContext";
 
 const nav = [
