@@ -3,7 +3,7 @@ export type PlanId = "premium" | "gold";
 export interface Plan {
   id: PlanId;
   name: string;
-  amount: number; // in paise
+  amount: number;
   priceLabel: string;
   description: string;
   features: string[];

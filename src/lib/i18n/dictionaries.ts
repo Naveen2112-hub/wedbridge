@@ -1,143 +1,288 @@
+export type Dictionary = typeof dictionaries.en;
+
 export const dictionaries = {
   en: {
-    nav: { home: "Home", login: "Login", register: "Register", logout: "Logout", dashboard: "Dashboard", profile: "Profile", search: "Search", aiMatches: "AI Matches", favourites: "Favourites", interests: "Interests", notifications: "Notifications", membership: "Membership", settings: "Settings" },
-    auth: {
-      login: { title: "Welcome Back", subtitle: "Sign in to continue your journey", email: "Email", password: "Password", forgot: "Forgot password?", submit: "Sign In", google: "Continue with Google", noAccount: "Don't have an account?" },
-      register: { title: "Create Your Account", subtitle: "Begin your matrimony journey", name: "Full Name", email: "Email", password: "Password", confirm: "Confirm Password", submit: "Create Account", google: "Sign up with Google", haveAccount: "Already have an account?", terms: "By continuing you agree to our Terms & Privacy Policy" },
-      forgot: { title: "Reset Password", subtitle: "We'll email you a reset link", email: "Email", submit: "Send Reset Link", sent: "Reset link sent. Check your inbox.", back: "Back to login" },
-      complete: { title: "Complete Your Profile", subtitle: "A few details to get started — you can finish later", name: "Full Name", dob: "Date of Birth", gender: "Gender", male: "Male", female: "Female", other: "Other", religion: "Religion", caste: "Caste", motherTongue: "Mother Tongue", district: "District", state: "State", country: "Country", phone: "Phone Number", email: "Email (Optional)", photo: "Profile Photo", contactVisibility: "Contact Privacy", visibility: { everyone: "Visible to everyone", afterAccept: "Visible after Interest Accepted", premiumOnly: "Premium Members Only" }, submit: "Save & Continue", maritalStatus: "Marital Status", height: "Height", education: "Education", occupation: "Occupation", annualIncome: "Annual Income" },
-      admin: { title: "Admin Login", subtitle: "Authorized personnel only", email: "Email", password: "Password", submit: "Sign In", notAuthorized: "You are not authorized." },
-      error: { required: "This field is required", email: "Enter a valid email", weakPassword: "Password must be at least 8 characters", mismatch: "Passwords do not match", invalid: "Invalid email or password", emailInUse: "Email already in use", notConfigured: "Firebase is not configured", generic: "Something went wrong. Please try again." },
+    nav: {
+      home: "Home",
+      login: "Login",
+      register: "Register",
+      logout: "Logout",
+      dashboard: "Dashboard",
+      profile: "Profile",
+      search: "Search",
+      aiMatches: "AI Matches",
+      favourites: "Favourites",
+      interests: "Interests",
+      notifications: "Notifications",
+      membership: "Membership",
+      settings: "Settings",
     },
-    dashboard: { welcome: "Welcome back", profileCompletion: "Profile completion", premiumBanner: "Upgrade to Premium", premiumBannerDesc: "Unlock unlimited interests, contact views, and AI matches.", upgrade: "Upgrade Now", completeProfile: "Complete your profile for better matches.", completeNow: "Complete Now", aiMatches: "AI Matches", recentInterests: "Recent Interests", notifications: "Notifications", quickSearch: "Quick Search", viewAll: "View all", recentlyViewed: "Recently Viewed", aiSuggestions: "AI Suggestions", membershipBanner: "Membership" },
-    search: {
-      title: "Find Your Perfect Match", subtitle: "Browse verified profiles across South India", filters: "Filters", advanced: "Advanced Filters", apply: "Apply Filters", reset: "Reset", clearAll: "Clear All", results: "Results", noResults: "No profiles match your filters.", noResultsDesc: "Try adjusting some filters.", loadMore: "Load More", loading: "Searching…", showing: "Showing", of: "of", sortBy: "Sort By", sortNewest: "Newest", sortOldest: "Oldest", sortPopular: "Most Viewed", sortRelevance: "Relevance",
-      fields: { gender: "Gender", ageRange: "Age Range", religion: "Religion", caste: "Caste", motherTongue: "Mother Tongue", maritalStatus: "Marital Status", district: "District", state: "State", country: "Country", education: "Education", occupation: "Occupation", annualIncome: "Annual Income", height: "Height", verified: "Verified Only", premium: "Premium Members", withPhoto: "With Photo", recentlyJoined: "Recently Joined", onlineNow: "Online Now", star: "Star", rasi: "Rasi", manglik: "Manglik", familyType: "Family Type", food: "Food Preference", smoking: "Smoking", drinking: "Drinking", lifestyle: "Lifestyle", any: "Any", minAge: "Min Age", maxAge: "Max Age" },
-      card: { viewProfile: "View Profile", interest: "Send Interest", favourite: "Add to Favourites", favourited: "Favourited", verified: "Verified", premium: "Premium", completion: "Completion", compatibility: "Compatibility", yrs: "yrs", online: "Online" },
-      history: { title: "Search History", clear: "Clear History", empty: "No recent searches.", recent: "Recent Searches" },
-    },
-    ai: {
-      title: "AI Matchmaking", subtitle: "Compatibility powered by 20 weighted factors", refresh: "Refresh Matches", refreshing: "Generating…", noMatches: "No AI matches yet.", noMatchesDesc: "Complete your profile for better matches.", freeLimit: "Showing 20 of your daily AI matches.", premiumUnlimited: "Unlimited AI matches with Premium.", upgrade: "Upgrade to Premium", score: "AI Score", reasonsLabel: "Why this match", insights: "AI Insights", filters: "Filters", minScore: "Minimum AI Score", apply: "Apply", reset: "Reset",
-      tabs: { top: "Top Matches", today: "Today's Best", recent: "Recently Compatible", near: "Near You", educated: "Highly Educated", premium: "Premium Members", active: "Recently Active" },
-      reasons: { sameReligion: "Same Religion", sameCaste: "Same Caste", sameDistrict: "Same District", similarEducation: "Similar Education", preferredAge: "Preferred Age", sameMotherTongue: "Same Mother Tongue", matchingLifestyle: "Matching Lifestyle", sameFood: "Same Food Preference", sameState: "Same State", sameCountry: "Same Country", sameMaritalStatus: "Same Marital Status", matchingHoroscope: "Matching Horoscope", sameStar: "Same Star", sameRasi: "Same Rasi", sameManglik: "Same Manglik", matchingOccupation: "Similar Occupation", matchingIncome: "Similar Income", partnerPrefMatch: "Partner preference aligns", idealAge: "Age difference is ideal", educationPref: "Education matches your preference" },
-    },
-    interests: {
-      title: "Interests", subtitle: "Interest requests you've sent and received", tabs: { sent: "Sent", received: "Received" }, send: "Send Interest", accept: "Accept", reject: "Reject", cancel: "Cancel", withdraw: "Withdraw", pending: "Pending", accepted: "Accepted", rejected: "Rejected", cancelled: "Cancelled", expired: "Expired", empty: "No interests here yet.", emptyReceived: "No incoming interest requests.", emptySent: "You haven't sent any interests.", dailyLimit: "20 interests per day on Free plan.", limitReached: "Daily interest limit reached. Upgrade to Premium for unlimited.", upgrade: "Upgrade to Premium", sentToday: "Interests sent today",
-    },
-    favourites: {
-      title: "Favourites", subtitle: "Profiles you've saved for later", empty: "No favourites yet.", emptyDesc: "Tap the star on any profile to save it here.", count: "Favourites", remove: "Remove", viewProfile: "View Profile", recentlyFavourited: "Recently Favourited",
-    },
-    notifications: {
-      title: "Notifications", subtitle: "Recent activity and updates about your matches", empty: "No notifications yet.", markAllRead: "Mark all read", unread: "Unread", delete: "Delete", all: "All", types: { interest_received: "Interest Received", interest_accepted: "Interest Accepted", interest_rejected: "Interest Rejected", profile_viewed: "Profile Viewed", premium_activated: "Premium Activated", new_ai_matches: "New AI Matches", new_message: "New Message", admin_announcement: "Announcement" },
-    },
-    profile: {
-      title: "My Profile", edit: "Edit Profile", save: "Save Changes", cancel: "Cancel", uploadPhoto: "Upload Photo", changePhoto: "Change Photo", cropPhoto: "Crop & Adjust", crop: "Apply Crop", maxSize: "Maximum 5 MB", compressing: "Compressing…", uploading: "Uploading…",
-      completion: "Profile Completion", completionTarget: "Reach 50% to appear in search", suggested: "Suggested missing fields", gallery: "Gallery", about: "About Me", family: "Family", education: "Education & Career", lifestyle: "Lifestyle", partner: "Partner Preference", basic: "Basic Details", contact: "Contact", verified: "Verified", unverified: "Unverified", pendingVerification: "Verification Pending",
-      details: { views: "Views", sendInterest: "Send Interest", relatedProfiles: "Related Profiles", contactHidden: "Contact details are hidden based on privacy settings.", horoscope: "Horoscope", backToSearch: "Back to Search", notFound: "Profile not found." },
-      visibility: { show: "Show Profile", hide: "Hide Profile", deactivate: "Deactivate Account", visible: "Profile is visible", hidden: "Profile is hidden", deactivated: "Account is deactivated", reactivate: "Reactivate Account" },
-      fatherName: "Father's Name", motherName: "Mother's Name", brothers: "Brothers", sisters: "Sisters", familyType: "Family Type", familyStatus: "Family Status", lifestyleLabel: "Lifestyle", food: "Food Preference", smoking: "Smoking", drinking: "Drinking", horoscope: "Horoscope", star: "Star", rasi: "Rasi", manglik: "Manglik", aboutMe: "About Me", partnerPref: "Partner Preference",
-      ocr: { title: "OCR Biodata", subtitle: "Upload PDF or image to auto-fill", upload: "Upload Biodata", extracting: "Extracting text…", review: "Review & Edit extracted details", applied: "Auto-filled from biodata", failed: "Could not extract. Please fill manually.", retry: "Retry OCR", uploadAnother: "Upload Another", manualEntry: "Manual Entry", needsReview: "This field needs review", confidence: "Confidence", autofilled: "autofilled", needReview: "need review", notFound: "not found", partialSuccess: "Some fields extracted. Review highlighted fields.", completeSuccess: "All fields extracted successfully!", supportedFormats: "JPEG, PNG, WEBP, PDF, HEIC", processing: "Processing…", stepUploading: "Uploading", stepPreprocessing: "Preprocessing", stepRemovingPhoto: "Removing photo", stepRemovingHoroscope: "Removing horoscope", stepRemovingLogos: "Removing logos & borders", stepRunningOCR: "Running OCR", stepExtracting: "Extracting fields", stepAutofilling: "Autofilling profile", stepDone: "Done" },
-      saved: "Profile saved successfully.", saveFailed: "Could not save profile. Try again.", photoFailed: "Photo upload failed. Try again.",
-      verify: { title: "Verify Profile", desc: "Submit your profile for admin verification to earn a Verified badge.", submit: "Submit for Verification", submitted: "Verification request submitted.", status: "Verification Status" },
-    },
-    admin: { dashboard: { title: "Admin Dashboard" }, overview: "Platform overview", totalUsers: "Total Users", totalProfiles: "Total Profiles", pendingApprovals: "Pending Approvals", premiumMembers: "Premium Members", users: "Users", profiles: "Profiles", vendors: "Vendors", memberships: "Memberships", settings: "Settings" },
-    common: { loading: "Loading…", save: "Save", cancel: "Cancel", back: "Back", next: "Next", submit: "Submit", yes: "Yes", no: "No", dontKnow: "Don't know", optional: "Optional", required: "Required", delete: "Delete", edit: "Edit", view: "View", close: "Close" },
-    footer: { madeWith: "Made with love in South India", rights: "All rights reserved" },
     home: {
-      hero: { badge: "South India's Premium Matrimony", title: "Find your perfect life partner", subtitle: "Where tradition meets technology. AI-powered matchmaking rooted in South Indian values.", cta: "Begin Your Journey", secondary: "Explore Matches", stats: { profiles: "Verified Profiles", matches: "Happy Matches", cities: "Cities" } },
-      why: { title: "Why WedBridge", subtitle: "Built for the modern South Indian family", items: { verified: { title: "Verified Profiles", desc: "Every profile is manually verified for authenticity." }, ai: { title: "AI Matching", desc: "Compatibility powered by values, not just algorithms." }, privacy: { title: "Privacy First", desc: "Your contact details stay private until you're ready." }, support: { title: "Dedicated Support", desc: "Real humans, real help, every step of the way." } } },
-      stats: { title: "Trusted by thousands", profiles: "Verified Profiles", matches: "Happy Matches", cities: "Cities Covered", years: "Years of Trust" },
-      featured: { title: "Featured Profiles", subtitle: "Meet some of our verified members", viewAll: "View all profiles" },
-      ai: { title: "AI-Powered Matchmaking", subtitle: "Compatibility beyond filters", desc: "Our AI learns your preferences and values to suggest matches that truly fit — not just on paper, but in life.", cta: "Try AI Matching" },
-      services: { title: "Our Services", subtitle: "Everything you need for a beautiful beginning", items: { matchmaking: { title: "Personalized Matchmaking", desc: "Dedicated relationship managers." }, verification: { title: "Profile Verification", desc: "Authentic, verified members only." }, wedding: { title: "Wedding Services", desc: "Vendors, planners, and venues." }, astro: { title: "Astrology Matching", desc: "Horoscope compatibility reports." } } },
-      membership: { title: "Membership Plans", subtitle: "Choose the plan that fits your journey", free: { name: "Free", price: "₹0", desc: "Start your journey", features: ["20 interests/day", "5 contact views/day", "Unlimited AI matches"] }, premium: { name: "Premium", price: "₹2,999", desc: "Most popular", features: ["Unlimited interests", "Unlimited contact views", "Priority support", "Advanced filters"] }, elite: { name: "Elite", price: "₹5,999", desc: "White-glove service", features: ["Dedicated manager", "Profile highlight", "Astrology reports", "VIP events"] }, cta: "Choose Plan" },
-    membershipPage: {
-      title: "Membership", subtitle: "Choose the plan that fits your journey", currentPlan: "Current Plan", expiresOn: "Expires on", expired: "Expired", upgrade: "Upgrade", renew: "Renew", downgrade: "Downgrade", choosePlan: "Choose Plan", current: "Current", popular: "Most Popular", benefits: "Membership Benefits", noActive: "You are on the Free plan.", noActiveDesc: "Upgrade to unlock unlimited features.", paymentFailed: "Payment failed. Please try again.", paymentCancelled: "Payment was cancelled.", paymentNotConfigured: "Payments are not configured yet.", processing: "Processing payment…", payNow: "Pay Now",
-      plans: {
-        free: { name: "Free", price: "₹0", period: "forever", desc: "Start your journey", features: ["Unlimited registration & login", "Unlimited profile search", "Unlimited AI recommendations", "20 interests per day", "5 contact views per day"] },
-        basic: { name: "Basic", price: "₹999", period: "3 months", desc: "Priority search, no ads", features: ["Unlimited interests", "20 contact views per day", "Priority search ranking", "No advertisements"] },
-        premium: { name: "Premium", price: "₹2,999", period: "6 months", desc: "Most popular", features: ["Unlimited contact views", "Unlimited interests", "Unlimited AI matches", "Priority search ranking", "Premium badge", "Highlighted profile"] },
-        gold: { name: "Gold", price: "₹5,999", period: "1 year", desc: "Top-tier experience", features: ["Everything in Premium", "Highest search priority", "Top featured profile", "Exclusive wedding vendor discounts", "Early access to new features"] },
+      hero: {
+        badge: "South India's Premium Matrimony",
+        title: "Find your perfect life partner",
+        subtitle:
+          "Where tradition meets technology. AI-powered matchmaking rooted in South Indian values.",
+        cta: "Begin Your Journey",
+        secondary: "Explore Matches",
+        stats: {
+          profiles: "Verified Profiles",
+          matches: "Happy Matches",
+          cities: "Cities",
+        },
       },
-    },
-    badges: { basic: "Basic", premium: "Premium", gold: "Gold", verified: "Verified" },
-    contactPrivacy: { title: "Contact Privacy", desc: "Control who can see your contact details", everyone: "Visible to Everyone", afterAccept: "Visible After Interest Accepted", premiumOnly: "Premium Members Only", saved: "Privacy setting saved", everyoneDesc: "Anyone can see your phone and email", afterAcceptDesc: "Only after an interest is accepted (default)", premiumOnlyDesc: "Only premium members can view" },
-      success: { title: "Success Stories", subtitle: "Real couples, real love" },
-      testimonials: { title: "What families say", subtitle: "Trusted across South India" },
-      faq: { title: "Frequently Asked Questions", subtitle: "Everything you need to know" },
-      download: { title: "Get the app", subtitle: "Match on the go", ios: "App Store", android: "Google Play" },
+      why: {
+        title: "Why WedBridge",
+        subtitle: "Built for the modern South Indian family",
+        items: {
+          verified: {
+            title: "Verified Profiles",
+            desc: "Every profile is manually verified for authenticity.",
+          },
+          ai: {
+            title: "AI Matching",
+            desc: "Compatibility powered by values, not just algorithms.",
+          },
+          privacy: {
+            title: "Privacy First",
+            desc: "Your contact details stay private until you're ready.",
+          },
+          support: {
+            title: "Dedicated Support",
+            desc: "Real humans, real help, every step of the way.",
+          },
+        },
+      },
+      stats: {
+        title: "Trusted by thousands",
+        profiles: "Verified Profiles",
+        matches: "Happy Matches",
+        cities: "Cities Covered",
+        years: "Years of Trust",
+      },
+      featured: {
+        title: "Featured Profiles",
+        subtitle: "Meet some of our verified members",
+        viewAll: "View all profiles",
+      },
+      ai: {
+        title: "AI-Powered Matchmaking",
+        subtitle: "Compatibility beyond filters",
+        desc: "Our AI learns your preferences and values to suggest matches that truly fit — not just on paper, but in life.",
+        cta: "Try AI Matching",
+      },
+      services: {
+        title: "Our Services",
+        subtitle: "Everything you need for a beautiful beginning",
+        items: {
+          matchmaking: {
+            title: "Personalized Matchmaking",
+            desc: "Dedicated relationship managers.",
+          },
+          verification: {
+            title: "Profile Verification",
+            desc: "Authentic, verified members only.",
+          },
+          wedding: {
+            title: "Wedding Services",
+            desc: "Vendors, planners, and venues.",
+          },
+          astro: {
+            title: "Astrology Matching",
+            desc: "Horoscope compatibility reports.",
+          },
+        },
+      },
+      membership: {
+        title: "Membership Plans",
+        subtitle: "Choose the plan that fits your journey",
+        free: {
+          name: "Free",
+          price: "₹0",
+          desc: "Start your journey",
+          features: [
+            "20 interests/day",
+            "5 contact views/day",
+            "Unlimited AI matches",
+          ],
+        },
+        premium: {
+          name: "Premium",
+          price: "₹2,999",
+          desc: "Most popular",
+          features: [
+            "Unlimited interests",
+            "Unlimited contact views",
+            "Priority support",
+            "Advanced filters",
+          ],
+        },
+        elite: {
+          name: "Elite",
+          price: "₹5,999",
+          desc: "White-glove service",
+          features: [
+            "Dedicated manager",
+            "Profile highlight",
+            "Astrology reports",
+            "VIP events",
+          ],
+        },
+        cta: "Choose Plan",
+      },
+      success: {
+        title: "Success Stories",
+        subtitle: "Real couples, real love",
+      },
+      testimonials: {
+        title: "What families say",
+        subtitle: "Trusted across South India",
+      },
+      faq: {
+        title: "Frequently Asked Questions",
+        subtitle: "Everything you need to know",
+      },
+      download: {
+        title: "Get the app",
+        subtitle: "Match on the go",
+        ios: "App Store",
+        android: "Google Play",
+      },
     },
   },
   ta: {
-    nav: { home: "முகப்பு", login: "உள்நுழை", register: "பதிவு", logout: "வெளியேறு", dashboard: "டாஷ்போர்டு", profile: "சுயவிவரம்", search: "தேடல்", aiMatches: "AI பொருத்தங்கள்", favourites: "பிடித்தவை", interests: "ஆர்வங்கள்", notifications: "அறிவிப்புகள்", membership: "உறுப்பிணைப்பு", settings: "அமைப்புகள்" },
-    auth: {
-      login: { title: "மீண்டும் வரவேற்கிறோம்", subtitle: "உங்கள் பயணத்தைத் தொடர உள்நுழையவும்", email: "மின்னஞ்சல்", password: "கடவுச்சொல்", forgot: "கடவுச்சொல்லை மறந்துவிட்டீர்களா?", submit: "உள்நுழை", google: "Google மூலம் தொடரவும்", noAccount: "கணக்கு இல்லையா?" },
-      register: { title: "உங்கள் கணக்கை உருவாட்டுங்கள்", subtitle: "உங்கள் திருமணப் பயணத்தைத் தொடங்குங்கள்", name: "முழுப் பெயர்", email: "மின்னஞ்சல்", password: "கடவுச்சொல்", confirm: "கடவுச்சொல்லை உறுதிப்படுத்து", submit: "கணக்கை உருவாக்கு", google: "Google மூலம் பதிவு", haveAccount: "ஏற்கனவே கணக்கு உள்ளதா?", terms: "தொடர்வதன் மூலம் நிபந்தனைகளை ஏற்கிறீர்கள்" },
-      forgot: { title: "கடவுச்சொல் மீட்டமை", subtitle: "மீட்டமை இணைப்பை அனுப்புவோம்", email: "மின்னஞ்சல்", submit: "இணைப்பை அனுப்பு", sent: "மீட்டமை இணைப்பு அனுப்பப்பட்டது.", back: "உள்நுழையத் திரும்பு" },
-      complete: { title: "உங்கள் சுயவிவரத்தை முடிக்கவும்", subtitle: "தொடங்க சில விவரங்கள் — பின்னர் முடிக்கலாம்", name: "முழுப் பெயர்", dob: "பிறந்த தேதி", gender: "பாலினம்", male: "ஆண்", female: "பெண்", other: "மற்றொன்று", religion: "மதம்", caste: "சாதி", motherTongue: "தாய்மொழி", district: "மாவட்டம்", state: "மாநிலம்", country: "நாடு", phone: "தொலைபேசி எண்", email: "மின்னஞ்சல் (விரும்பினால்)", photo: "சுயவிவர புகைப்படம்", contactVisibility: "தொடர்ப் தனியுரிமை", visibility: { everyone: "அனைவருக்கும் தெரியும்", afterAccept: "ஆர்வம் ஏற்கப்பட்ட பின் தெரியும்", premiumOnly: "பிரீமியம் உறுப்பினர்களுக்கு மட்டும்" }, submit: "சேமி & தொடரவும்", maritalStatus: "திருமண நிலை", height: "உயரம்", education: "கல்வி", occupation: "தொழில்", annualIncome: "ஆண்டு வருமானம்" },
-      admin: { title: "நிர்வாக உள்நுழைவு", subtitle: "அங்கீகரிக்கப்பட்டவர்கள் மட்டும்", email: "மின்னஞ்சல்", password: "கடவுச்சொல்", submit: "உள்நுழை", notAuthorized: "நீங்கள் அங்கீகரிக்கப்படவில்லை." },
-      error: { required: "இந்த புலம் தேவை", email: "சரியான மின்னஞ்சலை உள்ளிடவும்", weakPassword: "கடவுச்சொல் குறைந்தது 8 எழுத்துகள்", mismatch: "கடவுச்சொற்கள் பொருந்தவில்லை", invalid: "தவறான மின்னஞ்சல் அல்லது கடவுச்சொல்", emailInUse: "மின்னஞ்சல் ஏற்கனவே பயன்பாட்டில் உள்ளது", notConfigured: "Firebase கட்டமைக்கப்படவில்லை", generic: "ஏதோ தவறு நிகழ்ந்தது. மீண்டும் முயலவும்." },
+    nav: {
+      home: "முகப்பு",
+      login: "உள்நுழை",
+      register: "பதிவு",
+      logout: "வெளியேறு",
+      dashboard: "டாஷ்போர்டு",
+      profile: "சுயவிவரம்",
+      search: "தேடல்",
+      aiMatches: "AI பொருத்தங்கள்",
+      favourites: "பிடித்தவை",
+      interests: "ஆர்வங்கள்",
+      notifications: "அறிவிப்புகள்",
+      membership: "உறுப்பினர்",
+      settings: "அமைப்புகள்",
     },
-    dashboard: { welcome: "மீண்டும் வரவேற்கிறோம்", profileCompletion: "சுயவிவர முடிப்பு", premiumBanner: "பிரீமியத்திற்கு மேம்படுத்து", premiumBannerDesc: "வரம்பற்ற ஆர்வங்கள், தொடர்பு பார்வைகள், AI பொருத்தங்கள்.", upgrade: "இப்போது மேம்படுத்து", completeProfile: "சிறந்த பொருத்தங்களுக்கு சுயவிவரத்தை முடிக்கவும்.", completeNow: "இப்போது முடி", aiMatches: "AI பொருத்தங்கள்", recentInterests: "சமீபத்திய ஆர்வங்கள்", notifications: "அறிவிப்புகள்", quickSearch: "விரைவு தேடல்", viewAll: "அனைத்தையும் காண்க", recentlyViewed: "சமீபத்தில் பார்த்தவை", aiSuggestions: "AI பரிந்துரைகள்", membershipBanner: "உறுப்பிணைப்பு" },
-    search: {
-      title: "உங்கள் சரியான பொருத்தத்தைக் கண்டறி", subtitle: "தென்னிந்தியா முழுவதும் சரிபார்க்கப்பட்ட சுயவிவரங்கள்", filters: "வடிகட்டிகள்", advanced: "மேம்படுத்தப்பட்ட வடிகட்டிகள்", apply: "வடிகட்டிகளைப் பயன்படுத்து", reset: "மீட்டமை", clearAll: "அனைத்தையும் அழி", results: "முடிவுகள்", noResults: "உங்கள் வடிகட்டிகளுக்கு சுயவிவரங்கள் இல்லை.", noResultsDesc: "சில வடிகட்டிகளை சரிசெய்து முயற்சிக்கவும்.", loadMore: "மேலும் ஏற்று", loading: "தேடுகிறது…", showing: "காட்டும்", of: "இல்", sortBy: "வரிசைப்படுத்து", sortNewest: "புதியவை", sortOldest: "பழையவை", sortPopular: "அதிக பார்வை", sortRelevance: "பொருத்தம்",
-      fields: { gender: "பாலினம்", ageRange: "வயது வரம்பு", religion: "மதம்", caste: "சாதி", motherTongue: "தாய்மொழி", maritalStatus: "திருமண நிலை", district: "மாவட்டம்", state: "மாநிலம்", country: "நாடு", education: "கல்வி", occupation: "தொழில்", annualIncome: "ஆண்டு வருமானம்", height: "உயரம்", verified: "சரிபார்க்கப்பட்டவர்கள் மட்டும்", premium: "பிரீமியம் உறுப்பினர்கள்", withPhoto: "படத்துடன்", recentlyJoined: "சமீபத்தில் இணைந்தவர்கள்", onlineNow: "இப்போது ஆன்லைன்", star: "நட்சத்திரம்", rasi: "ராசி", manglik: "மாங்கலிக்", familyType: "குடும்ப வகை", food: "உணவு விருப்பம்", smoking: "புகைத்தல்", drinking: "குடித்தல்", lifestyle: "வாழ்க்கை முறை", any: "எதுவும்", minAge: "குறைந்த வயது", maxAge: "அதிகபட்ச வயது" },
-      card: { viewProfile: "சுயவிவரம் காண்க", interest: "ஆர்வம் அனுப்பு", favourite: "பிடித்தவையில் சேர்", favourited: "பிடித்தது", verified: "சரிபார்க்கப்பட்டது", premium: "பிரீமியம்", completion: "முடிப்பு", compatibility: "பொருத்தம்", yrs: "வயது", online: "ஆன்லைன்" },
-      history: { title: "தேடல் வரலாறு", clear: "வரலாற்றை அழி", empty: "சமீபத்திய தேடல்கள் இல்லை.", recent: "சமீபத்திய தேடல்கள்" },
-    },
-    ai: {
-      title: "AI திருமண சேவை", subtitle: "20 எடை காரணிகளால் பொருத்தம்", refresh: "பொருத்தங்களைப் புதுப்பி", refreshing: "உருவாக்குகிறது…", noMatches: "இன்னும் AI பொருத்தங்கள் இல்லை.", noMatchesDesc: "சிறந்த பொருத்தங்களுக்கு சுயவிவரத்தை முடிக்கவும்.", freeLimit: "உங்கள் தினசரி 20 AI பொருத்தங்கள்.", premiumUnlimited: "பிரீமியத்துடன் வரம்பற்ற AI பொருத்தங்கள்.", upgrade: "பிரீமியத்திற்கு மேம்படுத்து", score: "AI மதிப்பெண்", reasonsLabel: "ஏன் இந்தப் பொருத்தம்", insights: "AI நுண்ணறிவுகள்", filters: "வடிகட்டிகள்", minScore: "குறைந்தபட்ச AI மதிப்பெண்", apply: "பயன்படுத்து", reset: "மீட்டமை",
-      tabs: { top: "சிறந்த பொருத்தங்கள்", today: "இன்றைய சிறந்தவை", recent: "சமீபத்திய பொருத்தங்கள்", near: "அருகில்", educated: "அதிக கல்வி", premium: "பிரீமியம் உறுப்பினர்கள்", active: "சமீபத்தில் செயலில்" },
-      reasons: { sameReligion: "ஒரே மதம்", sameCaste: "ஒரே சாதி", sameDistrict: "ஒரே மாவட்டம்", similarEducation: "ஒத்த கல்வி", preferredAge: "விருப்பப்பட்ட வயது", sameMotherTongue: "ஒரே தாய்மொழி", matchingLifestyle: "பொருந்தும் வாழ்க்கை முறை", sameFood: "ஒரே உணவு விருப்பம்", sameState: "ஒரே மாநிலம்", sameCountry: "ஒரே நாடு", sameMaritalStatus: "ஒரே திருமண நிலை", matchingHoroscope: "பொருந்தும் ஜாதகம்", sameStar: "ஒரே நட்சத்திரம்", sameRasi: "ஒரே ராசி", sameManglik: "ஒரே மாங்கலிக்", matchingOccupation: "ஒத்த தொழில்", matchingIncome: "ஒத்த வருமானம்", partnerPrefMatch: "துணை விருப்பம் பொருந்துகிறது", idealAge: "வயது வித்யாசம் சிறந்தது", educationPref: "கல்வி உங்கள் விருப்பத்துடன் பொருந்துகிறது" },
-    },
-    interests: {
-      title: "ஆர்வங்கள்", subtitle: "நீங்கள் அனுப்பிய மற்றும் பெற்ற ஆர்வக் கோரிக்கைகள்", tabs: { sent: "அனுப்பியவை", received: "பெற்றவை" }, send: "ஆர்வம் அனுப்பு", accept: "ஏற்க", reject: "நிராகரி", cancel: "ரத்து", withdraw: "திரும்பப் பெறு", pending: "நிலுவையில்", accepted: "ஏற்கப்பட்டது", rejected: "நிராகரிக்கப்பட்டது", cancelled: "ரத்தானது", expired: "காலாவதியானது", empty: "இன்னும் ஆர்வங்கள் இல்லை.", emptyReceived: "உள்வரும் ஆர்வக் கோரிக்கைகள் இல்லை.", emptySent: "நீங்கள் எந்த ஆர்வமும் அனுப்பவில்லை.", dailyLimit: "இலவசத் திட்டத்தில் தினசரி 20 ஆர்வங்கள்.", limitReached: "தினசரி ஆர்வ வரம்பு முடிந்தது. வரம்பற்றதற்கு பிரீமியத்திற்கு மேம்படுத்து.", upgrade: "பிரீமியத்திற்கு மேம்படுத்து", sentToday: "இன்று அனுப்பிய ஆர்வங்கள்",
-    },
-    favourites: {
-      title: "பிடித்தவை", subtitle: "நீங்கள் பிறகு பார்க்க சேமித்த சுயவிவரங்கள்", empty: "இன்னும் பிடித்தவை இல்லை.", emptyDesc: "எந்தச் சுயவிவரத்திலும் நட்சத்திரத்தைத் தட்டி இங்கே சேமிக்கவும்.", count: "பிடித்தவை", remove: "நீக்கு", viewProfile: "சுயவிவரம் காண்க", recentlyFavourited: "சமீபத்தில் பிடித்தவை",
-    },
-    notifications: {
-      title: "அறிவிப்புகள்", subtitle: "உங்கள் பொருத்தங்கள் பற்றிய சமீபத்திய செயல்பாடுகள்", empty: "அறிவிப்புகள் இல்லை.", markAllRead: "அனைத்தையும் படித்ததாக குறி", unread: "படிக்காத", delete: "நீக்கு", all: "அனைத்தும்", types: { interest_received: "ஆர்வம் பெறப்பட்டது", interest_accepted: "ஆர்வம் ஏற்கப்பட்டது", interest_rejected: "ஆர்வம் நிராகரிக்கப்பட்டது", profile_viewed: "சுயவிவரம் பார்க்கப்பட்டது", premium_activated: "பிரீமியம் செயல்படுத்தப்பட்டது", new_ai_matches: "புதிய AI பொருத்தங்கள்", new_message: "புதிய செய்தி", admin_announcement: "அறிவிப்பு" },
-    },
-    profile: {
-      title: "எனது சுயவிவரம்", edit: "சுயவிவரத்தைத் திருத்து", save: "மாற்றங்களைச் சேமி", cancel: "ரத்து", uploadPhoto: "புகைப்படம் பதிவேற்று", changePhoto: "புகைப்படத்தை மாற்று", cropPhoto: "செரிக்க & சரிசெய்", crop: "செரிக்கு", maxSize: "அதிகபட்சம் 5 MB", compressing: "சுருக்குகிறது…", uploading: "பதிவேற்றுகிறது…",
-      completion: "சுயவிவர முடிப்பு", completionTarget: "தேடலில் தோன்ற 50% அடையவும்", suggested: "பரிந்துரைக்கப்படும் விடுபட்ட புலங்கள்", gallery: "கேலரி", about: "என்னைப் பற்றி", family: "குடும்பம்", education: "கல்வி & தொழில்", lifestyle: "வாழ்க்கை முறை", partner: "துணை விருப்பம்", basic: "அடிப்படை விவரங்கள்", contact: "தொடர்பு", verified: "சரிபார்க்கப்பட்டது", unverified: "சரிபார்க்கப்படவில்லை", pendingVerification: "சரிபார்ப்பு நிலுவையில்",
-      details: { views: "பார்வைகள்", sendInterest: "ஆர்வம் அனுப்பு", relatedProfiles: "தொடர்புடைய சுயவிவரங்கள்", contactHidden: "தனியுரிமை அமைப்புகளின் அடிப்படையில் தொடர்பு விவரங்கள் மறைக்கப்பட்டுள்ளன.", horoscope: "ஜாதகம்", backToSearch: "தேடலுக்குத் திரும்பு", notFound: "சுயவிவரம் கிடைக்கவில்லை." },
-      visibility: { show: "சுயவிவரத்தைக் காட்டு", hide: "சுயவிவரத்தை மறை", deactivate: "கணக்கை முடக்கு", visible: "சுயவிவரம் தெரிகிறது", hidden: "சுயவிவரம் மறைக்கப்பட்டது", deactivated: "கணக்கு முடக்கப்பட்டது", reactivate: "கணக்கை மீண்டும் இயக்கு" },
-      fatherName: "தந்தை பெயர்", motherName: "தாய் பெயர்", brothers: "சகோதரர்கள்", sisters: "சகோதரிகள்", familyType: "குடும்ப வகை", familyStatus: "குடும்ப நிலை", lifestyleLabel: "வாழ்க்கை முறை", food: "உணவு விருப்பம்", smoking: "புகைத்தல்", drinking: "மது", horoscope: "ஜாதகம்", star: "நட்சத்திரம்", rasi: "ராசி", manglik: "மாங்கலிக்", aboutMe: "என்னைப் பற்றி", partnerPref: "துணை விருப்பம்",
-      ocr: { title: "OCR பயோடேட்டா", subtitle: "தானாக நிரப்ப PDF அல்லது படத்தைப் பதிவேற்றவும்", upload: "பயோடேட்டா பதிவேற்று", extracting: "உரையை எடுக்கிறது…", review: "எடுக்கப்பட்ட விவரங்களை மதிப்பாய்வு செய்", applied: "பயோடேட்டாவிலிருந்து தானாக நிரப்பப்பட்டது", failed: "எடுக்க முடியவில்லை. கைமுறையாக நிரப்பவும்.", retry: "OCR மீண்டும் முயற்சி", uploadAnother: "வேறு படம் பதிவேற்று", manualEntry: "கைமுறை உள்ளீடு", needsReview: "இந்த புலம் மதிப்பாய்வு தேவை", confidence: "நம்பகத்தன்மை", autofilled: "தானாக நிரப்பப்பட்டது", needReview: "மதிப்பாய்வு தேவை", notFound: "காணப்படவில்லை", partialSuccess: "சில புலங்கள் எடுக்கப்பட்டன. சிறப்பு புலங்களை மதிப்பாய்வு செய்.", completeSuccess: "அனைத்து புலங்களும் வெற்றிகரமாக எடுக்கப்பட்டன!", supportedFormats: "JPEG, PNG, WEBP, PDF, HEIC", processing: "செயல்படுகிறது…", stepUploading: "பதிவேற்றுகிறது", stepPreprocessing: "முன் செயலாக்கம்", stepRemovingPhoto: "புகைப்படம் நீக்குகிறது", stepRemovingHoroscope: "ஜாதகம் நீக்குகிறது", stepRemovingLogos: "லோகோ & பார்டர் நீக்குகிறது", stepRunningOCR: "OCR இயக்குகிறது", stepExtracting: "புலங்களை எடுக்கிறது", stepAutofilling: "சுயவிவரம் நிரப்புகிறது", stepDone: "முடிந்தது" },
-      saved: "சுயவிவரம் வெற்றிகரமாக சேமிக்கப்பட்டது.", saveFailed: "சுயவிவரத்தை சேமிக்க முடியவில்லை. மீண்டும் முயலவும்.", photoFailed: "புகைப்படம் பதிவேற்றம் தோல்வி. மீண்டும் முயலவும்.",
-      verify: { title: "சுயவிவரத்தை சரிபார்", desc: "சரிபார்க்கப்பட்ட பேட்ஜ் பெற நிர்வாக சரிபார்ப்புக்கு உங்கள் சுயவிவரத்தைச் சமர்ப்பிக்கவும்.", submit: "சரிபார்ப்புக்கு சமர்ப்பி", submitted: "சரிபார்ப்பு கோரிக்கை சமர்ப்பிக்கப்பட்டது.", status: "சரிபார்ப்பு நிலை" },
-    },
-    admin: { dashboard: { title: "நிர்வாக டாஷ்போர்டு" }, overview: "தளம் கண்ணோட்டம்", totalUsers: "மொத்த பயனர்கள்", totalProfiles: "மொத்த சுயவிவரங்கள்", pendingApprovals: "நிலுவையில் உள்ள அங்கீகாரங்கள்", premiumMembers: "பிரீமியம் உறுப்பினர்கள்", users: "பயனர்கள்", profiles: "சுயவிவரங்கள்", vendors: "விற்பனையாளர்கள்", memberships: "உறுப்பிணைப்புகள்", settings: "அமைப்புகள்" },
-    common: { loading: "ஏற்றுகிறது…", save: "சேமி", cancel: "ரத்து", back: "பின்", next: "அடுத்து", submit: "சமர்ப்பி", yes: "ஆம்", no: "இல்லை", dontKnow: "தெரியவில்லை", optional: "விருப்பத்தேர்வு", required: "தேவை", delete: "நீக்கு", edit: "திருத்து", view: "பார்", close: "மூடு" },
-    footer: { madeWith: "தென்னிந்தியாவில் அன்புடன்", rights: "அனைத்து உரிமைகளும்" },
     home: {
-      hero: { badge: "தென்னிந்தியாவின் பிரீமியம் திருமணச் சேவை", title: "உங்கள் சரியான வாழ்க்கைத் துணையைக் கண்டறியுங்கள்", subtitle: "பாரம்பரியம் தொழில்நுட்பத்தைச் சந்திக்கும் இடம். AI தொழில்நுட்ப பொருத்தம்.", cta: "உங்கள் பயணத்தைத் தொடங்குங்கள்", secondary: "பொருத்தங்களை ஆராயுங்கள்", stats: { profiles: "சரிபார்க்கப்பட்ட சுயவிவரங்கள்", matches: "மகிழ்ச்சியான பொருத்தங்கள்", cities: "நகரங்கள்" } },
-      why: { title: "WedBridge ஏன்", subtitle: "நவீன தென்னிந்திய குடும்பத்திற்காக", items: { verified: { title: "சரிபார்க்கப்பட்ட சுயவிவரங்கள்", desc: "ஒவ்வொரு சுயவிவரமும் உண்மைக்காக சரிபார்க்கப்படுகிறது." }, ai: { title: "AI பொருத்தம்", desc: "மதிப்புகளால் இணக்கம்." }, privacy: { title: "தனியுரிமை முதன்மை", desc: "நீங்கள் தயாரான வரை தொடர்பு தனிப்பட்டது." }, support: { title: "அர்ப்பணிக்கப்பட்ட ஆதரவு", desc: "உண்மையான மனிதர்கள், உண்மையான உதவி." } } },
-      stats: { title: "ஆயிரக்கணக்கானோரால் நம்பப்படுகிறது", profiles: "சரிபார்க்கப்பட்ட சுயவிவரங்கள்", matches: "மகிழ்ச்சியான பொருத்தங்கள்", cities: "நகரங்கள்", years: "நம்பிக்கையான ஆண்டுகள்" },
-      featured: { title: "சிறப்பு சுயவிவரங்கள்", subtitle: "எங்கள் சரிபார்க்கப்பட்ட உறுப்பினர்களைச் சந்திக்கவும்", viewAll: "அனைத்து சுயவிவரங்களையும் காண்க" },
-      ai: { title: "AI தொழில்நுட்ப பொருத்தம்", subtitle: "வடிகட்டிகளுக்கு அப்பால் இணக்கம்", desc: "எங்கள் AI உங்கள் விருப்பங்களைக் கற்றுக்கொண்டு உண்மையான பொருத்தங்களைப் பரிந்துரைக்கிறது.", cta: "AI பொருத்தத்தை முயற்சிக்கவும்" },
-      services: { title: "எங்கள் சேவைகள்", subtitle: "அழகான தொடக்கத்திற்கு நீங்கள் தேவைப்படும் அனைத்தும்", items: { matchmaking: { title: "தனிப்பயன் பொருத்தம்", desc: "அர்ப்பணிக்கப்பட்ட உறவு மேலாளர்கள்." }, verification: { title: "சுயவிவர சரிபார்ப்பு", desc: "சரிபார்க்கப்பட்ட உறுப்பினர்கள் மட்டும்." }, wedding: { title: "திருமண சேவைகள்", desc: "விற்பனையாளர்கள், திட்டமிடுபவர்கள்." }, astro: { title: "ஜோதிட பொருத்தம்", desc: "ஜாதக இணக்க அறிக்கைகள்." } } },
-      membership: { title: "உறுப்பிணைப்பு திட்டங்கள்", subtitle: "உங்கள் பயணத்திற்கு ஏற்ற திட்டத்தைத் தேர்வுசெய்யவும்", free: { name: "இலவசம்", price: "₹0", desc: "உங்கள் பயணத்தைத் தொடங்குங்கள்", features: ["நாளொன்றுக்கு 20 ஆர்வங்கள்", "நாளொன்றுக்கு 5 தொடர்பு பார்வைகள்", "வரம்பற்ற AI பொருத்தங்கள்"] }, premium: { name: "பிரீமியம்", price: "₹2,999", desc: "மிகவும் பிரபலமானது", features: ["வரம்பற்ற ஆர்வங்கள்", "வரம்பற்ற தொடர்பு பார்வைகள்", "முன்னுரிமை ஆதரவு", "மேம்படுத்தப்பட்ட வடிகட்டிகள்"] }, elite: { name: "எலைட்", price: "₹5,999", desc: "வெள்ளை கையுறை சேவை", features: ["அர்ப்பணிக்கப்பட்ட மேலாளர்", "சுயவிவர சிறப்பு", "ஜோதிட அறிக்கைகள்", "VIP நிகழ்வுகள்"] }, cta: "திட்டத்தைத் தேர்வுசெய்யவும்" },
-    membershipPage: {
-      title: "உறுப்பிணைப்பு", subtitle: "உங்கள் பயணத்திற்கு ஏற்ற திட்டத்தைத் தேர்வுசெய்யவும்", currentPlan: "தற்போதைய திட்டம்", expiresOn: "முடிவடையும் தேதி", expired: "காலாவதியானது", upgrade: "மேம்படுத்து", renew: "புதுப்பி", downgrade: "தரமிறக்கு", choosePlan: "திட்டத்தைத் தேர்வுசெய்யவும்", current: "தற்போதையது", popular: "மிகவும் பிரபலமானது", benefits: "உறுப்பிணைப்பு நன்மைகள்", noActive: "நீங்கள் இலவசத் திட்டத்தில் உள்ளீர்கள்.", noActiveDesc: "வரம்பற்ற அம்சங்களைத் திறக்க மேம்படுத்தவும்.", paymentFailed: "கட்டணம் தோல்வியடைந்தது. மீண்டும் முயற்சிக்கவும்.", paymentCancelled: "கட்டணம் ரத்து செய்யப்பட்டது.", paymentNotConfigured: "கட்டணங்கள் இன்னும் கட்டமைக்கப்படவில்லை.", processing: "கட்டணம் செயல்படுத்தப்படுகிறது…", payNow: "இப்போது செலுத்து",
-      plans: {
-        free: { name: "இலவசம்", price: "₹0", period: "என்றென்றைக்கும்", desc: "உங்கள் பயணத்தைத் தொடங்குங்கள்", features: ["வரம்பற்ற பதிவு & உள்நுழைவு", "வரம்பற்ற சுயவிவரத் தேடல்", "வரம்பற்ற AI பரிந்துரைகள்", "நாளொன்றுக்கு 20 ஆர்வங்கள்", "நாளொன்றுக்கு 5 தொடர்பு பார்வைகள்"] },
-        basic: { name: "பேசிக்", price: "₹999", period: "3 மாதங்கள்", desc: "முன்னுரிமை தேடல், விளம்பரங்கள் இல்லை", features: ["வரம்பற்ற ஆர்வங்கள்", "நாளொன்றுக்கு 20 தொடர்பு பார்வைகள்", "முன்னுரிமை தேடல் தரவரிசை", "விளம்பரங்கள் இல்லை"] },
-        premium: { name: "பிரீமியம்", price: "₹2,999", period: "6 மாதங்கள்", desc: "மிகவும் பிரபலமானது", features: ["வரம்பற்ற தொடர்பு பார்வைகள்", "வரம்பற்ற ஆர்வங்கள்", "வரம்பற்ற AI பொருத்தங்கள்", "முன்னுரிமை தேடல் தரவரிசை", "பிரீமியம் பேட்ஜ்", "சிறப்பு சுயவிவரம்"] },
-        gold: { name: "கோல்ட்", price: "₹5,999", period: "1 ஆண்டு", desc: "உயர்மட்ட அனுபவம்", features: ["பிரீமியத்தில் உள்ள அனைத்தும்", "உயர்ந்த தேடல் முன்னுரிமை", "சிறந்த சுயவிவரம்", "தனிப்பட்ட திருமண விற்பனையாளர் தள்ளுபடி", "புதிய அம்சங்களுக்கு முன்கூட்டியே அணுகல்"] },
+      hero: {
+        badge: "தென்னிந்தியாவின் பிரீமியம் திருமண சேவை",
+        title: "உங்கள் வாழ்க்கைத் துணையைக் கண்டறியுங்கள்",
+        subtitle:
+          "பாரம்பரியமும் தொழில்நுட்பமும் சந்திக்கும் இடம். AI இயக்கப்பட்ட பொருத்தம்.",
+        cta: "உங்கள் பயணத்தைத் தொடங்குங்கள்",
+        secondary: "பொருத்தங்களை உலாவுங்கள்",
+        stats: {
+          profiles: "சரிபார்க்கப்பட்ட சுயவிவரங்கள்",
+          matches: "மகிழ்ச்சியான பொருத்தங்கள்",
+          cities: "நகரங்கள்",
+        },
       },
-    },
-    badges: { basic: "பேசிக்", premium: "பிரீமியம்", gold: "கோல்ட்", verified: "சரிபார்க்கப்பட்டது" },
-    contactPrivacy: { title: "தொடர்பு தனியுரிமை", desc: "உங்கள் தொடர்பு விவரங்களை யார் பார்க்கலாம் என்பதைக் கட்டுப்படுத்தவும்", everyone: "அனைவருக்கும் தெரியும்", afterAccept: "ஆர்வம் ஏற்கப்பட்ட பிறகு தெரியும்", premiumOnly: "பிரீமியம் உறுப்பினர்களுக்கு மட்டும்", saved: "தனியுரிமை அமைப்பு சேமிக்கப்பட்டது", everyoneDesc: "எவரும் உங்கள் தொலைபேசி மற்றும் மின்னஞ்சலைப் பார்க்கலாம்", afterAcceptDesc: "ஆர்வம் ஏற்கப்பட்ட பிறகு மட்டும் (இயல்புநிலை)", premiumOnlyDesc: "பிரீமியம் உறுப்பினர்கள் மட்டும் பார்க்கலாம்" },
-      success: { title: "வெற்றி கதைகள்", subtitle: "உண்மையான ஜோடிகள், உண்மையான அன்பு" },
-      testimonials: { title: "குடும்பங்கள் என்ன சொல்கிறார்கள்", subtitle: "தென்னிந்தியா முழுவதும் நம்பப்படுகிறது" },
-      faq: { title: "அடிக்கடி கேட்கப்படும் கேள்விகள்", subtitle: "நீங்கள் தெரிந்துகொள்ள வேண்டிய அனைத்தும்" },
-      download: { title: "செயலியைப் பெறுங்கள்", subtitle: "எங்கும் எப்போதும் பொருத்தம்", ios: "App Store", android: "Google Play" },
+      why: {
+        title: "ஏன் WedBridge",
+        subtitle: "நவீன தென்னிந்திய குடும்பத்திற்காக",
+        items: {
+          verified: {
+            title: "சரிபார்க்கப்பட்ட சுயவிவரங்கள்",
+            desc: "ஒவ்வொரு சுயவிவரமும் கைமுறையாக சரிபார்க்கப்படுகிறது.",
+          },
+          ai: {
+            title: "AI பொருத்தம்",
+            desc: "மதிப்புகளால் இயக்கப்பட்ட பொருத்தம்.",
+          },
+          privacy: {
+            title: "தனியுரிமை முதலில்",
+            desc: "நீங்கள் தயாராகும் வரை தொடர்பு விவரங்கள் பாதுகாப்பாக.",
+          },
+          support: {
+            title: "அர்ப்பணிப்பு ஆதரவு",
+            desc: "உண்மையான மனிதர்கள், உண்மையான உதவி.",
+          },
+        },
+      },
+      stats: {
+        title: "ஆயிரக்கணக்காலோரால் நம்பப்பட்டது",
+        profiles: "சரிபார்க்கப்பட்ட சுயவிவரங்கள்",
+        matches: "மகிழ்ச்சியான பொருத்தங்கள்",
+        cities: "நகரங்கள்",
+        years: "நம்பிக்கையான ஆண்டுகள்",
+      },
+      featured: {
+        title: "சிறப்பு சுயவிவரங்கள்",
+        subtitle: "எங்கள் சரிபார்க்கப்பட்ட உறுப்பினர்களை சந்திக்கவும்",
+        viewAll: "அனைத்து சுயவிவரங்களையும் காண்க",
+      },
+      ai: {
+        title: "AI இயக்கப்பட்ட பொருத்தம்",
+        subtitle: "வடிகட்டிகளுக்கு அப்பால்",
+        desc: "எங்கள் AI உங்கள் விருப்பங்களைக் கற்றுக்கொண்டு உண்மையான பொருத்தங்களை பரிந்துரைக்கிறது.",
+        cta: "AI பொருத்தத்தை முயற்சிக்கவும்",
+      },
+      services: {
+        title: "எங்கள் சேவைகள்",
+        subtitle: "அழகான தொடக்கத்திற்கு தேவையான அனைத்தும்",
+        items: {
+          matchmaking: {
+            title: "தனிப்பயன் பொருத்தம்",
+            desc: "அர்ப்பணிக்கப்பட்ட உறவு மேலாளர்கள்.",
+          },
+          verification: {
+            title: "சுயவிவர சரிபார்ப்பு",
+            desc: "நம்பகமான, சரிபார்க்கப்பட்ட உறுப்பினர்கள் மட்டும்.",
+          },
+          wedding: {
+            title: "திருமண சேவைகள்",
+            desc: "விற்பனையாளர்கள், திட்டமிடுபவர்கள், மற்றும் இடங்கள்.",
+          },
+          astro: {
+            title: "ஜோதிட பொருத்தம்",
+            desc: "ஜாதக பொருத்தம் அறிக்கைகள்.",
+          },
+        },
+      },
+      membership: {
+        title: "உறுப்பினர் திட்டங்கள்",
+        subtitle: "உங்கள் பயணத்திற்கு ஏற்ற திட்டத்தைத் தேர்வு செய்யுங்கள்",
+        free: {
+          name: "இலவசம்",
+          price: "₹0",
+          desc: "உங்கள் பயணத்தைத் தொடங்குங்கள்",
+          features: ["நாளொன்றுக்கு 20 ஆர்வங்கள்", "நாளொன்றுக்கு 5 தொடர்பு பார்வைகள்", "வரம்பற்ற AI பொருத்தங்கள்"],
+        },
+        premium: {
+          name: "பிரீமியம்",
+          price: "₹2,999",
+          desc: "மிகவும் பிரபலமானது",
+          features: ["வரம்பற்ற ஆர்வங்கள்", "வரம்பற்ற தொடர்பு பார்வைகள்", "முன்னுரிமை ஆதரவு", "மேம்பட்ட வடிகட்டிகள்"],
+        },
+        elite: {
+          name: "எலைட்",
+          price: "₹5,999",
+          desc: "சிறப்பு சேவை",
+          features: ["அர்ப்பணிக்கப்பட்ட மேலாளர்", "சுயவிவர சிறப்பு", "ஜோதிட அறிக்கைகள்", "VIP நிகழ்வுகள்"],
+        },
+        cta: "திட்டத்தைத் தேர்வு செய்யவும்",
+      },
+      success: {
+        title: "வெற்றிக் கதைகள்",
+        subtitle: "உண்மையான தம்பதிகள், உண்மையான காதல்",
+      },
+      testimonials: {
+        title: "குடும்பங்கள் என்ன சொல்கிறார்கள்",
+        subtitle: "தென்னிந்தியா முழுவதும் நம்பப்பட்டது",
+      },
+      faq: {
+        title: "அடிக்கடி கேட்கப்படும் கேள்விகள்",
+        subtitle: "நீங்கள் அறிந்து கொள்ள வேண்டிய அனைத்தும்",
+      },
+      download: {
+        title: "செயலியைப் பெறுங்கள்",
+        subtitle: "எங்கிருந்தும் பொருத்தம் காணுங்கள்",
+        ios: "App Store",
+        android: "Google Play",
+      },
     },
   },
 } as const;
-
-export type Dictionary = (typeof dictionaries)["en"];
-export type DictKey = keyof Dictionary;

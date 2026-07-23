@@ -1,3 +1,19 @@
 import { type ReactNode } from "react";
-import { cn } from "@/lib/cn";
-export function Section({ id, className, children }: { id?: string; className?: string; children: ReactNode }) { return <section id={id} className={cn("section-pad", className)}><div className="container-page">{children}</div></section>; }
+import { cn } from "@/lib/utils";
+
+interface SectionProps {
+  children: ReactNode;
+  className?: string;
+  id?: string;
+}
+
+export function Section({ children, className, id }: SectionProps) {
+  return (
+    <section
+      id={id}
+      className={cn("px-6 py-16 sm:py-20", className)}
+    >
+      <div className="mx-auto max-w-6xl">{children}</div>
+    </section>
+  );
+}

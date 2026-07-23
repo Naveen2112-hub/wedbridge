@@ -16,13 +16,11 @@ export default function MembershipPage() {
   const router = useRouter();
 
   const [membership, setMembership] = useState<Membership | null>(null);
-  const [fetchingMembership, setFetchingMembership] = useState(false);
   const [processingPlan, setProcessingPlan] = useState<PlanId | null>(null);
 
   const fetchMembership = useCallback(async () => {
     const token = await getIdToken();
     if (!token) return;
-    setFetchingMembership(true);
     try {
       const res = await fetch("/api/membership/status", {
         headers: { Authorization: `Bearer ${token}` },
@@ -33,8 +31,6 @@ export default function MembershipPage() {
       }
     } catch {
       // non-fatal
-    } finally {
-      setFetchingMembership(false);
     }
   }, [getIdToken]);
 
@@ -54,9 +50,9 @@ export default function MembershipPage() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <p className="text-neutral-500">Loading…</p>
-      </main>
+      </div>
     );
   }
 
@@ -65,27 +61,7 @@ export default function MembershipPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-neutral-50 to-neutral-100">
-      <header className="border-b border-neutral-200 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-brand-500" />
-            <span className="text-lg font-semibold tracking-tight">WedBridge</span>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="hidden text-sm text-neutral-500 sm:inline">
-              {user.email}
-            </span>
-            <button
-              onClick={() => logout()}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 px-3 py-1.5 text-sm font-medium text-neutral-700 transition hover:bg-neutral-50"
-            >
-              <LogOut className="h-4 w-4" /> Sign out
-            </button>
-          </div>
-        </div>
-      </header>
-
+    <div className="min-h-screen bg-gradient-to-b from-neutral-50 to-neutral-100">
       <section className="mx-auto max-w-5xl px-6 py-12">
         <div className="text-center">
           <h1 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
@@ -98,7 +74,26 @@ export default function MembershipPage() {
         </div>
 
         {membership && membership.status === "active" && (
-          <CurrentMembershipCard membership={membership} />
+          <div className="mt-8 rounded-2xl border border-green-200 bg-green-50 p-6">
+            <div className="flex items-center gap-2">
+              <Check className="h-5 w-5 text-green-600" />
+              <h2 className="text-lg font-semibold text-green-800">Active Membership</h2>
+            </div>
+            <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3">
+              <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-neutral-500">Current Plan</dt>
+                <dd className="mt-0.5 font-medium text-neutral-900">{PLANS[membership.plan].name}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-neutral-500">Status</dt>
+                <dd className="mt-0.5 font-medium text-neutral-900">Active</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-medium uppercase tracking-wide text-neutral-500">Expiry Date</dt>
+                <dd className="mt-0.5 font-medium text-neutral-900">{formatDate(membership.expiryDate)}</dd>
+              </div>
+            </dl>
+          </div>
         )}
 
         <div className="mt-10 grid gap-6 md:grid-cols-2">
@@ -147,35 +142,6 @@ export default function MembershipPage() {
           })}
         </div>
       </section>
-    </main>
-  );
-}
-
-function CurrentMembershipCard({ membership }: { membership: Membership }) {
-  const plan = PLANS[membership.plan];
-  return (
-    <div className="mt-8 rounded-2xl border border-green-200 bg-green-50 p-6">
-      <div className="flex items-center gap-2">
-        <Check className="h-5 w-5 text-green-600" />
-        <h2 className="text-lg font-semibold text-green-800">Active Membership</h2>
-      </div>
-      <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3">
-        <Field label="Current Plan" value={plan.name} />
-        <Field label="Status" value="Active" />
-        <Field label="Expiry Date" value={formatDate(membership.expiryDate)} />
-        <Field label="Payment ID" value={membership.paymentId || "—"} mono />
-      </dl>
-    </div>
-  );
-}
-
-function Field({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <div>
-      <dt className="text-xs font-medium uppercase tracking-wide text-neutral-500">{label}</dt>
-      <dd className={cn("mt-0.5 font-medium text-neutral-900", mono && "font-mono text-xs break-all")}>
-        {value}
-      </dd>
     </div>
   );
 }
@@ -219,7 +185,7 @@ function SignInScreen() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-neutral-50 to-neutral-100 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-neutral-50 to-neutral-100 px-4">
       <div className="w-full max-w-sm rounded-2xl border border-neutral-200 bg-white p-8 shadow-sm">
         <div className="mb-6 flex items-center gap-2">
           <Sparkles className="h-6 w-6 text-brand-500" />
@@ -274,6 +240,6 @@ function SignInScreen() {
           {mode === "signin" ? "Need an account? Sign up" : "Already have an account? Sign in"}
         </button>
       </div>
-    </main>
+    </div>
   );
 }

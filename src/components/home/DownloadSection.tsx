@@ -1,10 +1,33 @@
 "use client";
-import Link from "next/link";
-import { Download } from "lucide-react";
+
+import { Smartphone, Apple } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
+
 export function DownloadSection() {
   const { t } = useLanguage();
-  return (<Section><div className="relative overflow-hidden rounded-3xl bg-primary-950 p-10 text-center text-white shadow-md sm:p-16"><div className="absolute inset-0 bg-hero-pattern opacity-30" /><div className="relative"><Reveal><h2 className="heading-lg text-white">{t("home.download.title")}</h2><p className="mt-3 text-white/70">{t("home.download.subtitle")}</p><div className="mt-8 flex flex-wrap justify-center gap-3"><Link href="/" className="btn-secondary"><Download className="h-4 w-4" />{t("home.download.ios")}</Link><Link href="/" className="btn-outline bg-white/10 text-white hover:bg-white/20"><Download className="h-4 w-4" />{t("home.download.android")}</Link></div></Reveal></div></div></Section>);
+
+  return (
+    <Section className="bg-rose-600">
+      <Reveal>
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">
+            {t("home.download.title")}
+          </h2>
+          <p className="mt-3 text-rose-100">{t("home.download.subtitle")}</p>
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <button className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-100">
+              <Apple className="h-5 w-5" />
+              {t("home.download.ios")}
+            </button>
+            <button className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-100">
+              <Smartphone className="h-5 w-5" />
+              {t("home.download.android")}
+            </button>
+          </div>
+        </div>
+      </Reveal>
+    </Section>
+  );
 }

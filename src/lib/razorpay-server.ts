@@ -19,7 +19,7 @@ function getInstance(): Razorpay {
 }
 
 export interface CreateOrderInput {
-  amount: number; // paise
+  amount: number;
   currency?: string;
   receipt?: string;
   notes?: Record<string, string>;

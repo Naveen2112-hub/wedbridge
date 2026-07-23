@@ -32,16 +32,16 @@ export default function SuccessPage() {
 
   if (loading || !user) {
     return (
-      <main className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <p className="text-neutral-500">Loading…</p>
-      </main>
+      </div>
     );
   }
 
   const plan = membership ? PLANS[membership.plan] : null;
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-neutral-50 to-neutral-100 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-neutral-50 to-neutral-100 px-4">
       <div className="w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-8 text-center shadow-sm">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
           <CheckCircle2 className="h-9 w-9 text-green-600" />
@@ -55,10 +55,22 @@ export default function SuccessPage() {
 
         {membership && (
           <dl className="mt-6 space-y-3 rounded-xl bg-neutral-50 p-5 text-left text-sm">
-            <Row label="Current Plan" value={plan?.name ?? "—"} />
-            <Row label="Status" value="Active" />
-            <Row label="Expiry Date" value={formatDate(membership.expiryDate)} />
-            <Row label="Payment ID" value={membership.paymentId || "—"} mono />
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-xs font-medium uppercase tracking-wide text-neutral-500">Current Plan</dt>
+              <dd className="font-medium text-neutral-900">{plan?.name ?? "—"}</dd>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-xs font-medium uppercase tracking-wide text-neutral-500">Status</dt>
+              <dd className="font-medium text-neutral-900">Active</dd>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-xs font-medium uppercase tracking-wide text-neutral-500">Expiry Date</dt>
+              <dd className="font-medium text-neutral-900">{formatDate(membership.expiryDate)}</dd>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <dt className="text-xs font-medium uppercase tracking-wide text-neutral-500">Payment ID</dt>
+              <dd className="font-mono text-xs break-all text-neutral-900">{membership.paymentId || "—"}</dd>
+            </div>
           </dl>
         )}
 
@@ -69,17 +81,6 @@ export default function SuccessPage() {
           Back to membership <ArrowRight className="h-4 w-4" />
         </button>
       </div>
-    </main>
-  );
-}
-
-function Row({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <dt className="text-xs font-medium uppercase tracking-wide text-neutral-500">{label}</dt>
-      <dd className={mono ? "font-mono text-xs break-all text-neutral-900" : "font-medium text-neutral-900"}>
-        {value}
-      </dd>
     </div>
   );
 }

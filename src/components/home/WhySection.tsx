@@ -1,10 +1,47 @@
 "use client";
+
 import { ShieldCheck, Sparkles, Lock, Headset } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { Section } from "@/components/ui/Section";
 import { Reveal } from "@/components/ui/Reveal";
-const items = [{ key: "verified", icon: ShieldCheck }, { key: "ai", icon: Sparkles }, { key: "privacy", icon: Lock }, { key: "support", icon: Headset }] as const;
+
+const items = [
+  { key: "verified", icon: ShieldCheck },
+  { key: "ai", icon: Sparkles },
+  { key: "privacy", icon: Lock },
+  { key: "support", icon: Headset },
+] as const;
+
 export function WhySection() {
   const { t } = useLanguage();
-  return (<Section id="why"><div className="mx-auto max-w-2xl text-center"><h2 className="heading-lg">{t("home.why.title")}</h2><p className="text-lead mt-3">{t("home.why.subtitle")}</p></div><div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">{items.map((it, i) => (<Reveal key={it.key} delay={i * 0.08}><div className="h-full rounded-2xl bg-white p-6 shadow-sm transition hover:shadow-md"><span className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-50 text-primary-800"><it.icon className="h-6 w-6" /></span><h3 className="mt-4 font-display text-lg font-semibold text-primary-900">{t(`home.why.items.${it.key}.title` as never)}</h3><p className="mt-2 text-sm text-gray-500">{t(`home.why.items.${it.key}.desc` as never)}</p></div></Reveal>))}</div></Section>);
+
+  return (
+    <Section className="bg-white">
+      <Reveal>
+        <div className="text-center">
+          <h2 className="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
+            {t("home.why.title")}
+          </h2>
+          <p className="mt-3 text-neutral-600">{t("home.why.subtitle")}</p>
+        </div>
+      </Reveal>
+      <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        {items.map((it, i) => (
+          <Reveal key={it.key} delay={i * 100}>
+            <div className="flex flex-col items-center rounded-2xl border border-neutral-200 bg-neutral-50 p-6 text-center transition hover:shadow-md">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-rose-100">
+                <it.icon className="h-7 w-7 text-rose-600" />
+              </div>
+              <h3 className="mt-4 text-lg font-semibold text-neutral-900">
+                {t(`home.why.items.${it.key}.title`)}
+              </h3>
+              <p className="mt-2 text-sm text-neutral-600">
+                {t(`home.why.items.${it.key}.desc`)}
+              </p>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </Section>
+  );
 }
