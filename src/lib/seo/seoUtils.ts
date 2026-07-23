@@ -23,6 +23,7 @@ export function getOrganizationSchema() {
     contactPoint: {
       "@type": "ContactPoint",
       contactType: "customer service",
+      telephone: "+916383109341",
       email: "support@wedbridge.com",
       availableLanguage: ["English", "Tamil"],
     },
