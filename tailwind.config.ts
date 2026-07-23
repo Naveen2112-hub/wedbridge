@@ -20,6 +20,7 @@ const config: Config = {
       fontFamily: { sans: ["var(--font-inter)", "system-ui", "sans-serif"] },
     },
   },
+  darkMode: "class",
   plugins: [],
 };
 export default config;
