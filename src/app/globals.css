@@ -14,6 +14,17 @@ body {
   color: #1a1a1a;
 }
 
+html.dark,
+html.dark body {
+  background-color: #0a0a0a;
+  color: #e5e5e5;
+}
+
 * {
   box-sizing: border-box;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }

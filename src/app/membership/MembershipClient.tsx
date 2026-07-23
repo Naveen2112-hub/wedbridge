@@ -5,17 +5,18 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
 import { AuthGuard } from "@/components/auth/AuthGuard";
-import { getActiveSubscription, getEffectiveTier, daysUntilExpiry } from "@/lib/membership/membershipService";
+import { getActiveSubscription, getEffectiveTier, daysUntilExpiry, listAllSubscriptions } from "@/lib/membership/membershipService";
 import type { SubscriptionDocument } from "@/firebase/schema";
 import { createOrder, verifyPayment, openCheckout, isPaymentConfigured, updatePaymentStatus } from "@/lib/membership/paymentService";
 import { createNotification } from "@/lib/notifications/notificationService";
 import { MEMBERSHIP_PLANS, planRank, type MembershipTier } from "@/firebase/schema";
-import { cn } from "@/lib/cn";
+import { cn, formatDate } from "@/lib/utils";
 
 export default function MembershipClient() {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [sub, setSub] = useState<SubscriptionDocument | null>(null);
+  const [history, setHistory] = useState<SubscriptionDocument[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<MembershipTier | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +25,12 @@ export default function MembershipClient() {
 
   useEffect(() => {
     if (!user?.uid) return;
-    (async () => { setSub(await getActiveSubscription(user.uid)); setLoading(false); })();
+    (async () => {
+      setSub(await getActiveSubscription(user.uid));
+      const all = await listAllSubscriptions(50);
+      setHistory(all.filter((s) => s.uid === user.uid));
+      setLoading(false);
+    })();
   }, [user?.uid]);
 
   const currentTier = getEffectiveTier(sub);
