@@ -1,12 +1,12 @@
 import "server-only";
-import admin from "firebase-admin";
-import { getFirestore } from "@/lib/firebase-admin";
+import { Timestamp } from "firebase-admin/firestore";
+import { getDb } from "@/lib/firebase-admin";
 import type { Membership, PlanId } from "@/lib/plans";
 
 const MEMBERSHIP_COLLECTION = "memberships";
 
 export async function getMembership(uid: string): Promise<Membership | null> {
-  const db = getFirestore();
+  const db = getDb();
   const snap = await db.collection(MEMBERSHIP_COLLECTION).doc(uid).get();
 
   if (!snap.exists) return null;
@@ -40,7 +40,7 @@ export interface ActivateMembershipInput {
 export async function activateMembership(
   input: ActivateMembershipInput,
 ): Promise<Membership> {
-  const db = getFirestore();
+  const db = getDb();
   const now = Date.now();
   const expiryDate = now + 365 * 24 * 60 * 60 * 1000;
 
@@ -52,10 +52,10 @@ export async function activateMembership(
     orderId: input.orderId,
     amount: input.amount,
     currency: input.currency,
-    activatedAt: admin.firestore.Timestamp.fromMillis(now),
-    expiryDate: admin.firestore.Timestamp.fromMillis(expiryDate),
-    createdAt: admin.firestore.Timestamp.fromMillis(now),
-    updatedAt: admin.firestore.Timestamp.fromMillis(now),
+    activatedAt: Timestamp.fromMillis(now),
+    expiryDate: Timestamp.fromMillis(expiryDate),
+    createdAt: Timestamp.fromMillis(now),
+    updatedAt: Timestamp.fromMillis(now),
   };
 
   await db

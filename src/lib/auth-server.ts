@@ -1,4 +1,5 @@
 import "server-only";
+import { getAuth } from "firebase-admin/auth";
 import { getFirebaseAdmin } from "@/lib/firebase-admin";
 
 export interface AuthUser {
@@ -14,7 +15,7 @@ export async function getAuthUser(req: Request): Promise<AuthUser | null> {
   if (!idToken) return null;
 
   try {
-    const decoded = await getFirebaseAdmin().auth().verifyIdToken(idToken);
+    const decoded = await getAuth(getFirebaseAdmin()).verifyIdToken(idToken);
     return { uid: decoded.uid, email: decoded.email ?? null };
   } catch {
     return null;

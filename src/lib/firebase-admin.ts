@@ -1,7 +1,8 @@
 import "server-only";
-import admin, { ServiceAccount } from "firebase-admin";
+import { initializeApp, getApps, cert, type App, type ServiceAccount } from "firebase-admin/app";
+import { getFirestore, type Firestore } from "firebase-admin/firestore";
 
-let app: admin.app.App | null = null;
+let app: App | null = null;
 
 function getCredentials(): ServiceAccount {
   const projectId = process.env.FIREBASE_PROJECT_ID;
@@ -16,20 +17,18 @@ function getCredentials(): ServiceAccount {
   return { projectId, clientEmail, privateKey };
 }
 
-export function getFirebaseAdmin(): admin.app.App {
+export function getFirebaseAdmin(): App {
   if (app) return app;
 
-  if (admin.apps.length > 0) {
-    app = admin.apps[0]!;
+  if (getApps().length > 0) {
+    app = getApps()[0]!;
     return app;
   }
 
-  app = admin.initializeApp({
-    credential: admin.credential.cert(getCredentials()),
-  });
+  app = initializeApp({ credential: cert(getCredentials()) });
   return app;
 }
 
-export function getFirestore(): admin.firestore.Firestore {
-  return getFirebaseAdmin().firestore();
+export function getDb(): Firestore {
+  return getFirestore(getFirebaseAdmin());
 }
