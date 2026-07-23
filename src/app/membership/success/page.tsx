@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { CircleCheck as CheckCircle2, ArrowRight } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { getActiveSubscription, getEffectiveTier } from "@/lib/membership/membershipService";
 import { MEMBERSHIP_PLANS, type SubscriptionDocument } from "@/firebase/schema";
