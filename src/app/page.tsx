@@ -9,6 +9,7 @@ import { MembershipSection } from "@/components/home/MembershipSection";
 import { TestimonialsSection } from "@/components/home/TestimonialsSection";
 import { FaqSection } from "@/components/home/FaqSection";
 import { DownloadSection } from "@/components/home/DownloadSection";
+import { ContactCTASection } from "@/components/home/ContactCTASection";
 
 export default function HomePage() {
   return (
@@ -24,6 +25,7 @@ export default function HomePage() {
       <TestimonialsSection />
       <FaqSection />
       <DownloadSection />
+      <ContactCTASection />
     </>
   );
 }
