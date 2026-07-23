@@ -10,7 +10,7 @@ function toVendor(d: QueryDocumentSnapshot<DocumentData>): VendorDocument { retu
 
 export async function getApprovedVendors(max = 100): Promise<VendorDocument[]> {
   if (!db) return [];
-  try { const snap = await getDocs(query(collection(db, collections.vendors), where("status", "==", "approved" as VendorStatus), orderBy("featured", "desc"), orderBy("rating", "desc"), limit(max))); return snap.docs.map(toVendor).filter((v) => v.active !== false); } catch { return []; }
+  try { const snap = await getDocs(query(collection(db, collections.vendors), where("status", "==", "approved" as VendorStatus), limit(max))); return snap.docs.map(toVendor).filter((v) => v.active !== false).sort((a, b) => Number(b.featured) - Number(a.featured) || b.rating - a.rating); } catch { return []; }
 }
 export async function getFeaturedVendors(max = 8): Promise<VendorDocument[]> {
   if (!db) return [];
@@ -29,13 +29,13 @@ export async function searchVendors(filters: VendorFilters, cursor?: QueryDocume
     if (filters.district) constraints.push(where("district", "==", filters.district));
     if (filters.state) constraints.push(where("state", "==", filters.state));
     if (filters.verifiedOnly) constraints.push(where("verificationStatus", "==", "verified"));
-    let q = query(collection(db, collections.vendors), ...constraints, orderBy("featured", "desc"), orderBy("rating", "desc"), limit(PAGE_SIZE + 1));
+    let q = query(collection(db, collections.vendors), ...constraints, limit(PAGE_SIZE + 1));
     if (cursor) q = query(q, startAfter(cursor));
     const snap = await getDocs(q);
     const docs = snap.docs;
     const hasMore = docs.length > PAGE_SIZE;
     const slice = hasMore ? docs.slice(0, PAGE_SIZE) : docs;
-    let vendors = slice.map(toVendor).filter((v) => v.active !== false);
+    let vendors = slice.map(toVendor).filter((v) => v.active !== false).sort((a, b) => Number(b.featured) - Number(a.featured) || b.rating - a.rating);
     if (filters.minRating) vendors = vendors.filter((v) => v.rating >= filters.minRating!);
     if (filters.minPrice !== undefined) vendors = vendors.filter((v) => v.startingPrice >= filters.minPrice!);
     if (filters.maxPrice !== undefined) vendors = vendors.filter((v) => v.startingPrice <= filters.maxPrice!);
