@@ -31,6 +31,12 @@ export const collections = {
   recommendations: "recommendations",
   weddingPlanner: "wedding_planner",
   fraudDetection: "fraud_detection",
+  blocks: "blocks",
+  reports: "reports",
+  privacySettings: "privacy_settings",
+  invoices: "invoices",
+  vendorAvailability: "vendor_availability",
+  conversationHistory: "conversation_history",
 } as const;
 
 export type UserRole = "user" | "admin" | "vendor";

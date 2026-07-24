@@ -14,9 +14,15 @@ export interface ChatResponse {
   suggestions?: string[];
 }
 
+export interface ConversationMessageLite {
+  role: "user" | "assistant";
+  content: string;
+}
+
 interface ChatContext {
   uid: string;
   profile?: ProfileDocument;
+  history?: ConversationMessageLite[];
 }
 
 /**
