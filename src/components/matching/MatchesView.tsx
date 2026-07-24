@@ -59,7 +59,7 @@ const MatchCard = memo(function MatchCard({ match, sending, onInterest }: { matc
     <div className="card overflow-hidden transition hover:shadow-md">
       <div className="flex items-start justify-between bg-gradient-to-r from-secondary-50 to-primary-50 p-3"><span className="badge bg-secondary-100 text-secondary-800"><Sparkles className="h-3 w-3" />{match.score}% Match</span></div>
       <div className="flex gap-4 p-4">
-        <div className="h-20 w-20 flex-none overflow-hidden rounded-xl bg-primary-100">{p.photoURL && <Image src={p.photoURL} alt={p.name} fill className="h-full w-full object-cover" loading="lazy" />}</div>
+        <div className="relative h-20 w-20 flex-none overflow-hidden rounded-xl bg-primary-100">{p.photoURL && <Image src={p.photoURL} alt={`${p.name} profile photo`} fill sizes="80px" className="object-cover" loading="lazy" />}</div>
         <div className="flex-1"><div className="flex items-center gap-1.5"><h3 className="font-display text-lg font-semibold text-primary-900">{p.name}</h3>{p.verified && <BadgeCheck className="h-4 w-4 text-green-600" />}{p.premium && <Crown className="h-4 w-4 text-secondary-500" />}</div><p className="text-xs text-gray-500">{p.religion} · {p.caste ?? ""}</p><p className="mt-1 flex items-center gap-1 text-xs text-gray-500"><MapPin className="h-3 w-3" />{p.district ?? "TN"}</p></div>
       </div>
       <div className="px-4 pb-2"><div className="flex flex-wrap gap-1">{match.reasons.slice(0, 3).map((r) => <span key={r} className="badge bg-primary-50 text-primary-700 text-[10px]">{r}</span>)}</div></div>

@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 :root {
   --font-inter: "Inter", system-ui, sans-serif;
 }
@@ -77,6 +87,16 @@ html.dark, html.dark body {
     @apply animate-pulse rounded-xl bg-neutral-200;
   }
   .dark .skeleton { @apply bg-neutral-700; }
+
+  /* Focus ring for keyboard navigation */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2;
+  }
+
+  /* Visually hidden but accessible */
+  .sr-visible:focus {
+    @apply not-sr-only;
+  }
 
   /* Font display */
   .font-display { @apply font-bold; }
