@@ -2,9 +2,9 @@
  * AI Profile Verification Service
  * Detects fake profile photos, duplicate photos, AI-generated faces, edited photos.
  * Uses Gemini Vision for image analysis + heuristic checks.
- * Server-side only — uses Firebase Admin SDK.
  */
-import { getDb } from "@/lib/firebase-admin";
+import { db } from "@/firebase/config";
+import { collection, getDocs, query, where, limit } from "firebase/firestore";
 import { collections, type ProfileDocument } from "@/firebase/schema";
 import { isGeminiConfigured } from "@/lib/ocr/geminiVision";
 
@@ -115,9 +115,9 @@ async function checkDuplicatePhoto(
   photoURL: string,
   currentUserId: string,
 ): Promise<{ isDuplicate: boolean; matchedUid?: string }> {
+  if (!db) return { isDuplicate: false };
   try {
-    const db = getDb();
-    const snap = await db.collection(collections.profiles).where("photoURL", "==", photoURL).limit(5).get();
+    const snap = await getDocs(query(collection(db, collections.profiles), where("photoURL", "==", photoURL), limit(5)));
     for (const doc of snap.docs) {
       if (doc.id !== currentUserId) {
         return { isDuplicate: true, matchedUid: doc.id };
@@ -156,18 +156,18 @@ async function analyzeWithGemini(photoURL: string): Promise<{
 }
 
 async function checkMultipleAccounts(userId: string): Promise<boolean> {
+  if (!db) return false;
   try {
-    const db = getDb();
-    const userSnap = await db.collection(collections.users).where("uid", "==", userId).limit(1).get();
-    if (userSnap.empty) return false;
-    const userData = userSnap.docs[0].data() as { phone?: string; email?: string };
+    const userDoc = await getDocs(query(collection(db, collections.users), where("uid", "==", userId), limit(1)));
+    if (userDoc.empty) return false;
+    const userData = userDoc.docs[0].data() as { phone?: string; email?: string };
     if (!userData.phone && !userData.email) return false;
 
     const byPhone = userData.phone
-      ? await db.collection(collections.users).where("phone", "==", userData.phone).limit(5).get()
+      ? await getDocs(query(collection(db, collections.users), where("phone", "==", userData.phone), limit(5)))
       : { size: 0 };
     const byEmail = userData.email
-      ? await db.collection(collections.users).where("email", "==", userData.email).limit(5).get()
+      ? await getDocs(query(collection(db, collections.users), where("email", "==", userData.email), limit(5)))
       : { size: 0 };
 
     return (byPhone.size > 1 || byEmail.size > 1);
@@ -180,9 +180,9 @@ async function checkMultipleAccounts(userId: string): Promise<boolean> {
  * Batch verify all unverified profiles (for admin use).
  */
 export async function batchVerifyProfiles(): Promise<{ verified: number; flagged: number; errors: number }> {
+  if (!db) return { verified: 0, flagged: 0, errors: 0 };
   try {
-    const db = getDb();
-    const snap = await db.collection(collections.profiles).where("verificationStatus", "==", "unverified").limit(50).get();
+    const snap = await getDocs(query(collection(db, collections.profiles), where("verificationStatus", "==", "unverified"), limit(50)));
     let verified = 0, flagged = 0, errors = 0;
     for (const doc of snap.docs) {
       const profile = doc.data() as ProfileDocument;

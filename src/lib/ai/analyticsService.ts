@@ -2,9 +2,9 @@
  * Comprehensive Analytics Service
  * Dashboard: Users, Revenue, Matches, Success rate, Telegram imports, OCR accuracy,
  * Duplicate rate, Membership sales, Vendor revenue.
- * Server-side only — uses Firebase Admin SDK.
  */
-import { getDb } from "@/lib/firebase-admin";
+import { db } from "@/firebase/config";
+import { collection, getDocs, query, where, orderBy, limit } from "firebase/firestore";
 import { collections } from "@/firebase/schema";
 import { getOcrAnalytics } from "@/lib/ocr/analytics";
 
@@ -23,6 +23,8 @@ export interface DashboardAnalytics {
  * Get comprehensive dashboard analytics.
  */
 export async function getDashboardAnalytics(): Promise<DashboardAnalytics> {
+  if (!db) return emptyAnalytics();
+
   try {
     const [users, profiles, revenue, matches, ocrAnalytics, vendors] = await Promise.all([
       getUsersAnalytics(),
@@ -63,8 +65,7 @@ export async function getDashboardAnalytics(): Promise<DashboardAnalytics> {
 
 async function getUsersAnalytics(): Promise<DashboardAnalytics["users"]> {
   try {
-    const database = getDb();
-    const snap = await database.collection(collections.users).orderBy("createdAt", "desc").limit(500).get();
+    const snap = await getDocs(query(collection(db!, collections.users), orderBy("createdAt", "desc"), limit(500)));
     const now = new Date();
     const today = new Date(now); today.setHours(0, 0, 0, 0);
     const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate() - 7);
@@ -90,8 +91,7 @@ async function getUsersAnalytics(): Promise<DashboardAnalytics["users"]> {
 
 async function getProfilesAnalytics(): Promise<DashboardAnalytics["profiles"]> {
   try {
-    const database = getDb();
-    const snap = await database.collection(collections.profiles).limit(1000).get();
+    const snap = await getDocs(query(collection(db!, collections.profiles), limit(1000)));
     let approved = 0, pending = 0, rejected = 0, verified = 0, premium = 0;
     for (const doc of snap.docs) {
       const data = doc.data() as { status?: string; verified?: boolean; membership?: string };
@@ -109,8 +109,7 @@ async function getProfilesAnalytics(): Promise<DashboardAnalytics["profiles"]> {
 
 async function getRevenueAnalytics(): Promise<DashboardAnalytics["revenue"]> {
   try {
-    const database = getDb();
-    const snap = await database.collection(collections.payments).where("status", "==", "success").limit(1000).get();
+    const snap = await getDocs(query(collection(db!, collections.payments), where("status", "==", "success"), limit(1000)));
     const now = new Date(); now.setDate(1);
     let total = 0, thisMonth = 0;
     for (const doc of snap.docs) {
@@ -133,8 +132,7 @@ async function getRevenueAnalytics(): Promise<DashboardAnalytics["revenue"]> {
 
 async function getMatchesAnalytics(): Promise<DashboardAnalytics["matches"]> {
   try {
-    const database = getDb();
-    const snap = await database.collection(collections.interests).limit(1000).get();
+    const snap = await getDocs(query(collection(db!, collections.interests), limit(1000)));
     let accepted = 0, rejected = 0, pending = 0;
     for (const doc of snap.docs) {
       const data = doc.data() as { status?: string };
@@ -152,8 +150,7 @@ async function getMatchesAnalytics(): Promise<DashboardAnalytics["matches"]> {
 
 async function getMembershipByPlan(): Promise<Record<string, { count: number; revenue: number }>> {
   try {
-    const database = getDb();
-    const snap = await database.collection(collections.payments).where("status", "==", "success").limit(1000).get();
+    const snap = await getDocs(query(collection(db!, collections.payments), where("status", "==", "success"), limit(1000)));
     const byPlan: Record<string, { count: number; revenue: number }> = {};
     for (const doc of snap.docs) {
       const data = doc.data() as { plan?: string; amount?: number };
@@ -170,8 +167,7 @@ async function getMembershipByPlan(): Promise<Record<string, { count: number; re
 
 async function getVendorsAnalytics(): Promise<DashboardAnalytics["vendors"]> {
   try {
-    const database = getDb();
-    const snap = await database.collection(collections.vendors).limit(500).get();
+    const snap = await getDocs(query(collection(db!, collections.vendors), limit(500)));
     let featured = 0, totalRating = 0;
     for (const doc of snap.docs) {
       const data = doc.data() as { featured?: boolean; rating?: number };

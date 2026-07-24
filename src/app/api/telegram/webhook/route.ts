@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/firebase-admin";
+import { db } from "@/firebase/config";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { collections } from "@/firebase/schema";
 import { processBiodataImport } from "@/lib/ocr/biodataImport";
 
@@ -121,17 +122,18 @@ export async function POST(req: NextRequest) {
     }
 
     // Log unhandled message types
-    try {
-      const database = getDb();
-      await database.collection(collections.telegramLogs).add({
-        userId: "bot",
-        chatId,
-        messageType: "unhandled",
-        status: "success",
-        createdAt: new Date(),
-      });
-    } catch {
-      // best-effort
+    if (db) {
+      try {
+        await addDoc(collection(db, collections.telegramLogs), {
+          userId: "bot",
+          chatId,
+          messageType: "unhandled",
+          status: "success",
+          createdAt: serverTimestamp(),
+        });
+      } catch {
+        // best-effort
+      }
     }
 
     return NextResponse.json({ ok: true });
