@@ -1,40 +1,85 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    function isSignedIn() { return request.auth != null; }
-    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
-    function isAdmin() { return isSignedIn() && request.auth.token.admin == true; }
-    function isUserAdmin() { return isSignedIn() && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data.role == "admin"; }
 
-    match /profiles/{uid}/{fileName} {
+    // ── Auth helpers ─────────────────────────────────────────
+    function isSignedIn()        { return request.auth != null; }
+    function uid()               { return request.auth.uid; }
+    function isOwner(ownerUid)   { return isSignedIn() && uid() == ownerUid; }
+
+    // Admin check via Firestore custom claim or role doc
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.admin == true ||
+        firestore.get(/databases/(default)/documents/users/$(uid())).data.role == "admin"
+      );
+    }
+
+    function isVendorOwner(vendorId) {
+      return isSignedIn() &&
+        firestore.get(/databases/(default)/documents/vendors/$(vendorId)).data.ownerUid == uid();
+    }
+
+    // ── MIME / size helpers ─────────────────────────────────
+    function isImageMime() {
+      return request.resource.contentType.matches("image/(jpeg|png|webp|heic|heif)");
+    }
+
+    function isPdfMime() {
+      return request.resource.contentType == "application/pdf";
+    }
+
+    function isDocOrImage() {
+      return isImageMime() || isPdfMime();
+    }
+
+    // Max file sizes
+    function underPhotoLimit()    { return request.resource.size <= 5  * 1024 * 1024; }  // 5 MB
+    function underGalleryLimit()  { return request.resource.size <= 8  * 1024 * 1024; }  // 8 MB
+    function underOcrLimit()      { return request.resource.size <= 20 * 1024 * 1024; }  // 20 MB
+
+    // ── /profiles/{uid}/** ───────────────────────────────────
+    // Profile photos — authenticated owner only
+    match /profiles/{ownerUid}/{allPaths=**} {
       allow read: if true;
-      allow write: if isOwner(uid) || isAdmin() || isUserAdmin();
-      allow delete: if isOwner(uid) || isAdmin() || isUserAdmin();
+      allow create, update: if isOwner(ownerUid) && isImageMime() && underPhotoLimit() || isAdmin();
+      allow delete:         if isOwner(ownerUid) || isAdmin();
     }
-    match /vendors/{vendorId}/{fileName} {
+
+    // ── /vendors/{vendorId}/** ───────────────────────────────
+    // Vendor profile / logo images
+    match /vendors/{vendorId}/{allPaths=**} {
       allow read: if true;
-      allow write: if isSignedIn() && (firestore.get(/databases/(default)/documents/vendors/$(vendorId)).data.ownerUid == request.auth.uid || isAdmin() || isUserAdmin());
-      allow delete: if isSignedIn() && (firestore.get(/databases/(default)/documents/vendors/$(vendorId)).data.ownerUid == request.auth.uid || isAdmin() || isUserAdmin());
+      allow create, update: if (isVendorOwner(vendorId) && isImageMime() && underPhotoLimit()) || isAdmin();
+      allow delete:         if isVendorOwner(vendorId) || isAdmin();
     }
-    match /ocr/{uid}/{fileName} {
-      allow read: if isOwner(uid) || isAdmin() || isUserAdmin();
-      allow write: if isOwner(uid) || isAdmin() || isUserAdmin();
-      allow delete: if isOwner(uid) || isAdmin() || isUserAdmin();
-    }
-    match /vendorGallery/{vendorId}/{fileName} {
+
+    // ── /vendorGallery/{vendorId}/** ─────────────────────────
+    match /vendorGallery/{vendorId}/{allPaths=**} {
       allow read: if true;
-      allow write: if isSignedIn() && (firestore.get(/databases/(default)/documents/vendors/$(vendorId)).data.ownerUid == request.auth.uid || isAdmin() || isUserAdmin());
-      allow delete: if isSignedIn() && (firestore.get(/databases/(default)/documents/vendors/$(vendorId)).data.ownerUid == request.auth.uid || isAdmin() || isUserAdmin());
+      allow create, update: if (isVendorOwner(vendorId) && isImageMime() && underGalleryLimit()) || isAdmin();
+      allow delete:         if isVendorOwner(vendorId) || isAdmin();
     }
-    match /vendorPackages/{vendorId}/{fileName} {
+
+    // ── /vendorPackages/{vendorId}/** ────────────────────────
+    match /vendorPackages/{vendorId}/{allPaths=**} {
       allow read: if true;
-      allow write: if isSignedIn() && (firestore.get(/databases/(default)/documents/vendors/$(vendorId)).data.ownerUid == request.auth.uid || isAdmin() || isUserAdmin());
-      allow delete: if isSignedIn() && (firestore.get(/databases/(default)/documents/vendors/$(vendorId)).data.ownerUid == request.auth.uid || isAdmin() || isUserAdmin());
+      allow create, update: if (isVendorOwner(vendorId) && isImageMime() && underGalleryLimit()) || isAdmin();
+      allow delete:         if isVendorOwner(vendorId) || isAdmin();
     }
+
+    // ── /ocr/{uid}/** ────────────────────────────────────────
+    // Biodata file uploads — PDF or image, up to 20 MB
+    match /ocr/{ownerUid}/{allPaths=**} {
+      allow read:           if isOwner(ownerUid) || isAdmin();
+      allow create, update: if (isOwner(ownerUid) && isDocOrImage() && underOcrLimit()) || isAdmin();
+      allow delete:         if isOwner(ownerUid) || isAdmin();
+    }
+
+    // ── Deny everything else ─────────────────────────────────
     match /{allPaths=**} {
-      allow read: if true;
-      allow write: if isAdmin() || isUserAdmin();
-      allow delete: if isAdmin() || isUserAdmin();
+      allow read:  if false;
+      allow write: if false;
     }
   }
 }
