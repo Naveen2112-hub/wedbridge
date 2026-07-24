@@ -1,16 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import { updateImportStatus, type ImportStatus } from "@/lib/ocr/biodataImport";
+import { getAuthUser } from "@/lib/auth-server";
+import { getDb } from "@/lib/firebase-admin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
+  const user = await getAuthUser(req);
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const db = getDb();
+  const userDoc = await db.collection("users").doc(user.uid).get();
+  if (!userDoc.exists || userDoc.data()?.role !== "admin") {
+    return NextResponse.json({ error: "Forbidden — admin access required" }, { status: 403 });
+  }
+
   try {
     const body = await req.json();
-    const { importId, action, reviewedBy } = body as {
+    const { importId, action } = body as {
       importId: string;
       action: "approve" | "reject";
-      reviewedBy: string;
+      reviewedBy?: string;
     };
 
     if (!importId || !action) {
@@ -18,7 +31,7 @@ export async function POST(req: NextRequest) {
     }
 
     const status: ImportStatus = action === "approve" ? "approved" : "rejected";
-    await updateImportStatus(importId, status, reviewedBy ?? "admin");
+    await updateImportStatus(importId, status, user.uid);
 
     return NextResponse.json({ ok: true, status });
   } catch (e) {

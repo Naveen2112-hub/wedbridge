@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTelegramSettings, sendTelegramMessage, logTelegramNotification } from "@/lib/telegram";
+import { getAuthUser } from "@/lib/auth-server";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
-  try {
-    const userId = req.headers.get("x-user-id");
-    if (!userId) {
-      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-    }
+  const user = await getAuthUser(req);
+  if (!user) {
+    return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  }
 
-    const settings = await getTelegramSettings(userId);
+  try {
+    const settings = await getTelegramSettings(user.uid);
     if (!settings || !settings.chatId) {
       return NextResponse.json({ error: "Telegram not configured. Add your Chat ID first." }, { status: 400 });
     }
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
     const result = await sendTelegramMessage(settings.chatId, "✅ Telegram Integration Successful");
 
     await logTelegramNotification({
-      userId,
+      userId: user.uid,
       chatId: settings.chatId,
       messageType: "test",
       status: result.ok ? "success" : "failed",

@@ -1,12 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBotUpdates, getBotInfo, setBotCommands } from "@/lib/telegram";
+import { getAuthUser } from "@/lib/auth-server";
+import { getDb } from "@/lib/firebase-admin";
 
 export const runtime = "nodejs";
 
-/**
- * GET: Get bot info and recent updates (for Connect Telegram flow)
- */
-export async function GET() {
+async function verifyAdmin(req: Request): Promise<NextResponse | null> {
+  const user = await getAuthUser(req);
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const db = getDb();
+  const userDoc = await db.collection("users").doc(user.uid).get();
+  if (!userDoc.exists || userDoc.data()?.role !== "admin") {
+    return NextResponse.json({ error: "Forbidden — admin access required" }, { status: 403 });
+  }
+  return null;
+}
+
+export async function GET(req: NextRequest) {
+  const authError = await verifyAdmin(req);
+  if (authError) return authError;
+
   try {
     const botInfo = await getBotInfo();
     if (!botInfo.ok) {
@@ -16,7 +29,6 @@ export async function GET() {
     const updatesRes = await getBotUpdates();
     const updates = updatesRes.updates ?? [];
 
-    // Extract chat IDs from recent messages
     const chatIds = new Map<string, { chatId: string; username?: string; firstName?: string }>();
     for (const update of updates as Array<{ message?: { chat?: { id: number; username?: string; first_name?: string }; text?: string } }>) {
       const chat = update.message?.chat;
@@ -38,10 +50,10 @@ export async function GET() {
   }
 }
 
-/**
- * POST: Set up bot commands
- */
-export async function POST() {
+export async function POST(req: NextRequest) {
+  const authError = await verifyAdmin(req);
+  if (authError) return authError;
+
   try {
     const result = await setBotCommands();
     if (!result.ok) {

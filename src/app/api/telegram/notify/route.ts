@@ -1,20 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTelegramSettings, sendTelegramMessage, logTelegramNotification, enqueueRetry, type TelegramInlineButton } from "@/lib/telegram";
 import { buildNotificationText, getInlineButtons, type NotificationType } from "@/lib/telegram-notifications";
+import { getAuthUser } from "@/lib/auth-server";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
+  const user = await getAuthUser(req);
+  if (!user) {
+    return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  }
+
   try {
     const { type, extra } = (await req.json()) as { type: NotificationType; extra?: Record<string, string> };
 
-    // Get the authenticated user's ID from the request header set by client middleware
-    const userId = req.headers.get("x-user-id");
-    if (!userId) {
-      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-    }
-
-    const settings = await getTelegramSettings(userId);
+    const settings = await getTelegramSettings(user.uid);
     if (!settings || !settings.enabled || !settings.chatId) {
       return NextResponse.json({ error: "Telegram not configured." }, { status: 400 });
     }
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     const result = await sendTelegramMessage(settings.chatId, text, buttons);
 
     await logTelegramNotification({
-      userId,
+      userId: user.uid,
       chatId: settings.chatId,
       messageType: type,
       status: result.ok ? "success" : "failed",
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!result.ok) {
-      await enqueueRetry(userId, settings.chatId, type, { text }, result.error ?? "Unknown error");
+      await enqueueRetry(user.uid, settings.chatId, type, { text }, result.error ?? "Unknown error");
     }
 
     return NextResponse.json({ ok: result.ok, error: result.error });

@@ -1,15 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateBotToken, validateChatId, saveTelegramSettings } from "@/lib/telegram";
+import { getAuthUser } from "@/lib/auth-server";
 
 export const runtime = "nodejs";
 
 export async function POST(req: NextRequest) {
-  try {
-    const userId = req.headers.get("x-user-id");
-    if (!userId) {
-      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
-    }
+  const user = await getAuthUser(req);
+  if (!user) {
+    return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+  }
 
+  try {
     const { botToken, chatId, enabled } = (await req.json()) as {
       botToken: string;
       chatId: string;
@@ -20,20 +21,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Bot Token and Chat ID are required." }, { status: 400 });
     }
 
-    // Validate bot token
     const tokenCheck = await validateBotToken(botToken);
     if (!tokenCheck.ok) {
       return NextResponse.json({ error: tokenCheck.error ?? "Invalid bot token." }, { status: 400 });
     }
 
-    // Validate chat ID by sending a test message
     const chatCheck = await validateChatId(botToken, chatId);
     if (!chatCheck.ok) {
       return NextResponse.json({ error: chatCheck.error ?? "Invalid chat ID. Make sure you've started the bot first." }, { status: 400 });
     }
 
-    // Save settings
-    const saveResult = await saveTelegramSettings(userId, { botToken, chatId, enabled });
+    const saveResult = await saveTelegramSettings(user.uid, { botToken, chatId, enabled });
     if (!saveResult.ok) {
       return NextResponse.json({ error: saveResult.error ?? "Failed to save settings." }, { status: 500 });
     }

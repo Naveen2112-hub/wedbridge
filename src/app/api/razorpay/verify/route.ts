@@ -1,53 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
-import { initializeApp, getApps, cert, type AppOptions } from "firebase-admin/app";
-import { getFirestore, type Firestore } from "firebase-admin/firestore";
-import { getAuth } from "firebase-admin/auth";
+import { getAuthUser } from "@/lib/auth-server";
+import { getDb } from "@/lib/firebase-admin";
 import type { MembershipTier } from "@/firebase/schema";
+import { checkRateLimit, getClientIP } from "@/lib/security/securityService";
 
 export const runtime = "nodejs";
 
 const PLAN_PRICES: Record<string, number> = { premium: 99900, gold: 199900 };
-
-let adminDb: Firestore | null = null;
-
-function getAdminDb(): Firestore {
-  if (adminDb) return adminDb;
-  if (getApps().length) { adminDb = getFirestore(); return adminDb; }
-  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ?? "wedbridge-db0e2";
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKeyRaw = process.env.FIREBASE_PRIVATE_KEY ?? "";
-  const privateKey = privateKeyRaw.replace(/\\n/g, "\n");
-  const options: AppOptions = projectId ? { projectId } : {};
-  if (clientEmail && privateKey) { options.credential = cert({ projectId, clientEmail, privateKey }); }
-  initializeApp(options);
-  adminDb = getFirestore();
-  return adminDb;
-}
-
-function getAdminApp() {
-  if (getApps().length) return getApps()[0];
-  const projectId = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKeyRaw = process.env.FIREBASE_PRIVATE_KEY ?? "";
-  const privateKey = privateKeyRaw.replace(/\\n/g, "\n");
-  const options: AppOptions = projectId ? { projectId } : {};
-  if (clientEmail && privateKey) { options.credential = cert({ projectId: projectId ?? "", clientEmail, privateKey }); }
-  return initializeApp(options);
-}
-
-async function verifyToken(req: NextRequest): Promise<string | null> {
-  const header = req.headers.get("authorization");
-  if (!header || !header.startsWith("Bearer ")) return null;
-  const idToken = header.slice("Bearer ".length).trim();
-  if (!idToken) return null;
-  try {
-    const decoded = await getAuth(getAdminApp()).verifyIdToken(idToken);
-    return decoded.uid;
-  } catch {
-    return null;
-  }
-}
 
 interface VerifyBody {
   paymentId: string;
@@ -58,12 +18,18 @@ interface VerifyBody {
 }
 
 export async function POST(req: NextRequest) {
-  try {
-    const uid = await verifyToken(req);
-    if (!uid) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  const user = await getAuthUser(req);
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
 
+  const ip = getClientIP(req);
+  const rl = checkRateLimit(`razorpay-verify:${user.uid}:${ip}`, { windowMs: 60_000, maxRequests: 10 });
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
+  }
+
+  try {
     const body = (await req.json()) as VerifyBody;
     const { paymentId, razorpayOrderId, razorpayPaymentId, razorpaySignature, plan } = body;
 
@@ -87,7 +53,7 @@ export async function POST(req: NextRequest) {
       try { isValid = timingSafeEqual(expectedBuf, receivedBuf); } catch { isValid = false; }
     }
 
-    const db = getAdminDb();
+    const db = getDb();
     const now = new Date();
     const startDate = now;
     const expiryDate = new Date(now);
@@ -113,7 +79,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Payment record not found" }, { status: 404 });
     }
     const payData = paySnap.data() as { uid?: string; orderId?: string; amount?: number; status?: string };
-    if (payData.uid !== uid) {
+    if (payData.uid !== user.uid) {
       return NextResponse.json({ error: "Payment does not belong to this user" }, { status: 403 });
     }
     if (payData.orderId !== razorpayOrderId) {
@@ -140,11 +106,10 @@ export async function POST(req: NextRequest) {
 
     const subRef = db.collection("subscriptions").doc();
     batch.create(subRef, {
-      uid,
+      uid: user.uid,
       plan,
       status: "active",
       membershipStatus: "active",
-      paymentStatus: "paid",
       membershipPlan: plan,
       paymentProvider: "Razorpay",
       paymentId: razorpayPaymentId,
@@ -158,11 +123,10 @@ export async function POST(req: NextRequest) {
       updatedAt: now,
     });
 
-    const userRef = db.collection("users").doc(uid);
+    const userRef = db.collection("users").doc(user.uid);
     batch.update(userRef, {
       membershipTier: plan,
       membershipStatus: "active",
-      paymentStatus: "paid",
       membershipPlan: plan,
       paymentProvider: "Razorpay",
       updatedAt: now,
@@ -173,9 +137,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       verified: true,
       membershipStatus: "active",
-      paymentStatus: "paid",
       membershipPlan: plan,
-      paymentProvider: "Razorpay",
       paymentId: razorpayPaymentId,
       orderId: razorpayOrderId,
       paymentDate: now.toISOString(),
@@ -183,7 +145,7 @@ export async function POST(req: NextRequest) {
       expiryDate: expiryDate.toISOString(),
     });
   } catch (err) {
-    console.error("verify error:", err);
+    console.error("Payment verification error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
