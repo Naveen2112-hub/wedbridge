@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Shield, Mail, Phone, Loader as Loader2, User } from "lucide-react";
 import { useAdminAuth } from "@/lib/admin/AdminAuthContext";
 
@@ -17,7 +18,7 @@ export default function AdminProfilePage() {
       <div className="card p-6">
         <div className="flex items-center gap-4">
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary-100">
-            {adminUser?.photoURL ? <img src={adminUser.photoURL} alt="" className="h-16 w-16 rounded-2xl object-cover" /> : <Shield className="h-8 w-8 text-primary-600" />}
+            {adminUser?.photoURL ? <Image src={adminUser.photoURL} alt="Admin avatar" width={64} height={64} className="h-16 w-16 rounded-2xl object-cover" /> : <Shield className="h-8 w-8 text-primary-600" />}
           </div>
           <div><h2 className="text-lg font-bold text-primary-900">{adminUser?.name || adminUser?.email || "Administrator"}</h2><p className="text-sm text-gray-500">Administrator</p></div>
         </div>

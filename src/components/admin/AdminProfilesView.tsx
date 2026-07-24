@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { Search, Trash2, BadgeCheck, Star, Loader as Loader2 } from "lucide-react";
 import { listProfiles, deleteProfile, updateProfile } from "@/lib/admin/adminService";
@@ -14,8 +14,20 @@ export function AdminProfilesView() {
   const [search, setSearch] = useState("");
   const [acting, setActing] = useState<string | null>(null);
 
-  const load = async () => { setLoading(true); try { const p = await listProfiles(200); setProfiles(p); } catch (err) { console.error(err); toast("Failed to load profiles", "error"); } finally { setLoading(false); } };
-  useEffect(() => { load(); }, []);
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const p = await listProfiles(200);
+      setProfiles(p);
+    } catch (err) {
+      console.error(err);
+      toast("Failed to load profiles", "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => { load(); }, [load]);
 
   const filtered = profiles.filter((p) => { const q = search.toLowerCase(); return !q || p.name?.toLowerCase().includes(q) || p.religion?.toLowerCase().includes(q); });
 

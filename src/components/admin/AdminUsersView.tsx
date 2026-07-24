@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Search, Trash2, Crown, BadgeCheck, Loader as Loader2 } from "lucide-react";
 import { listUsers, deleteUser, updateUser } from "@/lib/admin/adminService";
 import type { AppUser } from "@/firebase/schema";
@@ -13,8 +13,20 @@ export function AdminUsersView() {
   const [search, setSearch] = useState("");
   const [acting, setActing] = useState<string | null>(null);
 
-  const load = async () => { setLoading(true); try { const u = await listUsers(200); setUsers(u); } catch (err) { console.error("Failed to load users:", err); toast("Failed to load users", "error"); } finally { setLoading(false); } };
-  useEffect(() => { load(); }, []);
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const u = await listUsers(200);
+      setUsers(u);
+    } catch (err) {
+      console.error("Failed to load users:", err);
+      toast("Failed to load users", "error");
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => { load(); }, [load]);
 
   const filtered = users.filter((u) => { const q = search.toLowerCase(); return !q || u.email?.toLowerCase().includes(q) || u.displayName?.toLowerCase().includes(q); });
 
