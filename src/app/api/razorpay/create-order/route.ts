@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuthUser } from "@/lib/auth-server";
 import { getDb } from "@/lib/firebase-admin";
+import { createOrder } from "@/lib/razorpay-server";
 import type { MembershipTier } from "@/firebase/schema";
 import { checkRateLimit, getClientIP } from "@/lib/security/securityService";
 
@@ -34,34 +35,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid plan. Must be premium or gold." }, { status: 400 });
     }
 
-    const keyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "";
-    const keySecret = process.env.RAZORPAY_KEY_SECRET ?? "";
-    if (!keyId || !keySecret) {
-      return NextResponse.json({ error: "Razorpay not configured" }, { status: 500 });
-    }
-
-    const auth = Buffer.from(`${keyId}:${keySecret}`).toString("base64");
-    const rzpRes = await fetch("https://api.razorpay.com/v1/orders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Basic ${auth}` },
-      body: JSON.stringify({ amount, currency: "INR", payment_capture: 1, notes: { uid: user.uid, plan: body.plan } }),
+    const order = await createOrder({
+      amount,
+      currency: "INR",
+      receipt: `wb_${user.uid}_${Date.now()}`,
+      notes: { uid: user.uid, plan: body.plan },
     });
-
-    if (!rzpRes.ok) {
-      return NextResponse.json({ error: "Failed to create Razorpay order" }, { status: 502 });
-    }
-
-    const rzpOrder = (await rzpRes.json()) as { id: string; amount: number; currency: string; status: string };
 
     const db = getDb();
     const payRef = await db.collection("payments").add({
       uid: user.uid,
       userId: user.uid,
-      orderId: rzpOrder.id,
-      razorpayOrderId: rzpOrder.id,
+      orderId: order.id,
+      razorpayOrderId: order.id,
       gateway: "razorpay",
-      amount: rzpOrder.amount,
-      currency: rzpOrder.currency,
+      amount: order.amount,
+      currency: order.currency,
       plan: body.plan,
       status: "pending",
       notes: { uid: user.uid, plan: body.plan },
@@ -70,11 +59,11 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({
-      orderId: rzpOrder.id,
+      orderId: order.id,
       paymentId: payRef.id,
-      amount: rzpOrder.amount,
-      currency: rzpOrder.currency,
-      keyId,
+      amount: order.amount,
+      currency: order.currency,
+      keyId: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
     });
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : "Internal server error" }, { status: 500 });
