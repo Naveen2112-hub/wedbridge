@@ -1,7 +1,5 @@
 {
   "indexes": [
-
-    // ── profiles ─────────────────────────────────────────────────
     {
       "collectionGroup": "profiles",
       "queryScope": "COLLECTION",
@@ -87,8 +85,6 @@
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
-
-    // ── vendors ──────────────────────────────────────────────────
     {
       "collectionGroup": "vendors",
       "queryScope": "COLLECTION",
@@ -122,8 +118,6 @@
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
-
-    // ── payments ─────────────────────────────────────────────────
     {
       "collectionGroup": "payments",
       "queryScope": "COLLECTION",
@@ -148,8 +142,6 @@
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
-
-    // ── subscriptions ────────────────────────────────────────────
     {
       "collectionGroup": "subscriptions",
       "queryScope": "COLLECTION",
@@ -167,8 +159,6 @@
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
-
-    // ── notifications ────────────────────────────────────────────
     {
       "collectionGroup": "notifications",
       "queryScope": "COLLECTION",
@@ -186,8 +176,6 @@
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
-
-    // ── interests ────────────────────────────────────────────────
     {
       "collectionGroup": "interests",
       "queryScope": "COLLECTION",
@@ -237,8 +225,6 @@
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
-
-    // ── vendorBookings ───────────────────────────────────────────
     {
       "collectionGroup": "vendorBookings",
       "queryScope": "COLLECTION",
@@ -264,8 +250,6 @@
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
-
-    // ── vendorReviews ────────────────────────────────────────────
     {
       "collectionGroup": "vendorReviews",
       "queryScope": "COLLECTION",
@@ -274,8 +258,6 @@
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
-
-    // ── aiMatches ────────────────────────────────────────────────
     {
       "collectionGroup": "aiMatches",
       "queryScope": "COLLECTION",
@@ -292,8 +274,6 @@
         { "fieldPath": "score", "order": "DESCENDING" }
       ]
     },
-
-    // ── matchHistory ─────────────────────────────────────────────
     {
       "collectionGroup": "matchHistory",
       "queryScope": "COLLECTION",
@@ -302,8 +282,6 @@
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
-
-    // ── profileViews ─────────────────────────────────────────────
     {
       "collectionGroup": "profileViews",
       "queryScope": "COLLECTION",
@@ -312,8 +290,6 @@
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
-
-    // ── favourites ───────────────────────────────────────────────
     {
       "collectionGroup": "favourites",
       "queryScope": "COLLECTION",
@@ -322,8 +298,6 @@
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
-
-    // ── searchHistory ────────────────────────────────────────────
     {
       "collectionGroup": "searchHistory",
       "queryScope": "COLLECTION",
@@ -332,8 +306,6 @@
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
-
-    // ── recentlyViewed ───────────────────────────────────────────
     {
       "collectionGroup": "recentlyViewed",
       "queryScope": "COLLECTION",
@@ -342,8 +314,6 @@
         { "fieldPath": "viewedAt",  "order": "DESCENDING" }
       ]
     },
-
-    // ── telegram_logs ────────────────────────────────────────────
     {
       "collectionGroup": "telegram_logs",
       "queryScope": "COLLECTION",
@@ -360,8 +330,6 @@
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
-
-    // ── ocr_imports ──────────────────────────────────────────────
     {
       "collectionGroup": "ocr_imports",
       "queryScope": "COLLECTION",
@@ -378,8 +346,6 @@
         { "fieldPath": "importTime",     "order": "DESCENDING" }
       ]
     },
-
-    // ── broadcasts ───────────────────────────────────────────────
     {
       "collectionGroup": "broadcasts",
       "queryScope": "COLLECTION",
@@ -387,8 +353,6 @@
         { "fieldPath": "createdAt", "order": "DESCENDING" }
       ]
     },
-
-    // ── auditLog ─────────────────────────────────────────────────
     {
       "collectionGroup": "auditLog",
       "queryScope": "COLLECTION",
@@ -406,6 +370,5 @@
       ]
     }
   ],
-
   "fieldOverrides": []
 }
