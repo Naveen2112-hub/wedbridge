@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -121,7 +122,7 @@ export function Navbar() {
           {user && !loading ? (
             <div className="relative" ref={profileRef}>
               <button onClick={() => setProfileOpen(!profileOpen)} className="flex items-center gap-1.5 rounded-lg p-1 transition hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                {appUser?.photoURL ? <img src={appUser.photoURL} alt="" className="h-8 w-8 rounded-full object-cover" /> :
+                {appUser?.photoURL ? <Image src={appUser.photoURL} alt="User avatar" width={32} height={32} className="h-8 w-8 rounded-full object-cover" /> :
                   <span className="flex h-8 w-8 items-center justify-center rounded-full bg-rose-600 text-sm font-semibold text-white">{(appUser?.name || appUser?.email || "U").charAt(0).toUpperCase()}</span>}
                 <ChevronDown className="h-4 w-4 text-neutral-500" />
               </button>

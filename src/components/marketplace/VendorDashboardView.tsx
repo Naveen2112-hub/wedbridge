@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Store, Loader as Loader2, Package, Calendar, Star, IndianRupee, Image as ImageIcon, BarChart3, Settings, MessageSquare, TrendingUp, CircleCheck as CheckCircle, Plus, CreditCard as Edit, Save } from "lucide-react";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { getVendorByOwner, updateVendor } from "@/lib/marketplace/vendorService";
@@ -139,7 +140,7 @@ export function VendorDashboardView() {
           <div className="rounded-2xl border border-neutral-200 bg-white p-6">
             <div className="flex items-center justify-between"><h2 className="text-lg font-semibold text-neutral-900">Gallery</h2><button className="flex items-center gap-1 rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-500"><Plus className="h-3.5 w-3.5" /> Add Image</button></div>
             {gallery.length === 0 ? <div className="mt-6 flex flex-col items-center py-12 text-center"><ImageIcon className="h-12 w-12 text-neutral-300" /><p className="mt-3 text-sm text-neutral-500">No gallery images yet.</p><p className="mt-1 text-xs text-neutral-400">Upload images to showcase your work.</p></div> :
-              <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">{gallery.map((g) => <div key={g.id} className="aspect-square overflow-hidden rounded-xl bg-neutral-100">{g.imageURL && <img src={g.imageURL} alt={g.caption ?? ""} className="h-full w-full object-cover" />}</div>)}</div>}
+              <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">{gallery.map((g) => <div key={g.id} className="relative aspect-square overflow-hidden rounded-xl bg-neutral-100">{g.imageURL && <Image src={g.imageURL} alt={g.caption ?? ""} fill className="object-cover" sizes="(max-width: 768px) 50vw, 25vw" />}</div>)}</div>}
           </div>
         )}
 
