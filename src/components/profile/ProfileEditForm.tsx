@@ -64,7 +64,7 @@ export function ProfileEditForm() {
       <h1 className="heading-md">{profileId ? "Edit Profile" : "Create Profile"}</h1>
       <p className="text-lead mt-1 text-sm">Fill in your details to find the best matches.</p>
       <div className="mt-6 flex items-center gap-4">
-        <div className="h-20 w-20 overflow-hidden rounded-2xl bg-primary-100">{photoURL && <Image src={photoURL} alt="Profile" fill className="h-full w-full object-cover" />}</div>
+        <div className="relative h-20 w-20 overflow-hidden rounded-2xl bg-primary-100">{photoURL && <Image src={photoURL} alt="Your profile photo" fill sizes="80px" className="object-cover" />}</div>
         <label className="btn-outline cursor-pointer text-sm">{uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Upload className="h-4 w-4" />Upload Photo</>}<input type="file" accept="image/*" className="hidden" onChange={handlePhoto} /></label>
         {photoURL && <button type="button" onClick={() => setPhotoURL("")} className="btn-ghost text-sm"><X className="h-4 w-4" />Remove</button>}
       </div>

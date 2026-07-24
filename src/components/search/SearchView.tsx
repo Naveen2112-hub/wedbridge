@@ -85,7 +85,7 @@ const ProfileCard = memo(function ProfileCard({ profile, sending, onInterest }: 
   return (
     <div className="card overflow-hidden transition hover:shadow-md">
       <div className="flex gap-4 p-4">
-        <div className="h-20 w-20 flex-none overflow-hidden rounded-xl bg-primary-100">{profile.photoURL && <Image src={profile.photoURL} alt={profile.name} fill className="h-full w-full object-cover" loading="lazy" />}</div>
+        <div className="relative h-20 w-20 flex-none overflow-hidden rounded-xl bg-primary-100">{profile.photoURL && <Image src={profile.photoURL} alt={`${profile.name} profile photo`} fill sizes="80px" className="object-cover" loading="lazy" />}</div>
         <div className="flex-1">
           <div className="flex items-center gap-1.5"><h3 className="font-display text-lg font-semibold text-primary-900">{profile.name}</h3>{profile.verified && <BadgeCheck className="h-4 w-4 text-green-600" />}{profile.premium && <Crown className="h-4 w-4 text-secondary-500" />}</div>
           <p className="text-xs text-gray-500">{profile.religion} · {profile.caste ?? "Any"}</p>

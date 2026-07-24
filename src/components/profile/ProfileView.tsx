@@ -33,7 +33,7 @@ export function ProfileView({ profile: passedProfile }: { profile?: ProfileDocum
         <div className="h-32 bg-gradient-to-r from-primary-500 to-primary-700" />
         <div className="px-6 pb-6">
           <div className="-mt-12 flex items-end gap-4">
-            <div className="h-24 w-24 overflow-hidden rounded-2xl border-4 border-white bg-primary-100">{profile.photoURL && <Image src={profile.photoURL} alt={profile.name} fill className="h-full w-full object-cover" />}</div>
+            <div className="relative h-24 w-24 overflow-hidden rounded-2xl border-4 border-white bg-primary-100">{profile.photoURL && <Image src={profile.photoURL} alt={`${profile.name} profile photo`} fill sizes="96px" className="object-cover" />}</div>
             <div className="flex-1 pb-2"><div className="flex items-center gap-2"><h1 className="heading-md">{profile.name}</h1>{profile.verified && <BadgeCheck className="h-5 w-5 text-green-600" />}{profile.premium && <Crown className="h-5 w-5 text-secondary-500" />}{profile.featured && <Star className="h-5 w-5 text-amber-500" />}</div><p className="text-sm text-gray-500">{profile.religion} · {profile.caste ?? ""}</p></div>
             <Link href="/profile/edit" className="btn-outline mb-2 text-sm">Edit Profile</Link>
           </div>
