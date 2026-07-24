@@ -2,11 +2,10 @@
  * Recommendation Engine
  * Recommends: premium membership, nearby profiles, recently active members,
  * wedding vendors, wedding packages, popular photographers, popular halls.
+ * Server-side only — uses Firebase Admin SDK.
  */
-import { db } from "@/firebase/config";
-import { collection, getDocs, query, where, orderBy, limit } from "firebase/firestore";
+import { getDb } from "@/lib/firebase-admin";
 import { collections, type ProfileDocument, type VendorDocument } from "@/firebase/schema";
-import { calculateAge } from "@/lib/format";
 
 export interface Recommendation {
   type: "premium_upgrade" | "nearby_profile" | "active_profile" | "vendor" | "package" | "popular_photographer" | "popular_hall";
@@ -103,9 +102,9 @@ export async function getRecommendations(
 }
 
 async function getNearbyProfiles(district: string, excludeUid: string): Promise<ProfileDocument[]> {
-  if (!db) return [];
   try {
-    const snap = await getDocs(query(collection(db, collections.profiles), where("status", "==", "approved"), where("district", "==", district), limit(5)));
+    const db = getDb();
+    const snap = await db.collection(collections.profiles).where("status", "==", "approved").where("district", "==", district).limit(5).get();
     return snap.docs.filter((d) => d.id !== excludeUid).map((d) => ({ uid: d.id, ...(d.data() as Omit<ProfileDocument, "uid">) }));
   } catch {
     return [];
@@ -113,9 +112,9 @@ async function getNearbyProfiles(district: string, excludeUid: string): Promise<
 }
 
 async function getRecentlyActiveProfiles(excludeUid: string): Promise<ProfileDocument[]> {
-  if (!db) return [];
   try {
-    const snap = await getDocs(query(collection(db, collections.profiles), where("status", "==", "approved"), limit(10)));
+    const db = getDb();
+    const snap = await db.collection(collections.profiles).where("status", "==", "approved").limit(10).get();
     return snap.docs.filter((d) => d.id !== excludeUid).map((d) => ({ uid: d.id, ...(d.data() as Omit<ProfileDocument, "uid">) }));
   } catch {
     return [];
@@ -123,9 +122,9 @@ async function getRecentlyActiveProfiles(excludeUid: string): Promise<ProfileDoc
 }
 
 async function getPopularVendors(): Promise<(VendorDocument & { id: string })[]> {
-  if (!db) return [];
   try {
-    const snap = await getDocs(query(collection(db, collections.vendors), orderBy("rating", "desc"), limit(10)));
+    const db = getDb();
+    const snap = await db.collection(collections.vendors).orderBy("rating", "desc").limit(10).get();
     return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<VendorDocument, "id">) }));
   } catch {
     return [];

@@ -1,8 +1,8 @@
 /**
  * OCR Analytics: success rate, average confidence, duplicate rate, common errors, processing time.
+ * Server-side only — uses Firebase Admin SDK.
  */
-import { db } from "@/firebase/config";
-import { collection, getDocs, query, orderBy, limit, where } from "firebase/firestore";
+import { getDb } from "@/lib/firebase-admin";
 import { collections } from "@/firebase/schema";
 
 export interface OcrAnalytics {
@@ -25,12 +25,9 @@ export interface OcrAnalytics {
  * Calculate analytics from OCR imports.
  */
 export async function getOcrAnalytics(): Promise<OcrAnalytics> {
-  if (!db) return emptyAnalytics();
-
   try {
-    const ref = collection(db, collections.ocrImports);
-    const q = query(ref, orderBy("importTime", "desc"), limit(500));
-    const snap = await getDocs(q);
+    const database = getDb();
+    const snap = await database.collection(collections.ocrImports).orderBy("importTime", "desc").limit(500).get();
     const imports = snap.docs.map((d) => d.data() as Record<string, unknown>);
 
     const total = imports.length;

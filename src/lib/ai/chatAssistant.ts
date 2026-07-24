@@ -2,9 +2,9 @@
  * AI Chat Assistant Service
  * Users can ask natural language questions about their matches, membership, bookings, etc.
  * Routes queries to appropriate services and returns structured responses.
+ * Server-side only — uses Firebase Admin SDK.
  */
-import { db } from "@/firebase/config";
-import { collection, getDocs, query, where, limit, orderBy } from "firebase/firestore";
+import { getDb } from "@/lib/firebase-admin";
 import { collections, type ProfileDocument, type InterestDocument } from "@/firebase/schema";
 import { calculateAge } from "@/lib/format";
 
@@ -114,9 +114,9 @@ export async function processChatQuery(
 }
 
 async function getReceivedInterests(uid: string): Promise<InterestDocument[]> {
-  if (!db) return [];
   try {
-    const snap = await getDocs(query(collection(db, collections.interests), where("toUserId", "==", uid), orderBy("createdAt", "desc"), limit(50)));
+    const db = getDb();
+    const snap = await db.collection(collections.interests).where("toUserId", "==", uid).orderBy("createdAt", "desc").limit(50).get();
     return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<InterestDocument, "id">) }));
   } catch {
     return [];
@@ -124,9 +124,9 @@ async function getReceivedInterests(uid: string): Promise<InterestDocument[]> {
 }
 
 async function getSentInterests(uid: string): Promise<InterestDocument[]> {
-  if (!db) return [];
   try {
-    const snap = await getDocs(query(collection(db, collections.interests), where("fromUserId", "==", uid), orderBy("createdAt", "desc"), limit(50)));
+    const db = getDb();
+    const snap = await db.collection(collections.interests).where("fromUserId", "==", uid).orderBy("createdAt", "desc").limit(50).get();
     return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<InterestDocument, "id">) }));
   } catch {
     return [];

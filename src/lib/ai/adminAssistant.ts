@@ -2,9 +2,9 @@
  * AI Admin Assistant
  * Allows admin to type natural language queries like:
  * "Show today's registrations", "Pending OCR", "Revenue", "Membership sales", "Duplicate profiles"
+ * Server-side only — uses Firebase Admin SDK.
  */
-import { db } from "@/firebase/config";
-import { collection, getDocs, query, where, orderBy, limit } from "firebase/firestore";
+import { getDb } from "@/lib/firebase-admin";
 import { collections } from "@/firebase/schema";
 import { getOcrAnalytics } from "@/lib/ocr/analytics";
 
@@ -20,54 +20,40 @@ export interface AdminChatResponse {
 export async function processAdminQuery(message: string): Promise<AdminChatResponse> {
   const text = message.toLowerCase().trim();
 
-  // Today's registrations
   if (text.includes("registration") || text.includes("new user") || text.includes("பதிவு")) {
     return await handleRegistrationsQuery();
   }
-
-  // Pending OCR
   if (text.includes("ocr") || text.includes("pending ocr") || text.includes("import")) {
     return await handleOcrQuery();
   }
-
-  // Revenue
   if (text.includes("revenue") || text.includes("payment") || text.includes("வருவாய்")) {
     return await handleRevenueQuery();
   }
-
-  // Membership sales
   if (text.includes("membership") || text.includes("subscription") || text.includes("premium")) {
     return await handleMembershipQuery();
   }
-
-  // Duplicate profiles
   if (text.includes("duplicate") || text.includes("நகல்")) {
     return await handleDuplicateQuery();
   }
-
-  // Analytics / overview
   if (text.includes("analytics") || text.includes("overview") || text.includes("dashboard") || text.includes("summary")) {
     return await handleOverviewQuery();
   }
-
-  // Help
   if (text.includes("help") || text.includes("உதவி")) {
     return {
       text: "I can help you with:\n• Today's registrations\n• Pending OCR imports\n• Revenue overview\n• Membership sales\n• Duplicate profiles\n• Analytics summary\n\nJust ask me anything!",
     };
   }
-
   return {
     text: "I can help you check registrations, OCR imports, revenue, membership sales, duplicates, and analytics. What would you like to know?",
   };
 }
 
 async function handleRegistrationsQuery(): Promise<AdminChatResponse> {
-  if (!db) return { text: "Database unavailable" };
   try {
+    const database = getDb();
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const snap = await getDocs(query(collection(db, collections.users), orderBy("createdAt", "desc"), limit(100)));
+    const snap = await database.collection(collections.users).orderBy("createdAt", "desc").limit(100).get();
     const users = snap.docs.map((d) => d.data() as { createdAt?: { seconds?: number } });
     const todayCount = users.filter((u) => {
       if (!u.createdAt?.seconds) return false;
@@ -97,9 +83,9 @@ async function handleOcrQuery(): Promise<AdminChatResponse> {
 }
 
 async function handleRevenueQuery(): Promise<AdminChatResponse> {
-  if (!db) return { text: "Database unavailable" };
   try {
-    const snap = await getDocs(query(collection(db, collections.payments), where("status", "==", "success"), limit(500)));
+    const database = getDb();
+    const snap = await database.collection(collections.payments).where("status", "==", "success").limit(500).get();
     const payments = snap.docs.map((d) => d.data() as { amount?: number });
     const totalRevenue = payments.reduce((sum, p) => sum + (p.amount ?? 0), 0);
     return {
@@ -113,9 +99,9 @@ async function handleRevenueQuery(): Promise<AdminChatResponse> {
 }
 
 async function handleMembershipQuery(): Promise<AdminChatResponse> {
-  if (!db) return { text: "Database unavailable" };
   try {
-    const snap = await getDocs(query(collection(db, collections.payments), where("status", "==", "success"), limit(500)));
+    const database = getDb();
+    const snap = await database.collection(collections.payments).where("status", "==", "success").limit(500).get();
     const payments = snap.docs.map((d) => d.data() as { plan?: string; amount?: number });
     const byPlan: Record<string, { count: number; revenue: number }> = {};
     for (const p of payments) {
@@ -149,12 +135,12 @@ async function handleDuplicateQuery(): Promise<AdminChatResponse> {
 }
 
 async function handleOverviewQuery(): Promise<AdminChatResponse> {
-  if (!db) return { text: "Database unavailable" };
   try {
+    const database = getDb();
     const [userSnap, profileSnap, paymentSnap] = await Promise.all([
-      getDocs(query(collection(db, collections.users), limit(1))),
-      getDocs(query(collection(db, collections.profiles), limit(1))),
-      getDocs(query(collection(db, collections.payments), limit(1))),
+      database.collection(collections.users).limit(1).get(),
+      database.collection(collections.profiles).limit(1).get(),
+      database.collection(collections.payments).limit(1).get(),
     ]);
     const ocrAnalytics = await getOcrAnalytics();
     return {

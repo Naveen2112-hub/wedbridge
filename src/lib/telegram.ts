@@ -2,8 +2,7 @@
  * Telegram Bot API integration for WedBridge.
  * Server-side only. Never expose bot tokens to the client.
  */
-import { db } from "@/firebase/config";
-import { doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, where, getDocs, limit, orderBy } from "firebase/firestore";
+import { getDb } from "@/lib/firebase-admin";
 import { collections, type AppUser } from "@/firebase/schema";
 
 const TELEGRAM_API_BASE = "https://api.telegram.org/bot";
@@ -199,10 +198,10 @@ async function sendTelegramMessageWithToken(
  * Get Telegram settings for a user from Firestore.
  */
 export async function getTelegramSettings(userId: string): Promise<TelegramSettings | null> {
-  if (!db) return null;
   try {
-    const snap = await getDoc(doc(db, collections.telegramSettings, userId));
-    if (!snap.exists()) return null;
+    const db = getDb();
+    const snap = await db.collection(collections.telegramSettings).doc(userId).get();
+    if (!snap.exists) return null;
     return snap.data() as TelegramSettings;
   } catch {
     return null;
@@ -213,14 +212,14 @@ export async function getTelegramSettings(userId: string): Promise<TelegramSetti
  * Save Telegram settings to Firestore.
  */
 export async function saveTelegramSettings(userId: string, settings: TelegramSettings): Promise<{ ok: boolean; error?: string }> {
-  if (!db) return { ok: false, error: "Database unavailable." };
   try {
-    await setDoc(doc(db, collections.telegramSettings, userId), {
+    const db = getDb();
+    await db.collection(collections.telegramSettings).doc(userId).set({
       userId,
       botToken: settings.botToken,
       chatId: settings.chatId,
       enabled: settings.enabled,
-      updatedAt: serverTimestamp(),
+      updatedAt: new Date(),
     });
     return { ok: true };
   } catch (e) {
@@ -232,11 +231,11 @@ export async function saveTelegramSettings(userId: string, settings: TelegramSet
  * Log a Telegram notification to Firestore.
  */
 export async function logTelegramNotification(entry: TelegramLogEntry): Promise<void> {
-  if (!db) return;
   try {
-    await addDoc(collection(db, collections.telegramLogs), {
+    const db = getDb();
+    await db.collection(collections.telegramLogs).add({
       ...entry,
-      createdAt: serverTimestamp(),
+      createdAt: new Date(),
     });
   } catch {
     // logging is best-effort
@@ -253,9 +252,9 @@ export async function enqueueRetry(
   payload: Record<string, unknown>,
   error: string
 ): Promise<void> {
-  if (!db) return;
   try {
-    await addDoc(collection(db, collections.telegramQueue), {
+    const db = getDb();
+    await db.collection(collections.telegramQueue).add({
       userId,
       chatId,
       messageType,
@@ -264,8 +263,8 @@ export async function enqueueRetry(
       attempts: 0,
       maxAttempts: MAX_RETRIES,
       status: "pending",
-      createdAt: serverTimestamp(),
-      nextRetryAt: serverTimestamp(),
+      createdAt: new Date(),
+      nextRetryAt: new Date(),
     });
   } catch {
     // best-effort
@@ -281,8 +280,6 @@ export async function sendUserNotification(
   text: string,
   inlineButtons?: TelegramInlineButton[][]
 ): Promise<{ ok: boolean; error?: string }> {
-  if (!db) return { ok: false, error: "Database unavailable." };
-
   const settings = await getTelegramSettings(userId);
   if (!settings || !settings.enabled || !settings.chatId) {
     return { ok: false, error: "Telegram not configured for this user." };
@@ -313,23 +310,21 @@ export async function broadcastMessage(
   text: string,
   inlineButtons?: TelegramInlineButton[][]
 ): Promise<BroadcastResult> {
-  if (!db) return { total: 0, success: 0, failed: 0, failedUserIds: [] };
-  const database = db;
+  const database = getDb();
 
   let userIds: string[] = [];
 
   if (target.type === "specific" && target.userIds) {
     userIds = target.userIds;
   } else {
-    const q = query(collection(database, collections.telegramSettings), where("enabled", "==", true));
-    const snap = await getDocs(q);
+    const snap = await database.collection(collections.telegramSettings).where("enabled", "==", true).get();
     const settingsList = snap.docs.map((d) => ({ id: d.id, ...(d.data() as TelegramSettings) }));
 
     if (target.type === "all") {
       userIds = settingsList.map((s) => s.id);
     } else if (target.type === "premium") {
       const userSnaps = await Promise.all(
-        settingsList.map((s) => getDoc(doc(database, collections.users, s.id)))
+        settingsList.map((s) => database.collection(collections.users).doc(s.id).get())
       );
       userIds = settingsList
         .filter((_, i) => {
@@ -339,7 +334,7 @@ export async function broadcastMessage(
         .map((s) => s.id);
     } else if (target.type === "verified") {
       const userSnaps = await Promise.all(
-        settingsList.map((s) => getDoc(doc(database, collections.users, s.id)))
+        settingsList.map((s) => database.collection(collections.users).doc(s.id).get())
       );
       userIds = settingsList
         .filter((_, i) => {
@@ -362,14 +357,14 @@ export async function broadcastMessage(
 
   // Log broadcast
   try {
-    await addDoc(collection(database, collections.broadcasts), {
+    await database.collection(collections.broadcasts).add({
       target: target.type,
       text,
       total: userIds.length,
       success,
       failed,
       failedUserIds,
-      createdAt: serverTimestamp(),
+      createdAt: new Date(),
     });
   } catch {
     // best-effort
@@ -425,10 +420,9 @@ export async function setBotCommands(): Promise<{ ok: boolean; error?: string }>
  * Get recent broadcasts from Firestore.
  */
 export async function getRecentBroadcasts(limitCount = 20): Promise<unknown[]> {
-  if (!db) return [];
   try {
-    const q = query(collection(db, collections.broadcasts), orderBy("createdAt", "desc"), limit(limitCount));
-    const snap = await getDocs(q);
+    const database = getDb();
+    const snap = await database.collection(collections.broadcasts).orderBy("createdAt", "desc").limit(limitCount).get();
     return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   } catch {
     return [];
