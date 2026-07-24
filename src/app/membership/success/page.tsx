@@ -16,8 +16,8 @@ export default function SuccessPage() {
   useEffect(() => {
     if (!user?.uid) return;
     (async () => {
-      const s = await getActiveSubscription(user.uid);
-      setSub(s);
+      try { const s = await getActiveSubscription(user.uid); setSub(s); }
+      catch (err) { console.error("Failed to load subscription:", err); }
     })();
   }, [user?.uid]);
 
@@ -31,6 +31,18 @@ export default function SuccessPage() {
 
   const tier = getEffectiveTier(sub);
   const plan = MEMBERSHIP_PLANS.find((p) => p.id === tier);
+
+  if (!sub || tier === "free") {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-neutral-50 to-neutral-100 px-4">
+        <div className="w-full max-w-md rounded-2xl border border-neutral-200 bg-white p-8 text-center shadow-sm">
+          <h1 className="text-2xl font-bold text-neutral-900">No Active Membership</h1>
+          <p className="mt-2 text-sm text-neutral-600">We couldn&apos;t find an active membership. If you just paid, please wait a moment and try again.</p>
+          <button onClick={() => router.push("/membership")} className="mt-6 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-rose-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-rose-500">View plans <ArrowRight className="h-4 w-4" /></button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-neutral-50 to-neutral-100 px-4">

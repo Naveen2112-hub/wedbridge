@@ -14,14 +14,14 @@ export function AdminProfilesView() {
   const [search, setSearch] = useState("");
   const [acting, setActing] = useState<string | null>(null);
 
-  const load = async () => { setLoading(true); const p = await listProfiles(200); setProfiles(p); setLoading(false); };
+  const load = async () => { setLoading(true); try { const p = await listProfiles(200); setProfiles(p); } catch (err) { console.error(err); toast("Failed to load profiles", "error"); } finally { setLoading(false); } };
   useEffect(() => { load(); }, []);
 
   const filtered = profiles.filter((p) => { const q = search.toLowerCase(); return !q || p.name?.toLowerCase().includes(q) || p.religion?.toLowerCase().includes(q); });
 
-  const handleDelete = async (id: string) => { if (!confirm("Delete this profile?")) return; setActing(id); await deleteProfile(id); setActing(null); toast("Profile deleted", "success"); load(); };
-  const toggleVerified = async (p: ProfileDocument) => { setActing(p.id ?? null); await updateProfile(p.id ?? "", { verified: !p.verified }); setActing(null); toast("Updated", "success"); load(); };
-  const toggleFeatured = async (p: ProfileDocument) => { setActing(p.id ?? null); await updateProfile(p.id ?? "", { featured: !p.featured }); setActing(null); toast("Updated", "success"); load(); };
+  const handleDelete = async (id: string) => { if (!confirm("Delete this profile?")) return; setActing(id); try { await deleteProfile(id); toast("Profile deleted", "success"); load(); } catch (err) { console.error(err); toast("Failed to delete profile", "error"); } finally { setActing(null); } };
+  const toggleVerified = async (p: ProfileDocument) => { setActing(p.id ?? null); try { await updateProfile(p.id ?? "", { verified: !p.verified }); toast("Updated", "success"); load(); } catch (err) { console.error(err); toast("Failed to update", "error"); } finally { setActing(null); } };
+  const toggleFeatured = async (p: ProfileDocument) => { setActing(p.id ?? null); try { await updateProfile(p.id ?? "", { featured: !p.featured }); toast("Updated", "success"); load(); } catch (err) { console.error(err); toast("Failed to update", "error"); } finally { setActing(null); } };
 
   return (
     <div>
@@ -31,7 +31,7 @@ export function AdminProfilesView() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((p) => (
             <div key={p.id} className="card p-4">
-              <div className="flex items-center gap-3"><div className="h-12 w-12 overflow-hidden rounded-xl bg-primary-100">{p.photoURL && <Image src={p.photoURL} alt={p.name} fill className="h-full w-full object-cover" />}</div><div className="flex-1"><h3 className="font-semibold text-primary-900">{p.name}</h3><p className="text-xs text-gray-500">{p.religion} · {p.caste ?? ""}</p><p className="text-xs text-gray-500">{formatDate(p.createdAt as unknown as string)}</p></div></div>
+              <div className="flex items-center gap-3"><div className="relative h-12 w-12 overflow-hidden rounded-xl bg-primary-100">{p.photoURL && <Image src={p.photoURL} alt={p.name} fill className="object-cover" />}</div><div className="flex-1"><h3 className="font-semibold text-primary-900">{p.name}</h3><p className="text-xs text-gray-500">{p.religion} · {p.caste ?? ""}</p><p className="text-xs text-gray-500">{formatDate(p.createdAt as unknown as string)}</p></div></div>
               <div className="mt-3 flex items-center gap-2">{acting === p.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <><button type="button" onClick={() => toggleVerified(p)} className={cn("badge", p.verified ? "bg-green-50 text-green-700" : "bg-gray-50 text-gray-600")}><BadgeCheck className="h-3 w-3" />{p.verified ? "Verified" : "Verify"}</button><button type="button" onClick={() => toggleFeatured(p)} className={cn("badge", p.featured ? "bg-amber-50 text-amber-700" : "bg-gray-50 text-gray-600")}><Star className="h-3 w-3" />{p.featured ? "Featured" : "Feature"}</button><button type="button" onClick={() => handleDelete(p.id ?? "")} className="ml-auto rounded-lg p-1.5 text-red-600 hover:bg-red-50"><Trash2 className="h-4 w-4" /></button></>}</div>
             </div>
           ))}

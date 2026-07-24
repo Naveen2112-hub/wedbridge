@@ -1,7 +1,7 @@
 "use client";
 
-import { useAuth } from "@/components/AuthProvider";
-import { useToast } from "@/components/ToastProvider";
+import { useAuth } from "@/lib/auth/AuthProvider";
+import { useToast } from "@/components/ui/Toast";
 import { PLANS, type PlanId } from "@/lib/plans";
 
 interface CreateOrderResponse {
@@ -66,7 +66,7 @@ function loadScript(): Promise<void> {
 }
 
 export function useRazorpayCheckout() {
-  const { getIdToken, user } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
 
   async function subscribe(planId: PlanId): Promise<boolean> {
@@ -76,7 +76,7 @@ export function useRazorpayCheckout() {
       return false;
     }
 
-    const token = await getIdToken();
+    const token = user ? await user.getIdToken() : null;
     if (!token) {
       toast("Please sign in to subscribe", "error");
       return false;

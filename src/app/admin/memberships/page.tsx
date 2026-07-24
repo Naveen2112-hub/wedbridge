@@ -20,8 +20,11 @@ export default function AdminMembershipsPage() {
 
   useEffect(() => {
     (async () => {
-      const [s, p, r] = await Promise.all([listAllSubscriptions(100), listAllPayments(100), getRevenueStats()]);
-      setSubs(s); setPayments(p); setStats(r); setLoading(false);
+      try {
+        const [s, p, r] = await Promise.all([listAllSubscriptions(100), listAllPayments(100), getRevenueStats()]);
+        setSubs(s); setPayments(p); setStats(r);
+      } catch (err) { console.error("Failed to load membership data:", err); }
+      finally { setLoading(false); }
     })();
   }, []);
 

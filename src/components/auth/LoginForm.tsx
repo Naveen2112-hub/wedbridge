@@ -24,7 +24,7 @@ export function LoginForm() {
     setLoading(true);
     const res = await loginUser(email, password);
     setLoading(false);
-    if (res.ok) { toast("Welcome back!", "success"); const redirect = searchParams?.get("redirect"); router.push(redirect ?? "/search"); }
+    if (res.ok) { toast("Welcome back!", "success"); const redirect = searchParams?.get("redirect"); router.push(redirect && redirect.startsWith("/") && !redirect.startsWith("//") ? redirect : "/search"); }
     else toast(res.error ?? "Login failed", "error");
   };
 

@@ -7,7 +7,7 @@ import { formatDate } from "@/lib/utils";
 export default function ActivityLogsPage() {
   const [logs, setLogs] = useState<AdminActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
-  const load = () => { setLoading(true); getAdminActivityLogs(100).then((l) => { setLogs(l); setLoading(false); }); };
+  const load = () => { setLoading(true); getAdminActivityLogs(100).then((l) => { setLogs(l); setLoading(false); }).catch((err) => { console.error("Failed to load logs:", err); setLoading(false); }); };
   useEffect(() => { load(); }, []);
   return (
     <div>

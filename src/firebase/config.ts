@@ -1,6 +1,6 @@
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getAuth, type Auth } from "firebase/auth";
-import { getFirestore, type Firestore, enableIndexedDbPersistence } from "firebase/firestore";
+import { initializeFirestore, type Firestore, persistentLocalCache, getFirestore } from "firebase/firestore";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -22,9 +22,12 @@ if (typeof window !== "undefined" && firebaseConfig.apiKey) {
   try {
     app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
     authInstance = getAuth(app);
-    dbInstance = getFirestore(app);
+    try {
+      dbInstance = initializeFirestore(app, { localCache: persistentLocalCache() });
+    } catch {
+      dbInstance = getFirestore(app);
+    }
     storageInstance = getStorage(app);
-    enableIndexedDbPersistence(dbInstance).catch(() => { /* already enabled or unsupported */ });
   } catch (e) {
     console.error("Firebase initialization failed:", e);
   }

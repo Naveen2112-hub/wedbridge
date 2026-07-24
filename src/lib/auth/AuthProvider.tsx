@@ -3,10 +3,10 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signOut, sendPasswordResetEmail, updateProfile, onAuthStateChanged, type User } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { auth, db, isFirebaseConfigured } from "@/firebase/config";
-import { collections, type UserRole, type Language, type ContactVisibility, type AppUser } from "@/firebase/schema";
+import { collections, type UserRole, type Language, type ContactVisibility, type AppUser, type Gender } from "@/firebase/schema";
 
 export interface CompleteProfileInput { name: string; gender: Gender; dateOfBirth: string; religion: string; caste: string; district: string; phone: string; email?: string; photoURL?: string; contactVisibility: ContactVisibility; }
-import type { Gender } from "@/firebase/schema";
+
 
 export interface AuthContextValue {
   user: User | null; role: UserRole | null; appUser: AppUser | null; profileCompleted: boolean; loading: boolean; configured: boolean;
@@ -29,10 +29,10 @@ async function ensureUserDoc(user: User, defaults: Partial<Record<string, unknow
   const ref = doc(db, collections.users, user.uid);
   const snap = await getDoc(ref);
   if (!snap.exists()) {
-    const payload = { uid: user.uid, role: "user" as UserRole, name: user.displayName ?? defaults.name ?? "", email: user.email ?? "", phone: user.phoneNumber ?? "", gender: null, profileCompleted: false, photoURL: user.photoURL ?? "", contactVisibility: "after_accept" as ContactVisibility, language: readLanguage(), createdAt: serverTimestamp(), updatedAt: serverTimestamp(), ...defaults };
-    await setDoc(ref, payload);
+    const payload = { uid: user.uid, role: "user" as UserRole, name: user.displayName ?? (defaults.name as string) ?? "", email: user.email ?? "", phone: user.phoneNumber ?? "", gender: null, profileCompleted: false, photoURL: user.photoURL ?? "", contactVisibility: "after_accept" as ContactVisibility, language: readLanguage(), status: "active" as const, verified: false, membershipTier: "free" as const, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
+    await setDoc(ref, payload, { merge: true });
     const { uid: _u, email: _e, role: _r, ...restPayload } = payload;
-    return { role: "user", profileCompleted: false, appUser: { uid: user.uid, email: user.email ?? "", displayName: user.displayName ?? "", role: "user", status: "active", verified: false, ...restPayload } as AppUser };
+    return { role: "user", profileCompleted: false, appUser: { uid: user.uid, email: user.email ?? "", displayName: user.displayName ?? "", ...restPayload } as AppUser };
   }
   const data = snap.data();
   return { role: (data.role as UserRole) ?? "user", profileCompleted: Boolean(data.profileCompleted), appUser: { uid: user.uid, ...(data as Omit<AppUser, "uid">) } };
@@ -48,7 +48,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!configured || !auth) { setLoading(false); return; }
-    const unsub = onAuthStateChanged(auth, async (u) => { setUser(u); if (u && db) { const meta = await ensureUserDoc(u); setRole(meta.role); setAppUser(meta.appUser); setProfileCompleted(meta.profileCompleted); } else { setRole(null); setAppUser(null); setProfileCompleted(false); } setLoading(false); });
+    const unsub = onAuthStateChanged(auth, async (u) => {
+      setUser(u);
+      try {
+        if (u && db) { const meta = await ensureUserDoc(u); setRole(meta.role); setAppUser(meta.appUser); setProfileCompleted(meta.profileCompleted); }
+        else { setRole(null); setAppUser(null); setProfileCompleted(false); }
+      } catch (err) { console.error("Auth state change error:", err); setRole(null); setAppUser(null); setProfileCompleted(false); }
+      setLoading(false);
+    });
     return () => unsub();
   }, [configured]);
 
@@ -84,8 +91,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const completeProfile = useCallback(async (data: CompleteProfileInput) => {
     if (!auth || !db || !auth.currentUser) throw new Error("auth.error.notConfigured");
     const ref = doc(db, collections.users, auth.currentUser.uid);
-    await setDoc(ref, { name: data.name, gender: data.gender, dateOfBirth: data.dateOfBirth, religion: data.religion, caste: data.caste, district: data.district, phone: data.phone, email: data.email ?? auth.currentUser.email ?? "", photoURL: data.photoURL ?? auth.currentUser.photoURL ?? "", contactVisibility: data.contactVisibility, profileCompleted: true, updatedAt: serverTimestamp() }, { merge: true });
+    const updates = { name: data.name, gender: data.gender, dateOfBirth: data.dateOfBirth, religion: data.religion, caste: data.caste, district: data.district, phone: data.phone, email: data.email ?? auth.currentUser.email ?? "", photoURL: data.photoURL ?? auth.currentUser.photoURL ?? "", contactVisibility: data.contactVisibility, profileCompleted: true, updatedAt: serverTimestamp() };
+    await setDoc(ref, updates, { merge: true });
     setProfileCompleted(true);
+    setAppUser((prev) => prev ? { ...prev, ...updates } as AppUser : prev);
   }, []);
 
   const value = useMemo<AuthContextValue>(() => ({ user, role, appUser, profileCompleted, loading, configured, registerWithEmail, loginWithEmail, loginWithGoogle, resetPassword, logout, completeProfile, setProfileCompleted }), [user, role, appUser, profileCompleted, loading, configured, registerWithEmail, loginWithEmail, loginWithGoogle, resetPassword, logout, completeProfile]);

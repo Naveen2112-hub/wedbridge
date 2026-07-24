@@ -44,11 +44,11 @@ export function VendorCard({ vendor }: { vendor: VendorDocument }) {
           <MapPin className="h-3.5 w-3.5" /><span className="truncate">{[vendor.address, vendor.city, vendor.state].filter(Boolean).join(", ")}</span>
         </div>
         <div className="mt-2 flex items-center gap-3">
-          <div className="flex items-center gap-1"><StarRating rating={vendor.rating} /><span className="text-xs font-medium text-gray-900/70">{vendor.rating > 0 ? vendor.rating.toFixed(1) : "New"}</span></div>
+          <div className="flex items-center gap-1"><StarRating rating={vendor.rating} /><span className="text-xs font-medium text-gray-900/70">{(vendor.rating ?? 0) > 0 ? (vendor.rating ?? 0).toFixed(1) : "New"}</span></div>
           {vendor.experienceYears > 0 && <span className="text-xs text-gray-500">· {vendor.experienceYears}y exp</span>}
         </div>
         <div className="mt-3 flex items-center justify-between">
-          <p className="flex items-center text-sm font-semibold text-primary-900"><IndianRupee className="h-3.5 w-3.5" />{vendor.startingPrice.toLocaleString()}<span className="text-xs font-normal text-gray-500"> onwards</span></p>
+          <p className="flex items-center text-sm font-semibold text-primary-900"><IndianRupee className="h-3.5 w-3.5" />{(vendor.startingPrice ?? 0).toLocaleString()}<span className="text-xs font-normal text-gray-500"> onwards</span></p>
         </div>
         <div className="mt-3 flex flex-wrap gap-3 text-xs text-gray-600">
           {vendor.phone && <span className="flex items-center gap-1"><Phone className="h-3.5 w-3.5 text-primary-600" />{vendor.phone}</span>}

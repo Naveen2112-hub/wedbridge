@@ -174,6 +174,8 @@ export async function getPaymentHistory(userId: string): Promise<PaymentDocument
 
 /**
  * Mark a UPI payment as paid (manual confirmation).
+ * NOTE: This only marks the payment as "pending verification". Actual activation
+ * requires server-side verification via the Razorpay verify API route.
  */
 export async function confirmUpiPayment(
   paymentId: string,
@@ -182,8 +184,8 @@ export async function confirmUpiPayment(
   if (!db) return;
   const { updateDoc } = await import("firebase/firestore");
   await updateDoc(doc(db, collections.payments, paymentId), {
-    status: "success",
+    status: "pending_verification",
     transactionId,
-    paidAt: serverTimestamp(),
+    submittedAt: serverTimestamp(),
   });
 }

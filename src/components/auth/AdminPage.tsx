@@ -2,7 +2,7 @@
 import { type LucideIcon } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
 import { AdminGuard } from "@/components/auth/AdminGuard";
-import { AdminLayout } from "@/components/layout/AdminLayout";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 interface AdminPageProps { title: string; description: string; icon: LucideIcon; children?: React.ReactNode; }
 export function AdminPage({ title, description, icon: Icon, children }: AdminPageProps) {
   const { t } = useLanguage();

@@ -26,8 +26,8 @@ export function VendorDetailView({ idPromise }: { idPromise: Promise<{ id: strin
 
   useEffect(() => {
     (async () => {
-      const [v, p, g, r] = await Promise.all([getVendor(id), getPackages(id), getGallery(id), getReviews(id)]);
-      setVendor(v); setPackages(p); setGallery(g); setReviews(r); setLoading(false);
+      const [v, p, g, r] = await Promise.all([getVendor(id), getPackages(id), getGallery(id), getReviews(id)]).catch(() => [null, [], [], []] as [null, never[], never[], never[]]);
+      setVendor(v); setPackages(p || []); setGallery(g || []); setReviews(r || []); setLoading(false);
     })();
   }, [id]);
 
@@ -63,7 +63,7 @@ export function VendorDetailView({ idPromise }: { idPromise: Promise<{ id: strin
             <div>
               <div className="flex items-center gap-2"><h1 className="heading-md">{vendor.businessName}</h1>{vendor.verificationStatus === "verified" && <BadgeCheck className="h-5 w-5 text-green-600" />}</div>
               <p className="mt-1 flex items-center gap-1 text-sm text-gray-500"><MapPin className="h-4 w-4" />{vendor.city}, {vendor.district}, {vendor.state}</p>
-              <div className="mt-2 flex items-center gap-4 text-sm"><span className="flex items-center gap-1"><Star className="h-4 w-4 text-secondary-500" fill="currentColor" />{vendor.rating.toFixed(1)} ({vendor.reviewCount} reviews)</span><span className="font-semibold text-primary-700">From {formatCurrency(vendor.startingPrice)}</span></div>
+              <div className="mt-2 flex items-center gap-4 text-sm"><span className="flex items-center gap-1"><Star className="h-4 w-4 text-secondary-500" fill="currentColor" />{(vendor.rating ?? 0).toFixed(1)} ({vendor.reviewCount ?? 0} reviews)</span><span className="font-semibold text-primary-700">From {formatCurrency(vendor.startingPrice ?? 0)}</span></div>
             </div>
           </div>
         </div>
@@ -74,7 +74,7 @@ export function VendorDetailView({ idPromise }: { idPromise: Promise<{ id: strin
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           {tab === "about" && <div className="card p-6"><h2 className="heading-sm">About</h2><p className="mt-3 text-sm text-gray-500">{vendor.about || "No description available."}</p><div className="mt-4 space-y-2 text-sm">{vendor.phone && <p className="flex items-center gap-2"><Phone className="h-4 w-4 text-primary-600" />{vendor.phone}</p>}{vendor.email && <p className="flex items-center gap-2"><Mail className="h-4 w-4 text-primary-600" />{vendor.email}</p>}{vendor.website && <p className="flex items-center gap-2"><Globe className="h-4 w-4 text-primary-600" /><a href={vendor.website} target="_blank" rel="noopener noreferrer" className="text-primary-700 hover:underline">{vendor.website}</a></p>}{vendor.businessHours && <p className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary-600" />{vendor.businessHours.days}: {vendor.businessHours.hours}</p>}</div></div>}
-          {tab === "packages" && <div className="space-y-3">{packages.length === 0 ? <p className="text-gray-500">No packages listed.</p> : packages.map((p) => <div key={p.id} className="card p-4"><h3 className="font-semibold text-primary-900">{p.name}</h3><p className="mt-1 text-sm text-gray-500">{p.description}</p><p className="mt-2 font-bold text-primary-700">{formatCurrency(p.price)}</p>{p.inclusions.length > 0 && <ul className="mt-2 text-sm text-gray-500">{p.inclusions.map((inc, i) => <li key={i}>• {inc}</li>)}</ul>}</div>)}</div>}
+          {tab === "packages" && <div className="space-y-3">{packages.length === 0 ? <p className="text-gray-500">No packages listed.</p> : packages.map((p) => <div key={p.id} className="card p-4"><h3 className="font-semibold text-primary-900">{p.name}</h3><p className="mt-1 text-sm text-gray-500">{p.description}</p><p className="mt-2 font-bold text-primary-700">{formatCurrency(p.price)}</p>{(p.inclusions?.length ?? 0) > 0 && <ul className="mt-2 text-sm text-gray-500">{(p.inclusions ?? []).map((inc, i) => <li key={i}>• {inc}</li>)}</ul>}</div>)}</div>}
           {tab === "gallery" && <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">{gallery.length === 0 ? <p className="text-gray-500">No images.</p> : gallery.map((g) => <div key={g.id} className="aspect-square overflow-hidden rounded-xl bg-primary-100"><Image src={g.imageURL} alt={g.caption ?? ""} fill className="h-full w-full object-cover" loading="lazy" /></div>)}</div>}
           {tab === "reviews" && <div className="space-y-3">{reviews.length === 0 ? <p className="text-gray-500">No reviews yet.</p> : reviews.map((r) => <div key={r.id} className="card p-4"><div className="flex items-center justify-between"><p className="font-medium text-primary-900">{r.userName}</p><span className="flex items-center gap-0.5">{Array.from({ length: 5 }).map((_, i) => <Star key={i} className={`h-3.5 w-3.5 ${i < r.rating ? "text-secondary-500" : "text-primary-100"}`} fill="currentColor" />)}</span></div><p className="mt-2 text-sm text-gray-500">{r.review}</p></div>)}</div>}
         </div>

@@ -22,7 +22,7 @@ export default function ProfileDetailsClient() {
   const params = useParams<{ id: string }>();
   const id = params?.id;
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, appUser } = useAuth();
   const { t } = useLanguage();
   const [profile, setProfile] = useState<ProfileDocument | null>(null);
   const [related, setRelated] = useState<ProfileDocument[]>([]);
@@ -59,8 +59,8 @@ export default function ProfileDetailsClient() {
     <AuthGuard><ProtectedLayout><div className="mx-auto max-w-md py-16 text-center"><h1 className="heading-md">{t("profile.details.notFound")}</h1><button onClick={() => router.back()} className="btn-primary mt-6">{t("profile.details.backToSearch")}</button></div></ProtectedLayout></AuthGuard>
   );
 
-  const isOwn = user?.uid === id;
-  const showContact = isOwn || profile.contactVisibility === "everyone";
+  const isOwn = user?.uid === id || user?.uid === profile.userId;
+  const showContact = isOwn || profile.contactVisibility === "everyone" || (profile.contactVisibility === "premium_only" && (appUser?.membershipTier === "premium" || appUser?.membershipTier === "gold"));
 
   const handleInterest = async () => {
     if (!user?.uid || !profile) return;
@@ -80,7 +80,7 @@ export default function ProfileDetailsClient() {
       if (fav) { await removeFavourite(user.uid, id!); setFav(false); }
       else {
         await addFavourite(user.uid, id!); setFav(true);
-        await createNotification(profile.userId ?? id!, { title: "Profile Favourited", message: "Someone added you to their favourites.", type: "profile_viewed" });
+        await createNotification(profile.userId ?? id!, { title: "Profile Favourited", message: "Someone added you to their favourites.", type: "system" });
       }
     } finally { setBusy(false); }
   };

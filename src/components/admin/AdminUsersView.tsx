@@ -13,20 +13,20 @@ export function AdminUsersView() {
   const [search, setSearch] = useState("");
   const [acting, setActing] = useState<string | null>(null);
 
-  const load = async () => { setLoading(true); const u = await listUsers(200); setUsers(u); setLoading(false); };
+  const load = async () => { setLoading(true); try { const u = await listUsers(200); setUsers(u); } catch (err) { console.error("Failed to load users:", err); toast("Failed to load users", "error"); } finally { setLoading(false); } };
   useEffect(() => { load(); }, []);
 
   const filtered = users.filter((u) => { const q = search.toLowerCase(); return !q || u.email?.toLowerCase().includes(q) || u.displayName?.toLowerCase().includes(q); });
 
   const handleDelete = async (uid: string) => {
     if (!confirm("Delete this user? This cannot be undone.")) return;
-    setActing(uid); await deleteUser(uid); setActing(null); toast("User deleted", "success"); load();
+    setActing(uid); try { await deleteUser(uid); toast("User deleted", "success"); load(); } catch (err) { console.error(err); toast("Failed to delete user", "error"); } finally { setActing(null); }
   };
   const togglePremium = async (u: AppUser) => {
-    setActing(u.uid); await updateUser(u.uid, { membershipTier: u.membershipTier === "free" ? "premium" : "free" }); setActing(null); toast("User updated", "success"); load();
+    setActing(u.uid); try { await updateUser(u.uid, { membershipTier: u.membershipTier === "free" ? "premium" : "free" }); toast("User updated", "success"); load(); } catch (err) { console.error(err); toast("Failed to update user", "error"); } finally { setActing(null); }
   };
   const toggleVerified = async (u: AppUser) => {
-    setActing(u.uid); await updateUser(u.uid, { verified: !u.verified }); setActing(null); toast("User updated", "success"); load();
+    setActing(u.uid); try { await updateUser(u.uid, { verified: !u.verified }); toast("User updated", "success"); load(); } catch (err) { console.error(err); toast("Failed to update user", "error"); } finally { setActing(null); }
   };
 
   return (

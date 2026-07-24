@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { initializeApp, getApps, cert, type AppOptions } from "firebase-admin/app";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
 import type { MembershipTier } from "@/firebase/schema";
 
 export const runtime = "nodejs";
@@ -23,16 +24,33 @@ function getAdminDb(): Firestore {
   return adminDb;
 }
 
+async function verifyToken(req: NextRequest): Promise<string | null> {
+  const header = req.headers.get("authorization");
+  if (!header || !header.startsWith("Bearer ")) return null;
+  const idToken = header.slice("Bearer ".length).trim();
+  if (!idToken) return null;
+  try {
+    const decoded = await getAuth(getApps().length ? getApps()[0] : initializeApp(process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ? { projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID } : {})).verifyIdToken(idToken);
+    return decoded.uid;
+  } catch {
+    return null;
+  }
+}
+
 interface CreateOrderBody {
-  uid: string;
   plan: MembershipTier;
 }
 
 export async function POST(req: NextRequest) {
   try {
+    const uid = await verifyToken(req);
+    if (!uid) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = (await req.json()) as CreateOrderBody;
-    if (!body.uid || !body.plan) {
-      return NextResponse.json({ error: "Missing uid or plan" }, { status: 400 });
+    if (!body.plan) {
+      return NextResponse.json({ error: "Missing plan" }, { status: 400 });
     }
     const amount = PLAN_PRICES[body.plan];
     if (!amount) {
@@ -45,12 +63,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Razorpay not configured" }, { status: 500 });
     }
 
-    // Create a real Razorpay order via the REST API
     const auth = Buffer.from(`${keyId}:${keySecret}`).toString("base64");
     const rzpRes = await fetch("https://api.razorpay.com/v1/orders", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Basic ${auth}` },
-      body: JSON.stringify({ amount, currency: "INR", payment_capture: 1, notes: { uid: body.uid, plan: body.plan } }),
+      body: JSON.stringify({ amount, currency: "INR", payment_capture: 1, notes: { uid, plan: body.plan } }),
     });
 
     if (!rzpRes.ok) {
@@ -61,11 +78,10 @@ export async function POST(req: NextRequest) {
 
     const rzpOrder = (await rzpRes.json()) as { id: string; amount: number; currency: string; status: string };
 
-    // Store a pending payment record in Firestore
     const db = getAdminDb();
     const payRef = await db.collection("payments").add({
-      uid: body.uid,
-      userId: body.uid,
+      uid,
+      userId: uid,
       orderId: rzpOrder.id,
       razorpayOrderId: rzpOrder.id,
       gateway: "razorpay",
@@ -73,7 +89,7 @@ export async function POST(req: NextRequest) {
       currency: rzpOrder.currency,
       plan: body.plan,
       status: "pending",
-      notes: { uid: body.uid, plan: body.plan },
+      notes: { uid, plan: body.plan },
       createdAt: new Date(),
       updatedAt: new Date(),
     });

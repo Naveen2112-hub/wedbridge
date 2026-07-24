@@ -16,7 +16,7 @@ const VendorCard = memo(function VendorCard({ vendor }: { vendor: VendorDocument
         <div className="flex items-center gap-2"><h3 className="font-display text-lg font-semibold text-primary-900">{vendor.businessName}</h3>{vendor.verificationStatus === "verified" && <BadgeCheck className="h-4 w-4 text-green-600" />}</div>
         <p className="text-xs text-gray-500">{VENDOR_CATEGORIES.find((c) => c.id === vendor.category)?.name ?? vendor.category}</p>
         <p className="mt-1 flex items-center gap-1 text-xs text-gray-500"><MapPin className="h-3 w-3" />{vendor.city}, {vendor.district}</p>
-        <div className="mt-2 flex items-center justify-between"><span className="flex items-center gap-1 text-sm font-medium text-primary-900"><Star className="h-3.5 w-3.5 text-secondary-500" fill="currentColor" />{vendor.rating.toFixed(1)}</span><span className="text-sm font-semibold text-primary-700">From {formatCurrency(vendor.startingPrice)}</span></div>
+        <div className="mt-2 flex items-center justify-between"><span className="flex items-center gap-1 text-sm font-medium text-primary-900"><Star className="h-3.5 w-3.5 text-secondary-500" fill="currentColor" />{(vendor.rating ?? 0).toFixed(1)}</span><span className="text-sm font-semibold text-primary-700">From {formatCurrency(vendor.startingPrice ?? 0)}</span></div>
       </div>
     </Link>
   );
@@ -30,7 +30,7 @@ export default function VendorSearchPage() {
   const [city, setCity] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"rating" | "price">("rating");
 
-  useEffect(() => { getApprovedVendors(200).then((v) => { setVendors(v); setLoading(false); }); }, []);
+  useEffect(() => { getApprovedVendors(200).then((v) => { setVendors(v); setLoading(false); }).catch(() => setLoading(false)); }, []);
   const cities = Array.from(new Set(vendors.map((v) => v.city).filter(Boolean)));
   const filtered = vendors.filter((v) => {
     const q = search.toLowerCase();
@@ -38,7 +38,7 @@ export default function VendorSearchPage() {
     const matchC = cat === "all" || v.category === cat;
     const matchCity = city === "all" || v.city === city;
     return matchQ && matchC && matchCity;
-  }).sort((a, b) => sortBy === "rating" ? b.rating - a.rating : a.startingPrice - b.startingPrice);
+  }).sort((a, b) => sortBy === "rating" ? (b.rating ?? 0) - (a.rating ?? 0) : (a.startingPrice ?? 0) - (b.startingPrice ?? 0));
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

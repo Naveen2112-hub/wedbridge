@@ -1,16 +1,51 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Settings as SettingsIcon, Globe, Bell, Shield, Trash2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageProvider";
+import { useAuth } from "@/lib/auth/AuthProvider";
+import { useToast } from "@/components/ui/Toast";
 import { AuthGuard } from "@/components/auth/AuthGuard";
 import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
+import { saveProfile } from "@/lib/profile/profileService";
+import { getProfileByUserId } from "@/lib/profile/profileService";
 import { cn } from "@/lib/cn";
 
 export default function SettingsPage() {
   const { t, lang, setLang } = useLanguage();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const [notifEmail, setNotifEmail] = useState(true);
   const [notifPush, setNotifPush] = useState(true);
   const [profileVisible, setProfileVisible] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!user?.uid) return;
+    getProfileByUserId(user.uid).then((p) => {
+      if (p?.profileVisibility === "hidden") setProfileVisible(false);
+    }).catch(() => {});
+  }, [user?.uid]);
+
+  const handleVisibilityChange = async (visible: boolean) => {
+    setProfileVisible(visible);
+    if (!user) return;
+    setSaving(true);
+    try {
+      await saveProfile(user.uid, { profileVisibility: visible ? "visible" : "hidden" });
+      toast("Privacy preference saved", "success");
+    } catch (err) {
+      console.error("Failed to save visibility:", err);
+      toast("Failed to save preference", "error");
+      setProfileVisible(!visible);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!confirm("Are you sure? This will permanently delete your account and all data. This cannot be undone.")) return;
+    toast("Please contact support to delete your account.", "info");
+  };
 
   return (
     <AuthGuard>
@@ -60,7 +95,7 @@ export default function SettingsPage() {
               </div>
               <div className="mt-4 flex items-center justify-between rounded-xl border border-primary-100 px-4 py-3">
                 <div><p className="text-sm font-medium text-gray-900">Profile Visible to Others</p><p className="text-xs text-gray-500">Allow your profile to appear in search results</p></div>
-                <button type="button" onClick={() => setProfileVisible(!profileVisible)} className={cn("relative h-6 w-11 rounded-full transition-colors", profileVisible ? "bg-primary-600" : "bg-primary-200")} aria-label="Profile visibility">
+                <button type="button" disabled={saving} onClick={() => handleVisibilityChange(!profileVisible)} className={cn("relative h-6 w-11 rounded-full transition-colors disabled:opacity-50", profileVisible ? "bg-primary-600" : "bg-primary-200")} aria-label="Profile visibility">
                   <span className={cn("absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform", profileVisible ? "translate-x-5" : "translate-x-0.5")} />
                 </button>
               </div>
@@ -71,7 +106,7 @@ export default function SettingsPage() {
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-error-50 text-error-600"><Trash2 className="h-5 w-5" /></span>
                 <div><h2 className="heading-sm text-error-700">Danger Zone</h2><p className="text-caption">Irreversible account actions</p></div>
               </div>
-              <button type="button" className="btn-danger mt-4">Delete My Account</button>
+              <button type="button" onClick={handleDeleteAccount} className="btn-danger mt-4">Delete My Account</button>
             </div>
           </div>
         </div>

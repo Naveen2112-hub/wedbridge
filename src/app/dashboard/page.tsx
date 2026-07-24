@@ -20,15 +20,18 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const [s, n] = await Promise.all([getActiveSubscription(user.uid), getUserNotifications(user.uid, 5)]);
-      setSub(s); setNotifications(n); setDashLoading(false);
+      try {
+        const [s, n] = await Promise.all([getActiveSubscription(user.uid), getUserNotifications(user.uid, 5)]);
+        setSub(s); setNotifications(n);
+      } catch (err) { console.error("Dashboard load error:", err); }
+      finally { setDashLoading(false); }
     })();
   }, [user]);
 
-  if (loading || dashLoading) return <div className="mx-auto max-w-7xl px-4 py-8 lg:px-8"><div className="flex items-center gap-3"><Loader2 className="h-8 w-8 animate-spin text-rose-600" /><p className="text-neutral-500">Loading dashboard...</p></div></div>;
+  if (loading || (dashLoading && user)) return <div className="mx-auto max-w-7xl px-4 py-8 lg:px-8"><div className="flex items-center gap-3"><Loader2 className="h-8 w-8 animate-spin text-rose-600" /><p className="text-neutral-500">Loading dashboard...</p></div></div>;
 
   const tier = getEffectiveTier(sub);
-  const daysLeft = daysUntilExpiry(sub);
+  const daysLeft = daysUntilExpiry(sub) ?? 0;
   const unreadCount = notifications.filter((n) => !n.read).length;
   const profileComplete = appUser?.profileCompleted ?? false;
 

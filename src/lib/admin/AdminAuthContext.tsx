@@ -3,8 +3,8 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { useRouter } from "next/navigation";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from "firebase/auth";
 import { auth, db } from "@/firebase/config";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
-import { collections, type AppUser, type UserRole, type ContactVisibility, type Language } from "@/firebase/schema";
+import { doc, getDoc } from "firebase/firestore";
+import { collections, type AppUser, type Language } from "@/firebase/schema";
 
 interface AdminAuthContextType { user: User | null; adminUser: AppUser | null; loading: boolean; login: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>; logout: () => Promise<void>; }
 const AdminAuthContext = createContext<AdminAuthContextType>({ user: null, adminUser: null, loading: true, login: async () => ({ ok: false }), logout: async () => {} });
@@ -27,15 +27,11 @@ function friendlyAuthError(e: unknown): string {
   return map[code] ?? (e instanceof Error ? e.message : "Login failed. Please try again.");
 }
 
-async function ensureUserDoc(user: User): Promise<AppUser | null> {
+async function readUserDoc(user: User): Promise<AppUser | null> {
   if (!db) return null;
   const ref = doc(db, collections.users, user.uid);
   const snap = await getDoc(ref);
-  if (!snap.exists()) {
-    const payload = { uid: user.uid, role: "user" as UserRole, name: user.displayName ?? "", email: user.email ?? "", phone: user.phoneNumber ?? "", gender: null, profileCompleted: false, photoURL: user.photoURL ?? "", contactVisibility: "after_accept" as ContactVisibility, language: readLanguage(), createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
-    await setDoc(ref, payload);
-    return { uid: user.uid, email: user.email ?? "", displayName: user.displayName ?? "", role: "user", status: "active", verified: false } as AppUser;
-  }
+  if (!snap.exists()) return null;
   const data = snap.data() as Omit<AppUser, "uid">;
   return { uid: user.uid, ...data };
 }
@@ -56,9 +52,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       if (!u) { setUser(null); setAdminUser(null); settle(); return; }
       setUser(u);
       try {
-        const appUser = await ensureUserDoc(u);
+        const appUser = await readUserDoc(u);
         if (appUser && appUser.role === "admin") setAdminUser(appUser);
-        else { setAdminUser(null); if (auth) await signOut(auth); }
+        else setAdminUser(null);
       } catch { setAdminUser(null); }
       settle();
     });
@@ -73,7 +69,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password);
       try {
-        const appUser = await ensureUserDoc(cred.user);
+        const appUser = await readUserDoc(cred.user);
         if (!appUser || appUser.role !== "admin") { await signOut(auth); return { ok: false, error: "Access denied. Administrator account required." }; }
         setAdminUser(appUser);
         return { ok: true };
