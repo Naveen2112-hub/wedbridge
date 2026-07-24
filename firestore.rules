@@ -280,6 +280,52 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // ── /blocks ──────────────────────────────────────────────────
+    match /blocks/{id} {
+      allow read:   if isOwner(resource.data.blockerUid) || isAdmin();
+      allow create: if isOwner(request.resource.data.blockerUid) && isReasonableSize();
+      allow update: if isOwner(resource.data.blockerUid);
+      allow delete: if isOwner(resource.data.blockerUid) || isAdmin();
+    }
+
+    // ── /reports ─────────────────────────────────────────────────
+    match /reports/{id} {
+      allow read:   if isOwner(resource.data.reporterUid) || isAdmin();
+      allow create: if isOwner(request.resource.data.reporterUid) && isReasonableSize();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── /privacy_settings ────────────────────────────────────────
+    match /privacy_settings/{uid} {
+      allow read:  if isOwner(uid) || isAdmin();
+      allow write: if isOwner(uid) || isAdmin();
+    }
+
+    // ── /invoices ────────────────────────────────────────────────
+    match /invoices/{id} {
+      allow read:   if isOwner(resource.data.uid) || isAdmin();
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── /vendor_availability ─────────────────────────────────────
+    match /vendor_availability/{id} {
+      allow read:   if true;
+      allow create: if isSignedIn() && isReasonableSize();
+      allow update: if isSignedIn();
+      allow delete: if isAdmin();
+    }
+
+    // ── /conversation_history ────────────────────────────────────
+    match /conversation_history/{id} {
+      allow read:   if isOwner(resource.data.uid) || isAdmin();
+      allow create: if isOwner(request.resource.data.uid) && isReasonableSize();
+      allow update: if isOwner(resource.data.uid);
+      allow delete: if isOwner(resource.data.uid) || isAdmin();
+    }
+
     // ── Deny all other paths ─────────────────────────────────────
     match /{document=**} {
       allow read, write: if false;

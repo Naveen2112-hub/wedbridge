@@ -163,7 +163,71 @@ function offlineFallback(req) {
   return new Response("Offline", { status: 503 });
 }
 
-// ── Background sync (optional) ─────────────────────────────────
+// ── Push Notifications ──────────────────────────────────────────
+self.addEventListener("push", (event) => {
+  let data = { title: "WedBridge", body: "You have a new notification", url: "/" };
+  try { if (event.data) data = JSON.parse(event.data.text()); } catch { data = { title: "WedBridge", body: event.data?.text() ?? "Notification", url: "/" }; }
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
+      data: { url: data.url },
+      vibrate: [100, 50, 100],
+      tag: data.tag || "wedbridge-notification",
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const targetUrl = event.notification.data?.url || "/";
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url.includes(targetUrl) && "focus" in client) return client.focus();
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(targetUrl);
+    })
+  );
+});
+
+// ── Background Sync ─────────────────────────────────────────────
+self.addEventListener("sync", (event) => {
+  if (event.tag === "wb-sync-interests") {
+    event.waitUntil(syncPendingInterests());
+  } else if (event.tag === "wb-sync-messages") {
+    event.waitUntil(syncPendingMessages());
+  }
+});
+
+async function syncPendingInterests() {
+  const cache = await caches.open("wb-pending-ops");
+  const keys = await cache.keys();
+  for (const key of keys) {
+    if (key.url.includes("/api/interests")) {
+      try {
+        const res = await fetch(key, { method: key.method, body: await key.text() });
+        if (res.ok) await cache.delete(key);
+      } catch { /* retry on next sync */ }
+    }
+  }
+}
+
+async function syncPendingMessages() {
+  const cache = await caches.open("wb-pending-ops");
+  const keys = await cache.keys();
+  for (const key of keys) {
+    if (key.url.includes("/api/ai/chat")) {
+      try {
+        const res = await fetch(key, { method: key.method, body: await key.text() });
+        if (res.ok) await cache.delete(key);
+      } catch { /* retry on next sync */ }
+    }
+  }
+}
+
+// ── Message handler ─────────────────────────────────────────────
 self.addEventListener("message", (event) => {
   if (event.data?.type === "SKIP_WAITING") self.skipWaiting();
   if (event.data?.type === "GET_VERSION")  event.ports?.[0]?.postMessage({ version: CACHE_SHELL });

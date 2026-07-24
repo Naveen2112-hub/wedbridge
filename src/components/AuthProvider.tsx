@@ -16,7 +16,7 @@ import {
   signOut,
   type User,
 } from "firebase/auth";
-import { auth, googleProvider } from "@/lib/firebase-client";
+import { auth, googleProvider } from "@/firebase/config";
 
 interface AuthContextValue {
   user: User | null;

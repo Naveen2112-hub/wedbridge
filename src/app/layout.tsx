@@ -93,13 +93,27 @@ const organizationSchema = {
   },
 };
 
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "WedBridge",
+  url: siteUrl,
+  description: "AI-powered matrimony platform connecting Tamil Nadu families with verified profiles, plus a full wedding vendor marketplace.",
+  inLanguage: ["en", "ta"],
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${siteUrl}/search?q={query}`,
+    "query-input": "required name=query",
+  },
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <head>
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify([organizationSchema, websiteSchema]) }}
         />
       </head>
       <body className="font-sans antialiased">
