@@ -45,9 +45,7 @@ export interface VerifyPaymentInput {
 export interface VerifyPaymentResult {
   verified: boolean;
   membershipStatus: string;
-  paymentStatus: string;
   membershipPlan: string;
-  paymentProvider: string;
   paymentId: string;
   orderId: string;
   paymentDate: string;
@@ -69,10 +67,11 @@ export async function verifyPayment(input: VerifyPaymentInput): Promise<VerifyPa
 }
 
 export async function updatePaymentStatus(paymentId: string, status: PaymentStatus): Promise<void> {
-  // Payment status is now managed server-side during verification.
-  // This is kept for compatibility but is a no-op on the client.
-  void paymentId;
-  void status;
+  await fetch("/api/razorpay/verify", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ paymentId, status }),
+  }).catch(() => {});
 }
 
 export function loadRazorpayScript(): Promise<boolean> {
@@ -94,11 +93,23 @@ export interface CheckoutOptions {
   currency: string;
   name: string;
   description: string;
-  prefill: { name: string; email: string };
+  prefill: { name: string; email: string; contact?: string };
   keyId: string;
 }
 
-export async function openCheckout(opts: CheckoutOptions): Promise<{ gatewayPaymentId: string; gatewayOrderId: string; gatewaySignature: string } | null> {
+export interface CheckoutResult {
+  gatewayPaymentId: string;
+  gatewayOrderId: string;
+  gatewaySignature: string;
+}
+
+export interface CheckoutError {
+  code: string;
+  description: string;
+  reason: string;
+}
+
+export async function openCheckout(opts: CheckoutOptions): Promise<CheckoutResult | null> {
   const loaded = await loadRazorpayScript();
   if (!loaded) return null;
   return new Promise((resolve) => {
@@ -118,9 +129,15 @@ export async function openCheckout(opts: CheckoutOptions): Promise<{ gatewayPaym
           gatewaySignature: String(response.razorpay_signature ?? ""),
         });
       },
-      modal: { ondismiss: () => resolve(null) },
+      modal: {
+        ondismiss: () => resolve(null),
+      },
     });
-    rzp.on("payment_failed", () => resolve(null));
+    rzp.on("payment_failed", (resp: Record<string, unknown>) => {
+      const error = resp.error as Record<string, string> | undefined;
+      console.error("[razorpay] payment_failed:", error?.code, error?.description);
+      resolve(null);
+    });
     rzp.open();
   });
 }
