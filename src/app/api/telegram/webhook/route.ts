@@ -15,6 +15,12 @@ export const maxDuration = 300;
  */
 export async function POST(req: NextRequest) {
   try {
+    const secret = process.env.TELEGRAM_WEBHOOK_SECRET;
+    if (secret) {
+      const provided = req.headers.get("x-telegram-bot-api-secret-token");
+      if (provided !== secret) return NextResponse.json({ ok: true });
+    }
+
     const update = await req.json();
     const token = process.env.TELEGRAM_BOT_TOKEN;
     if (!token) return NextResponse.json({ ok: true });

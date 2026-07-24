@@ -1,8 +1,9 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { verifyPaymentSignature } from "@/lib/razorpay-server";
 import { activateMembership } from "@/lib/membership-service";
 import { getAuthUser } from "@/lib/auth-server";
 import { PLANS, type PlanId } from "@/lib/plans";
+import { checkRateLimit, getClientIP } from "@/lib/security/securityService";
 
 export const runtime = "nodejs";
 
@@ -15,10 +16,16 @@ interface VerifyBody {
   currency?: string;
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const user = await getAuthUser(req);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const ip = getClientIP(req);
+  const rl = checkRateLimit(`verify-payment:${user.uid}:${ip}`, { windowMs: 60_000, maxRequests: 10 });
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
   }
 
   let body: VerifyBody;
