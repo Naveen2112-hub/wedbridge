@@ -1,0 +1,39 @@
+# WedBridge robots.txt
+# Generated dynamically at /robots.txt via Next.js sitemap/robots API
+# This file is a fallback for static hosting.
+
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /faq
+Allow: /privacy
+Allow: /terms
+Allow: /refund
+Allow: /search
+Allow: /services
+Allow: /vendor/search
+Allow: /vendor-login
+Allow: /wedding-planner
+Allow: /membership
+Allow: /login
+Allow: /register
+
+# Disallow private/authenticated areas
+Disallow: /admin/
+Disallow: /dashboard
+Disallow: /profile/
+Disallow: /profile/edit
+Disallow: /complete-profile
+Disallow: /settings
+Disallow: /notifications
+Disallow: /interests
+Disallow: /favourites
+Disallow: /messages
+Disallow: /my-bookings
+Disallow: /vendor-dashboard
+Disallow: /ai-matches
+Disallow: /matches
+Disallow: /api/
+
+Sitemap: https://wedbridge.com/sitemap.xml

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- WedBridge browserconfig.xml — Windows tile settings -->
+<browserconfig>
+  <msapplication>
+    <tile>
+      <square150x150logo src="/icon-192.png"/>
+      <TileColor>#a51d3c</TileColor>
+    </tile>
+  </msapplication>
+</browserconfig>

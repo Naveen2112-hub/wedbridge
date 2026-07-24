@@ -2,121 +2,287 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isSignedIn() { return request.auth != null; }
-    function isOwner(uid) { return isSignedIn() && request.auth.uid == uid; }
-    function isAdmin() { return isSignedIn() && request.auth.token.admin == true; }
-    function isUserAdmin() { return isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin"; }
-    function isApprovedVendor() { return isSignedIn() && exists(/databases/$(database)/documents/vendors/$(request.auth.uid)) && get(/databases/$(database)/documents/vendors/$(request.auth.uid)).data.status == "approved"; }
+    // ── Auth helpers ─────────────────────────────────────────────
+    function isSignedIn()   { return request.auth != null; }
+    function uid()          { return request.auth.uid; }
+    function isOwner(id)    { return isSignedIn() && uid() == id; }
 
+    // Admin: either a custom claim OR a Firestore role document
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.admin == true ||
+        (
+          exists(/databases/$(database)/documents/users/$(uid())) &&
+          get(/databases/$(database)/documents/users/$(uid())).data.role == "admin"
+        )
+      );
+    }
+
+    // Approved vendor owner for a given vendorId
+    function isVendorOwner(vendorId) {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/vendors/$(vendorId)) &&
+        get(/databases/$(database)/documents/vendors/$(vendorId)).data.ownerUid == uid();
+    }
+
+    // ── Input size guard (max 32 KB per write) ───────────────────
+    function isReasonableSize() {
+      return request.resource.data.keys().size() <= 60;
+    }
+
+    // ── /users ───────────────────────────────────────────────────
     match /users/{id} {
-      allow read: if isOwner(id) || isUserAdmin() || isAdmin();
-      allow create: if isSignedIn() && request.auth.uid == id && request.resource.data.role == "user";
-      allow update: if (isOwner(id) && request.resource.data.role == resource.data.role) || isUserAdmin() || isAdmin();
-      allow delete: if isUserAdmin() || isAdmin();
-    }
-    match /profiles/{id} {
-      allow read: if resource.data.status == "approved" || isOwner(resource.data.userId) || isUserAdmin() || isAdmin();
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if isOwner(resource.data.userId) || isUserAdmin() || isAdmin();
-      allow delete: if isOwner(resource.data.userId) || isUserAdmin() || isAdmin();
-    }
-    match /payments/{id} {
-      allow read: if isOwner(resource.data.userId) || isUserAdmin() || isAdmin();
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid && request.resource.data.status == "pending";
-      allow update: if isUserAdmin() || isAdmin();
+      // Users may only read their own doc; admins can read all
+      allow read: if isOwner(id) || isAdmin();
+      // New user — must use their own UID, role must be "user"
+      allow create: if isOwner(id) && request.resource.data.role == "user" && isReasonableSize();
+      // Users may update their own doc but cannot escalate role
+      allow update: if (isOwner(id) && request.resource.data.role == resource.data.role && isReasonableSize()) || isAdmin();
       allow delete: if isAdmin();
     }
+
+    // ── /profiles ────────────────────────────────────────────────
+    match /profiles/{id} {
+      allow read: if resource.data.status == "approved" ||
+                     isOwner(resource.data.userId) ||
+                     isOwner(resource.data.uid) ||
+                     isAdmin();
+      allow create: if isSignedIn() &&
+                       (request.resource.data.userId == uid() || request.resource.data.uid == uid()) &&
+                       isReasonableSize();
+      allow update: if (isOwner(resource.data.userId) || isOwner(resource.data.uid)) && isReasonableSize() ||
+                       isAdmin();
+      allow delete: if isOwner(resource.data.userId) || isOwner(resource.data.uid) || isAdmin();
+    }
+
+    // ── /payments ────────────────────────────────────────────────
+    match /payments/{id} {
+      allow read: if isOwner(resource.data.userId) || isOwner(resource.data.uid) || isAdmin();
+      // Users can create payment records in "pending" status only
+      allow create: if isSignedIn() &&
+                       (request.resource.data.userId == uid() || request.resource.data.uid == uid()) &&
+                       request.resource.data.status == "pending" &&
+                       isReasonableSize();
+      // Status transitions must go through the server (admin SDK); UI cannot update
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── /subscriptions ───────────────────────────────────────────
     match /subscriptions/{id} {
-      allow read: if isOwner(resource.data.uid) || isUserAdmin() || isAdmin();
-      allow create: if isSignedIn() && request.resource.data.uid == request.auth.uid;
-      allow update: if isOwner(resource.data.uid) || isUserAdmin() || isAdmin();
-      allow delete: if isOwner(resource.data.uid) || isAdmin();
+      allow read: if isOwner(resource.data.uid) || isAdmin();
+      // Created server-side only — deny client creates
+      allow create: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
     }
+
+    // ── /memberships (new flat doc per user) ─────────────────────
+    match /memberships/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ── /interests ───────────────────────────────────────────────
     match /interests/{id} {
-      allow read: if isOwner(resource.data.fromUserId) || isOwner(resource.data.toUserId) || isUserAdmin() || isAdmin();
-      allow create: if isSignedIn() && request.resource.data.fromUserId == request.auth.uid && request.resource.data.status == "pending";
-      allow update: if isOwner(resource.data.toUserId) || isUserAdmin() || isAdmin();
-      allow delete: if isOwner(resource.data.fromUserId) || isUserAdmin() || isAdmin();
+      allow read: if isOwner(resource.data.fromUserId) ||
+                     isOwner(resource.data.fromUid) ||
+                     isOwner(resource.data.toUserId) ||
+                     isOwner(resource.data.toUid) ||
+                     isAdmin();
+      allow create: if isSignedIn() &&
+                       (request.resource.data.fromUserId == uid() || request.resource.data.fromUid == uid()) &&
+                       request.resource.data.status == "pending" &&
+                       isReasonableSize();
+      // Only the recipient may accept/reject
+      allow update: if (isOwner(resource.data.toUserId) || isOwner(resource.data.toUid)) || isAdmin();
+      allow delete: if isOwner(resource.data.fromUserId) || isOwner(resource.data.fromUid) || isAdmin();
     }
+
+    // ── /notifications ───────────────────────────────────────────
     match /notifications/{id} {
-      allow read: if isOwner(resource.data.userId) || (resource.data.target != null && (resource.data.target == "all" || (resource.data.target == "premium" && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.membershipTier != "free") || (resource.data.target == "free" && exists(/databases/$(database)/documents/users/$(request.auth.uid)) && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.membershipTier == "free") || (resource.data.target == "vendors" && exists(/databases/$(database)/documents/vendors/$(request.auth.uid))))) || isUserAdmin() || isAdmin();
-      allow create: if isSignedIn();
-      allow update, delete: if isUserAdmin() || isAdmin() || isOwner(resource.data.userId);
+      allow read: if isOwner(resource.data.userId) ||
+                     resource.data.userId == "all" ||
+                     isAdmin();
+      allow create: if isSignedIn() && isReasonableSize();
+      allow update: if isOwner(resource.data.userId) || isAdmin();
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
+
+    // ── /settings (platform-wide) ────────────────────────────────
     match /settings/{id} {
-      allow read: if true;
-      allow write: if isUserAdmin() || isAdmin();
+      allow read:  if true;
+      allow write: if isAdmin();
     }
+
+    // ── /auditLog ────────────────────────────────────────────────
     match /auditLog/{id} {
-      allow read: if isUserAdmin() || isAdmin();
-      allow create: if isUserAdmin() || isAdmin();
+      allow read:          if isAdmin();
+      allow create:        if isAdmin();
       allow update, delete: if isAdmin();
     }
+
+    // ── /favourites ──────────────────────────────────────────────
     match /favourites/{id} {
-      allow read: if isOwner(resource.data.userId) || isUserAdmin() || isAdmin();
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow read:   if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isSignedIn() && request.resource.data.userId == uid() && isReasonableSize();
       allow update: if isOwner(resource.data.userId);
-      allow delete: if isOwner(resource.data.userId) || isUserAdmin() || isAdmin();
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
+
+    // ── /aiMatches ───────────────────────────────────────────────
     match /aiMatches/{id} {
-      allow read: if isOwner(resource.data.uid) || isUserAdmin() || isAdmin();
-      allow create: if isOwner(resource.data.uid);
-      allow update: if isOwner(resource.data.uid);
-      allow delete: if isOwner(resource.data.uid) || isAdmin();
+      allow read:          if isOwner(resource.data.uid) || isAdmin();
+      allow create:        if isOwner(request.resource.data.uid) && isReasonableSize();
+      allow update:        if isOwner(resource.data.uid);
+      allow delete:        if isOwner(resource.data.uid) || isAdmin();
     }
+
+    // ── /matchHistory ────────────────────────────────────────────
     match /matchHistory/{id} {
-      allow read: if isOwner(resource.data.uid) || isUserAdmin() || isAdmin();
-      allow create: if isOwner(resource.data.uid);
-      allow update: if isOwner(resource.data.uid);
-      allow delete: if isOwner(resource.data.uid) || isAdmin();
+      allow read:          if isOwner(resource.data.uid) || isAdmin();
+      allow create:        if isOwner(request.resource.data.uid) && isReasonableSize();
+      allow update:        if isOwner(resource.data.uid);
+      allow delete:        if isOwner(resource.data.uid) || isAdmin();
     }
+
+    // ── /profileViews ────────────────────────────────────────────
     match /profileViews/{id} {
-      allow read: if isOwner(resource.data.viewerUid) || isUserAdmin() || isAdmin();
-      allow create: if isSignedIn();
+      allow read:          if isOwner(resource.data.viewerUid) || isOwner(resource.data.viewedUid) || isAdmin();
+      allow create:        if isSignedIn() && isReasonableSize();
       allow update, delete: if isAdmin();
     }
+
+    // ── /recentlyViewed ──────────────────────────────────────────
     match /recentlyViewed/{id} {
-      allow read: if isOwner(resource.data.uid) || isUserAdmin() || isAdmin();
-      allow create: if isOwner(resource.data.uid);
+      allow read:   if isOwner(resource.data.uid) || isAdmin();
+      allow create: if isOwner(request.resource.data.uid) && isReasonableSize();
       allow update: if isOwner(resource.data.uid);
       allow delete: if isOwner(resource.data.uid) || isAdmin();
     }
+
+    // ── /searchHistory ───────────────────────────────────────────
     match /searchHistory/{id} {
-      allow read: if isOwner(resource.data.uid) || isUserAdmin() || isAdmin();
-      allow create: if isOwner(resource.data.uid);
+      allow read:   if isOwner(resource.data.uid) || isAdmin();
+      allow create: if isOwner(request.resource.data.uid) && isReasonableSize();
       allow update: if isOwner(resource.data.uid);
       allow delete: if isOwner(resource.data.uid) || isAdmin();
     }
+
+    // ── /vendors ─────────────────────────────────────────────────
     match /vendors/{id} {
-      allow read: if resource.data.status == "approved" || isOwner(resource.data.ownerUid) || isUserAdmin() || isAdmin();
-      allow create: if isSignedIn() && request.resource.data.ownerUid == request.auth.uid;
-      allow update: if isOwner(resource.data.ownerUid) || isUserAdmin() || isAdmin();
-      allow delete: if isUserAdmin() || isAdmin();
+      allow read: if resource.data.status == "approved" || isOwner(resource.data.ownerUid) || isAdmin();
+      allow create: if isSignedIn() && request.resource.data.ownerUid == uid() && isReasonableSize();
+      allow update: if isOwner(resource.data.ownerUid) && isReasonableSize() || isAdmin();
+      allow delete: if isAdmin();
     }
-    match /vendorCategories/{id} { allow read: if true; allow write: if isAdmin(); }
+
+    match /vendorCategories/{id} {
+      allow read:  if true;
+      allow write: if isAdmin();
+    }
+
     match /vendorBookings/{id} {
-      allow read: if isOwner(resource.data.userId) || (isSignedIn() && exists(/databases/$(database)/documents/vendors/$(resource.data.vendorId)) && get(/databases/$(database)/documents/vendors/$(resource.data.vendorId)).data.ownerUid == request.auth.uid) || isUserAdmin() || isAdmin();
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if isOwner(resource.data.userId) || isUserAdmin() || isAdmin();
-      allow delete: if isOwner(resource.data.userId) || isUserAdmin() || isAdmin();
+      allow read: if isOwner(resource.data.userId) ||
+                     isVendorOwner(resource.data.vendorId) ||
+                     isAdmin();
+      allow create: if isSignedIn() && request.resource.data.userId == uid() && isReasonableSize();
+      allow update: if isOwner(resource.data.userId) || isVendorOwner(resource.data.vendorId) || isAdmin();
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
+
     match /vendorReviews/{id} {
-      allow read: if true;
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if isOwner(resource.data.userId) || isUserAdmin() || isAdmin();
-      allow delete: if isOwner(resource.data.userId) || isUserAdmin() || isAdmin();
+      allow read:   if true;
+      allow create: if isSignedIn() && request.resource.data.userId == uid() && isReasonableSize();
+      allow update: if isOwner(resource.data.userId) || isAdmin();
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
     }
+
     match /vendorGallery/{id} {
-      allow read: if true;
-      allow create: if isSignedIn() && request.resource.data.vendorId != null && exists(/databases/$(database)/documents/vendors/$(request.resource.data.vendorId)) && get(/databases/$(database)/documents/vendors/$(request.resource.data.vendorId)).data.ownerUid == request.auth.uid;
-      allow update: if isSignedIn() && exists(/databases/$(database)/documents/vendors/$(resource.data.vendorId)) && get(/databases/$(database)/documents/vendors/$(resource.data.vendorId)).data.ownerUid == request.auth.uid;
-      allow delete: if isSignedIn() && exists(/databases/$(database)/documents/vendors/$(resource.data.vendorId)) && get(/databases/$(database)/documents/vendors/$(resource.data.vendorId)).data.ownerUid == request.auth.uid || isUserAdmin() || isAdmin();
+      allow read:   if true;
+      allow create: if isVendorOwner(request.resource.data.vendorId) && isReasonableSize();
+      allow update: if isVendorOwner(resource.data.vendorId);
+      allow delete: if isVendorOwner(resource.data.vendorId) || isAdmin();
     }
+
     match /vendorPackages/{id} {
-      allow read: if true;
-      allow create: if isSignedIn() && request.resource.data.vendorId != null && exists(/databases/$(database)/documents/vendors/$(request.resource.data.vendorId)) && get(/databases/$(database)/documents/vendors/$(request.resource.data.vendorId)).data.ownerUid == request.auth.uid;
-      allow update: if isSignedIn() && exists(/databases/$(database)/documents/vendors/$(resource.data.vendorId)) && get(/databases/$(database)/documents/vendors/$(resource.data.vendorId)).data.ownerUid == request.auth.uid;
-      allow delete: if isSignedIn() && exists(/databases/$(database)/documents/vendors/$(resource.data.vendorId)) && get(/databases/$(database)/documents/vendors/$(resource.data.vendorId)).data.ownerUid == request.auth.uid || isUserAdmin() || isAdmin();
+      allow read:   if true;
+      allow create: if isVendorOwner(request.resource.data.vendorId) && isReasonableSize();
+      allow update: if isVendorOwner(resource.data.vendorId);
+      allow delete: if isVendorOwner(resource.data.vendorId) || isAdmin();
+    }
+
+    // ── /telegram_settings ───────────────────────────────────────
+    match /telegram_settings/{userId} {
+      allow read:  if isOwner(userId) || isAdmin();
+      allow write: if isOwner(userId) || isAdmin();
+    }
+
+    match /telegram_logs/{id} {
+      allow read:  if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /telegram_queue/{id} {
+      allow read:  if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /broadcasts/{id} {
+      allow read:  if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    match /notification_templates/{id} {
+      allow read:  if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ── /ocr_imports ─────────────────────────────────────────────
+    match /ocr_imports/{id} {
+      allow read:  if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ── /chat_assistant ──────────────────────────────────────────
+    match /chat_assistant/{id} {
+      allow read:   if isOwner(resource.data.uid) || isAdmin();
+      allow create: if isOwner(request.resource.data.uid) && isReasonableSize();
+      allow delete: if isOwner(resource.data.uid) || isAdmin();
+    }
+
+    // ── /recommendations ─────────────────────────────────────────
+    match /recommendations/{id} {
+      allow read:   if isOwner(resource.data.uid) || isAdmin();
+      allow create: if isOwner(request.resource.data.uid) && isReasonableSize();
+      allow delete: if isOwner(resource.data.uid) || isAdmin();
+    }
+
+    // ── /wedding_planner ─────────────────────────────────────────
+    match /wedding_planner/{id} {
+      allow read:   if isOwner(resource.data.uid) || isAdmin();
+      allow create: if isOwner(request.resource.data.uid) && isReasonableSize();
+      allow update: if isOwner(resource.data.uid);
+      allow delete: if isOwner(resource.data.uid) || isAdmin();
+    }
+
+    // ── /fraud_detection ─────────────────────────────────────────
+    match /fraud_detection/{id} {
+      allow read:  if isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ── /compatibility_cache ─────────────────────────────────────
+    match /compatibility_cache/{id} {
+      allow read:   if isSignedIn();
+      allow create: if isSignedIn() && isReasonableSize();
+      allow update: if isSignedIn();
+      allow delete: if isAdmin();
+    }
+
+    // ── Deny all other paths ─────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
