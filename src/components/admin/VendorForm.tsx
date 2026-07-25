@@ -197,11 +197,27 @@ export function VendorForm({ initial, onSubmit, onCancel }: VendorFormProps) {
 
       {/* Actions */}
       <div className="flex justify-end gap-3">
-        <button type="button" onClick={onCancel} className="rounded-xl border border-gray-200 px-6 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-xl border border-gray-200 px-6 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
+        >
           Cancel
         </button>
-        <button type="submit" disabled={saving} className={cn("flex items-center gap-2 rounded-xl bg-primary-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-800", saving && "opacity-50")}>
-          <Save className="h-4 w-4" />{saving ? "Saving..." : initial ? "Update Vendor" : "Create Vendor"}
+        <button
+          type="submit"
+          disabled={saving}
+          className={cn(
+            "flex items-center gap-2 rounded-xl bg-primary-700 px-6 py-3 text-sm font-semibold text-white transition hover:bg-primary-800",
+            saving && "opacity-50"
+          )}
+        >
+          <Save className="h-4 w-4" />
+          {saving
+            ? "Saving..."
+            : initial
+              ? "Update Vendor"
+              : "Create Vendor"}
         </button>
       </div>
     </form>
