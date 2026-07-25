@@ -4,12 +4,10 @@ import { useRouter } from "next/navigation";
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, type User } from "firebase/auth";
 import { auth, db } from "@/firebase/config";
 import { doc, getDoc } from "firebase/firestore";
-import { collections, type AppUser, type Language } from "@/firebase/schema";
+import { collections, type AppUser } from "@/firebase/schema";
 
 interface AdminAuthContextType { user: User | null; adminUser: AppUser | null; loading: boolean; login: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>; logout: () => Promise<void>; }
 const AdminAuthContext = createContext<AdminAuthContextType>({ user: null, adminUser: null, loading: true, login: async () => ({ ok: false }), logout: async () => {} });
-
-function readLanguage(): Language { if (typeof window === "undefined") return "en"; return window.localStorage.getItem("wedbridge:lang") === "ta" ? "ta" : "en"; }
 
 function friendlyAuthError(e: unknown): string {
   const code = (e as { code?: string })?.code ?? "";
@@ -28,7 +26,6 @@ function friendlyAuthError(e: unknown): string {
 }
 
 async function readUserDoc(user: User): Promise<AppUser | null> {
-  if (!db) return null;
   const ref = doc(db, collections.users, user.uid);
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
@@ -43,8 +40,6 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!auth) { setLoading(false); return; }
-
     let settled = false;
     const settle = () => { if (!settled) { settled = true; setLoading(false); } };
 
@@ -64,8 +59,6 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    if (!auth) return { ok: false, error: "Authentication is not configured." };
-    if (!db) return { ok: false, error: "Database is unavailable. Please try again later." };
     try {
       const cred = await signInWithEmailAndPassword(auth, email, password);
       try {
@@ -79,7 +72,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (e) { return { ok: false, error: friendlyAuthError(e) }; }
   };
-  const logout = async () => { if (auth) await signOut(auth); setAdminUser(null); router.push("/admin/login"); };
+  const logout = async () => { await signOut(auth); setAdminUser(null); router.push("/admin/login"); };
 
   return <AdminAuthContext.Provider value={{ user, adminUser, loading, login, logout }}>{children}</AdminAuthContext.Provider>;
 }

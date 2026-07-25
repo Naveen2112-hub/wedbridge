@@ -1,12 +1,11 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, updateProfile, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { auth, db } from "@/firebase/config";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, updateProfile, signInWithPopup } from "firebase/auth";
+import { auth, db, googleProvider } from "@/firebase/config";
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 import { collections, type AppUser } from "@/firebase/schema";
 import { sanitizeText } from "@/lib/utils";
 import { sendNotification } from "@/lib/telegram-notifications";
 
 export async function registerUser(email: string, password: string, displayName: string): Promise<{ ok: boolean; error?: string }> {
-  if (!auth || !db) return { ok: false, error: "Authentication not configured." };
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(cred.user, { displayName });
@@ -18,16 +17,12 @@ export async function registerUser(email: string, password: string, displayName:
 }
 
 export async function loginUser(email: string, password: string): Promise<{ ok: boolean; error?: string }> {
-  if (!auth) return { ok: false, error: "Authentication not configured." };
   try { await signInWithEmailAndPassword(auth, email, password); void sendNotification("login").catch(() => {}); return { ok: true }; } catch (e) { return { ok: false, error: e instanceof Error ? e.message : "Login failed" }; }
 }
 
 export async function loginWithGoogle(): Promise<{ ok: boolean; error?: string }> {
-  if (!auth || !db) return { ok: false, error: "Authentication not configured." };
   try {
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: "select_account" });
-    const cred = await signInWithPopup(auth, provider);
+    const cred = await signInWithPopup(auth, googleProvider);
     const userDoc = await getDoc(doc(db, collections.users, cred.user.uid));
     if (!userDoc.exists()) { const userData: Omit<AppUser, "uid" | "createdAt"> = { email: cred.user.email ?? "", displayName: cred.user.displayName ?? "", role: "user", status: "active", verified: false, membershipTier: "free" }; await setDoc(doc(db, collections.users, cred.user.uid), { ...userData, createdAt: serverTimestamp() }); }
     return { ok: true };
@@ -35,8 +30,7 @@ export async function loginWithGoogle(): Promise<{ ok: boolean; error?: string }
 }
 
 export async function resetPassword(email: string): Promise<{ ok: boolean; error?: string }> {
-  if (!auth) return { ok: false, error: "Authentication not configured." };
   try { await sendPasswordResetEmail(auth, email); void sendNotification("password_reset").catch(() => {}); return { ok: true }; } catch (e) { return { ok: false, error: e instanceof Error ? e.message : "Reset failed" }; }
 }
 
-export async function logoutUser(): Promise<void> { if (auth) await signOut(auth); }
+export async function logoutUser(): Promise<void> { await signOut(auth); }

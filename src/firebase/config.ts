@@ -1,6 +1,6 @@
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, type Auth } from "firebase/auth";
-import { initializeFirestore, type Firestore, persistentLocalCache, getFirestore } from "firebase/firestore";
+import { getFirestore, type Firestore } from "firebase/firestore";
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -13,31 +13,13 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-let app: FirebaseApp | null = null;
-let authInstance: Auth | null = null;
-let dbInstance: Firestore | null = null;
-let storageInstance: FirebaseStorage | null = null;
+const app: FirebaseApp =
+  getApps().length > 0 ? getApps()[0] : initializeApp(firebaseConfig);
 
-if (typeof window !== "undefined" && firebaseConfig.apiKey) {
-  try {
-    app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
-    authInstance = getAuth(app);
-    try {
-      dbInstance = initializeFirestore(app, { localCache: persistentLocalCache() });
-    } catch {
-      dbInstance = getFirestore(app);
-    }
-    storageInstance = getStorage(app);
-  } catch (e) {
-    console.error("Firebase initialization failed:", e);
-  }
-}
-
-export const db = dbInstance;
-export const auth = authInstance;
-export const storage = storageInstance;
+export const auth: Auth = getAuth(app);
+export const db: Firestore = getFirestore(app);
+export const storage: FirebaseStorage = getStorage(app);
 export { app };
-export const isFirebaseConfigured = Boolean(app);
 
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.setCustomParameters({ prompt: "select_account" });
