@@ -34,7 +34,6 @@ function downloadHTMLAsPDF(htmlContent: string) {
 }
 
 export async function exportUsers(format: ExportFormat, max = 1000): Promise<void> {
-  if (!db) return;
   try {
     const snap = await getDocs(query(collection(db, collections.users), limit(max)));
     const users = snap.docs.map((d) => d.data() as AppUser);
@@ -58,7 +57,6 @@ export async function exportUsers(format: ExportFormat, max = 1000): Promise<voi
 }
 
 export async function exportVendors(format: ExportFormat, max = 1000): Promise<void> {
-  if (!db) return;
   try {
     const snap = await getDocs(query(collection(db, collections.vendors), limit(max)));
     const vendors = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<VendorDocument, "id">) }));

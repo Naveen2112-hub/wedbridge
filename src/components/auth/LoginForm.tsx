@@ -32,7 +32,7 @@ export function LoginForm() {
     setGoogleLoading(true);
     const res = await loginWithGoogle();
     setGoogleLoading(false);
-    if (res.ok) { toast("Welcome back!", "success"); router.push("/search"); }
+    if (res.ok) { toast("Welcome back!", "success"); const redirect = searchParams?.get("redirect"); router.push(redirect && redirect.startsWith("/") && !redirect.startsWith("//") ? redirect : "/search"); }
     else toast(res.error ?? "Google login failed", "error");
   };
 

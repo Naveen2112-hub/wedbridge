@@ -14,7 +14,6 @@ export interface AdminActivityLog {
 }
 
 export async function logAdminActivity(adminUid: string, adminEmail: string, action: string, target: string, details?: string): Promise<void> {
-  if (!db) return;
   try {
     await addDoc(collection(db, collections.auditLog), { adminUid, adminEmail, action, target, details: details ?? "", createdAt: serverTimestamp() });
     logger.info("Admin activity logged", { action, target, adminUid });
@@ -24,7 +23,6 @@ export async function logAdminActivity(adminUid: string, adminEmail: string, act
 }
 
 export async function getAdminActivityLogs(max = 50): Promise<AdminActivityLog[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(query(collection(db, collections.auditLog), orderBy("createdAt", "desc"), limit(max)));
     return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<AdminActivityLog, "id">) }));

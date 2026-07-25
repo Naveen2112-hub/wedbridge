@@ -100,7 +100,6 @@ export async function downloadTelegramFile(
 export async function checkDuplicate(
   extractedData: Record<string, string>,
 ): Promise<DuplicateCheckResult> {
-  if (!db) return { isDuplicate: false, similarity: 0, matchedFields: [] };
 
   const fields = {
     phone: extractedData.phone?.trim(),
@@ -444,7 +443,6 @@ async function notifyAdminDuplicate(
 export async function getImports(
   statusFilter?: ImportStatus,
 ): Promise<OcrImportRecord[]> {
-  if (!db) return [];
   try {
     const ref = collection(db, collections.ocrImports);
     const q = statusFilter
@@ -466,7 +464,6 @@ export async function updateImportStatus(
   reviewedBy: string,
   extractedData?: Record<string, string>,
 ): Promise<void> {
-  if (!db) return;
   const update: Record<string, unknown> = {
     status,
     reviewedBy,
@@ -480,7 +477,6 @@ export async function updateImportStatus(
  * Get a single import by ID.
  */
 export async function getImportById(importId: string): Promise<OcrImportRecord | null> {
-  if (!db) return null;
   const snap = await getDoc(doc(db, collections.ocrImports, importId));
   if (!snap.exists()) return null;
   return { id: snap.id, ...snap.data() } as OcrImportRecord;
@@ -493,7 +489,6 @@ export async function saveChatIdToUser(
   userId: string,
   chatId: string,
 ): Promise<void> {
-  if (!db) return;
   await updateDoc(doc(db, collections.users, userId), {
     telegramChatId: chatId,
     updatedAt: serverTimestamp(),
@@ -506,7 +501,6 @@ export async function saveChatIdToUser(
 export async function findUserByChatId(
   chatId: string,
 ): Promise<AppUser | null> {
-  if (!db) return null;
   try {
     const q = query(collection(db, collections.users), where("telegramChatId", "==", chatId), limit(1));
     const snap = await getDocs(q);

@@ -79,7 +79,6 @@ function isProfileSearchable(p: ProfileDocument): boolean {
 }
 
 export async function generateAiMatches(user: ProfileDocument, max = 50): Promise<ScoredMatch[]> {
-  if (!db) return [];
   try {
     const targetGender = user.gender === "male" ? "female" : user.gender === "female" ? "male" : null;
     let q;
@@ -109,7 +108,6 @@ function isCacheFresh(generatedAt: unknown): boolean {
 }
 
 export async function getCachedMatches(uid: string): Promise<ScoredMatch[] | null> {
-  if (!db) return null;
   try {
     const snap = await getDocs(query(collection(db, collections.aiMatches), where("uid", "==", uid), orderBy("score", "desc"), limit(50)));
     if (snap.empty) return null;
@@ -131,7 +129,6 @@ export async function getCachedMatches(uid: string): Promise<ScoredMatch[] | nul
 }
 
 export async function saveCachedMatches(uid: string, matches: ScoredMatch[]): Promise<void> {
-  if (!db) return;
   const database = db;
   try {
     const existing = await getDocs(query(collection(database, collections.aiMatches), where("uid", "==", uid)));
@@ -198,7 +195,6 @@ export function limitByMembership(matches: ScoredMatch[], membership: Membership
 }
 
 export async function recordMatchAction(uid: string, profileUid: string, score: number, action: MatchHistoryDocument["action"]): Promise<void> {
-  if (!db) return;
   const database = db;
   try {
     await addDoc(collection(database, collections.matchHistory), {
@@ -208,7 +204,6 @@ export async function recordMatchAction(uid: string, profileUid: string, score: 
 }
 
 export async function getMatchHistory(uid: string, max = 20): Promise<MatchHistoryDocument[]> {
-  if (!db) return [];
   const database = db;
   try {
     const snap = await getDocs(query(collection(database, collections.matchHistory), where("uid", "==", uid), orderBy("createdAt", "desc"), limit(max)));

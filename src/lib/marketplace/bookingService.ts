@@ -14,22 +14,17 @@ export async function createBooking(input: CreateBookingInput): Promise<string> 
   return ref.id;
 }
 export async function updateBookingStatus(id: string, status: BookingStatus): Promise<void> {
-  if (!db) return;
   try { await updateDoc(doc(db, collections.vendorBookings, id), { status, updatedAt: serverTimestamp() }); } catch { /* ignore */ }
 }
 export async function getUserBookings(uid: string, max = 50): Promise<VendorBookingDocument[]> {
-  if (!db) return [];
   try { const snap = await getDocs(query(collection(db, collections.vendorBookings), where("userId", "==", uid), orderBy("createdAt", "desc"), limit(max))); return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<VendorBookingDocument, "id">) })); } catch { return []; }
 }
 export async function getVendorBookings(vendorId: string, max = 100): Promise<VendorBookingDocument[]> {
-  if (!db) return [];
   try { const snap = await getDocs(query(collection(db, collections.vendorBookings), where("vendorId", "==", vendorId), orderBy("createdAt", "desc"), limit(max))); return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<VendorBookingDocument, "id">) })); } catch { return []; }
 }
 export async function listAllBookings(max = 100): Promise<VendorBookingDocument[]> {
-  if (!db) return [];
   try { const snap = await getDocs(query(collection(db, collections.vendorBookings), orderBy("createdAt", "desc"), limit(max))); return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<VendorBookingDocument, "id">) })); } catch { return []; }
 }
 export async function hasUserBookedVendor(uid: string, vendorId: string): Promise<boolean> {
-  if (!db) return false;
   try { const snap = await getDocs(query(collection(db, collections.vendorBookings), where("userId", "==", uid), where("vendorId", "==", vendorId), limit(1))); return !snap.empty; } catch { return false; }
 }

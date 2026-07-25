@@ -97,7 +97,6 @@ export async function checkProfileDuplicate(
   profile: Partial<ProfileDocument>,
   excludeUid?: string,
 ): Promise<DuplicateResult> {
-  if (!db) return { isDuplicate: false, similarity: 0, matchedFields: [] };
 
   try {
     const candidates: ProfileDocument[] = [];

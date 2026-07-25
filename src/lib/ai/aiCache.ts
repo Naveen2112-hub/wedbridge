@@ -17,7 +17,6 @@ function makeCacheKey(...parts: (string | number)[]): string {
 }
 
 export async function getCached<T>(key: string): Promise<T | null> {
-  if (!db) return null;
   try {
     const snap = await getDoc(doc(db, CACHE_COLLECTION, key));
     if (!snap.exists()) return null;
@@ -33,7 +32,6 @@ export async function getCached<T>(key: string): Promise<T | null> {
 }
 
 export async function setCached<T>(key: string, value: T, ttlMs: number = DEFAULT_TTL_MS): Promise<void> {
-  if (!db) return;
   try {
     const now = new Date();
     const expiresAt = new Date(now.getTime() + ttlMs);

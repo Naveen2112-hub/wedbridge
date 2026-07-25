@@ -16,7 +16,6 @@ export interface ContactAccessResult {
 }
 
 export async function getContactVisibility(uid: string): Promise<ContactVisibility> {
-  if (!db) return DEFAULT_CONTACT_VISIBILITY;
   const database = db;
   try {
     const snap = await getDoc(doc(database, collections.profiles, uid));
@@ -29,7 +28,6 @@ export async function getContactVisibility(uid: string): Promise<ContactVisibili
 }
 
 export async function setContactVisibility(uid: string, visibility: ContactVisibility): Promise<void> {
-  if (!db) return;
   const database = db;
   try {
     await updateDoc(doc(database, collections.profiles, uid), { contactVisibility: visibility, updatedAt: serverTimestamp() });
@@ -61,7 +59,6 @@ function isPremiumTier(tier: MembershipTier): boolean {
 function startOfDay(): number { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); }
 
 export async function getTodayContactViewCount(uid: string): Promise<number> {
-  if (!db) return 0;
   const database = db;
   try {
     const snap = await getDocs(query(collection(database, collections.profileViews), where("viewerUid", "==", uid), where("viewedAt", ">=", new Date(startOfDay()))));
@@ -72,7 +69,6 @@ export async function getTodayContactViewCount(uid: string): Promise<number> {
 }
 
 export async function recordContactView(viewerId: string, profileUid: string): Promise<void> {
-  if (!db) return;
   const database = db;
   try {
     const { addDoc } = await import("firebase/firestore");

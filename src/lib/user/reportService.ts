@@ -46,7 +46,6 @@ export async function reportUser(
 }
 
 export async function getReportsByStatus(status: ReportRecord["status"]): Promise<ReportRecord[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(
       query(collection(db, collections.reports), where("status", "==", status)),
@@ -62,7 +61,6 @@ export async function updateReportStatus(
   status: ReportRecord["status"],
   adminUid: string,
 ): Promise<boolean> {
-  if (!db) return false;
   try {
     await updateDoc(doc(db, collections.reports, reportId), {
       status,

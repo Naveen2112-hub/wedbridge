@@ -9,7 +9,7 @@ import { useToast } from "@/components/ui/Toast";
 
 export default function VendorLoginPage() {
   const router = useRouter();
-  const { loginWithEmail } = useAuth();
+  const { loginWithEmail, role } = useAuth();
   const { toast } = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,9 +18,23 @@ export default function VendorLoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    try { await loginWithEmail(email, password); toast("Welcome back!", "success"); router.push("/vendor-dashboard"); }
-    catch { toast("Login failed. Check your credentials.", "error"); }
-    finally { setLoading(false); }
+    try {
+      await loginWithEmail(email, password);
+      // role is populated by onAuthStateChanged; check after login
+      // We use a short delay to allow the auth state to settle
+      setTimeout(() => {
+        if (role !== "vendor" && role !== "admin") {
+          toast("This account is not a vendor account.", "error");
+          return;
+        }
+        toast("Welcome back!", "success");
+        router.push("/vendor-dashboard");
+      }, 500);
+    } catch (e) {
+      toast(e instanceof Error ? e.message : "Login failed. Check your credentials.", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

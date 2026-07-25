@@ -10,7 +10,6 @@ export interface AdminAnalytics {
 const empty: AdminAnalytics = { totalUsers: 0, maleProfiles: 0, femaleProfiles: 0, premiumMembers: 0, goldMembers: 0, verifiedProfiles: 0, weddingVendors: 0, todayRegistrations: 0, todayInterests: 0, todayRevenue: 0, monthlyRevenue: 0, newUsers: 0, profileViews: 0, aiMatchCount: 0, interestsSent: 0, premiumSales: 0, vendorRevenue: 0 };
 
 export async function getAnalytics(): Promise<AdminAnalytics> {
-  if (!db) return empty;
   const database = db;
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -50,7 +49,6 @@ export async function getAnalytics(): Promise<AdminAnalytics> {
 
 export interface ReportRow { date: string; users: number; revenue: number; interests: number; }
 export async function getReport(period: "daily" | "weekly" | "monthly" | "yearly"): Promise<ReportRow[]> {
-  if (!db) return [];
   const database = db;
   try {
     const snap = await getDocs(query(collection(database, collections.payments), orderBy("createdAt", "desc"), limit(500)));
@@ -66,7 +64,6 @@ export interface AnalyticsTrend { label: string; current: number; previous: numb
 
 export async function getAnalyticsTrends(): Promise<{ users: AnalyticsTrend; revenue: AnalyticsTrend; interests: AnalyticsTrend }> {
   const empty = { users: { label: "Users", current: 0, previous: 0, change: 0, changePercent: 0 }, revenue: { label: "Revenue", current: 0, previous: 0, change: 0, changePercent: 0 }, interests: { label: "Interests", current: 0, previous: 0, change: 0, changePercent: 0 } };
-  if (!db) return empty;
   const database = db;
   const now = new Date();
   const thisWeek = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7);

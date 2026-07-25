@@ -8,7 +8,6 @@ export { PLANS };
 export type { PlanInfo };
 
 export async function getActiveSubscription(uid: string): Promise<SubscriptionDocument | null> {
-  if (!db) return null;
   try {
     const snap = await getDocs(query(collection(db, collections.subscriptions), where("uid", "==", uid), where("status", "==", "active"), orderBy("endDate", "desc"), limit(1)));
     if (snap.empty) return null;
@@ -41,7 +40,6 @@ export function getPlan(tier: MembershipTier): PlanInfo | undefined {
 }
 
 export async function activateSubscription(uid: string, plan: MembershipTier, paymentId: string, _amount?: number, _mode?: string, durationDays?: number): Promise<SubscriptionDocument | null> {
-  if (!db) return null;
   try {
     const days = durationDays ?? 365;
     const startDate = new Date();
@@ -55,7 +53,6 @@ export async function activateSubscription(uid: string, plan: MembershipTier, pa
 }
 
 export async function createPayment(input: { userId: string; userName?: string; amount: number; plan: MembershipTier }): Promise<string | null> {
-  if (!db) return null;
   try {
     const ref = await addDoc(collection(db, collections.payments), {
       uid: input.userId, userId: input.userId, userName: input.userName ?? "", amount: input.amount * 100, currency: "INR", plan: input.plan, gateway: "razorpay", status: "pending", notes: {}, createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
@@ -65,7 +62,6 @@ export async function createPayment(input: { userId: string; userName?: string; 
 }
 
 export async function verifyPaymentAndActivateMembership(paymentId: string, uid: string, plan: MembershipTier, _gatewayPaymentId: string): Promise<boolean> {
-  if (!db) return false;
   try {
     await updateDoc(doc(db, collections.payments, paymentId), { status: "verified", gatewayPaymentId: _gatewayPaymentId, updatedAt: serverTimestamp() });
     await activateSubscription(uid, plan, paymentId);
@@ -74,7 +70,6 @@ export async function verifyPaymentAndActivateMembership(paymentId: string, uid:
 }
 
 export async function listAllSubscriptions(max = 100): Promise<SubscriptionDocument[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(query(collection(db, collections.subscriptions), orderBy("createdAt", "desc"), limit(max)));
     return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<SubscriptionDocument, "id">) }));

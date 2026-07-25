@@ -143,7 +143,6 @@ export async function openCheckout(opts: CheckoutOptions): Promise<CheckoutResul
 }
 
 export async function getPayment(paymentId: string): Promise<PaymentDocument | null> {
-  if (!db) return null;
   try {
     const snap = await getDocs(query(collection(db, collections.payments), where("__name__", "==", paymentId), limit(1)));
     if (snap.empty) return null;
@@ -155,7 +154,6 @@ export async function getPayment(paymentId: string): Promise<PaymentDocument | n
 }
 
 export async function listUserPayments(uid: string, max = 20): Promise<PaymentDocument[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(query(collection(db, collections.payments), where("uid", "==", uid), orderBy("createdAt", "desc"), limit(max)));
     const items: PaymentDocument[] = [];
@@ -167,7 +165,6 @@ export async function listUserPayments(uid: string, max = 20): Promise<PaymentDo
 }
 
 export async function listAllPayments(max = 100): Promise<PaymentDocument[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(query(collection(db, collections.payments), orderBy("createdAt", "desc"), limit(max)));
     const items: PaymentDocument[] = [];
@@ -179,7 +176,6 @@ export async function listAllPayments(max = 100): Promise<PaymentDocument[]> {
 }
 
 export function subscribeUserPayments(uid: string, cb: (items: PaymentDocument[]) => void, max = 20): Unsubscribe {
-  if (!db) return () => {};
   try {
     const q = query(collection(db, collections.payments), where("uid", "==", uid), orderBy("createdAt", "desc"), limit(max));
     return onSnapshot(q, (snap) => {
@@ -203,7 +199,6 @@ export interface RevenueStats {
 }
 
 export async function getRevenueStats(): Promise<RevenueStats> {
-  if (!db) return { totalRevenue: 0, totalPayments: 0, paidCount: 0, pendingCount: 0, failedCount: 0, refundedCount: 0, byPlan: {} };
   try {
     const snap = await getDocs(query(collection(db, collections.payments), limit(500)));
     const stats: RevenueStats = { totalRevenue: 0, totalPayments: snap.size, paidCount: 0, pendingCount: 0, failedCount: 0, refundedCount: 0, byPlan: {} };

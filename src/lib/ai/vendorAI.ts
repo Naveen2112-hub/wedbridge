@@ -86,7 +86,6 @@ export function rankVendors(
 export async function searchAndRankVendors(
   criteria: VendorSearchCriteria,
 ): Promise<VendorRanking[]> {
-  if (!db) return [];
   try {
     let q;
     const constraints = [];
@@ -110,7 +109,6 @@ export async function searchAndRankVendors(
  * Get top vendors by category.
  */
 export async function getTopVendorsByCategory(category: VendorCategory, max = 5): Promise<VendorRanking[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(query(collection(db, collections.vendors), where("category", "==", category), orderBy("rating", "desc"), limit(max * 2)));
     const vendors = snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<VendorDocument, "id">) }));

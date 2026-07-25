@@ -23,7 +23,6 @@ export interface DashboardAnalytics {
  * Get comprehensive dashboard analytics.
  */
 export async function getDashboardAnalytics(): Promise<DashboardAnalytics> {
-  if (!db) return emptyAnalytics();
 
   try {
     const [users, profiles, revenue, matches, ocrAnalytics, vendors] = await Promise.all([

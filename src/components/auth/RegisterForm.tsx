@@ -12,7 +12,7 @@ import { validateEmail, sanitizeText } from "@/lib/utils";
 export function RegisterForm() {
   const router = useRouter();
   const { toast } = useToast();
-  const { loginWithGoogle, profileCompleted } = useAuth();
+  const { loginWithGoogle } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,9 +25,9 @@ export function RegisterForm() {
   const google = async () => {
     setGoogleLoading(true);
     try {
-      await loginWithGoogle();
+      const user = await loginWithGoogle();
       toast("Account created! Welcome to WedBridge", "success");
-      router.push(profileCompleted ? "/dashboard" : "/complete-profile");
+      router.push(user.displayName ? "/dashboard" : "/complete-profile");
     } catch (e) {
       toast(e instanceof Error ? e.message : "Google sign-in failed", "error");
     } finally {
@@ -45,7 +45,7 @@ export function RegisterForm() {
     setLoading(true);
     const res = await registerUser(email, password, sanitizeText(name));
     setLoading(false);
-    if (res.ok) { toast("Account created! Welcome to WedBridge", "success"); router.push("/profile/edit"); }
+    if (res.ok) { toast("Account created! Welcome to WedBridge", "success"); router.push("/complete-profile"); }
     else toast(res.error ?? "Registration failed", "error");
   };
 

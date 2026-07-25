@@ -72,7 +72,6 @@ async function sendTelegram(request: NotificationRequest): Promise<boolean> {
     if (!token) return false;
 
     // Get user's Telegram chat ID
-    if (!db) return false;
     const userSnap = await getDocs(query(collection(db, collections.users), where("uid", "==", request.userId), limit(1)));
     if (userSnap.empty) return false;
     const chatId = (userSnap.docs[0].data() as { telegramChatId?: string }).telegramChatId;
@@ -124,7 +123,6 @@ async function sendPush(request: NotificationRequest): Promise<boolean> {
 }
 
 async function logNotification(log: Omit<NotificationLog, "id" | "sentAt">): Promise<void> {
-  if (!db) return;
   try {
     await addDoc(collection(db, collections.notificationTemplates), {
       ...log,
@@ -139,7 +137,6 @@ async function logNotification(log: Omit<NotificationLog, "id" | "sentAt">): Pro
  * Schedule a notification for later.
  */
 export async function scheduleNotification(request: NotificationRequest): Promise<void> {
-  if (!db) return;
   try {
     await addDoc(collection(db, collections.notificationTemplates), {
       userId: request.userId,
@@ -160,7 +157,6 @@ export async function scheduleNotification(request: NotificationRequest): Promis
  * Get notification history for a user.
  */
 export async function getNotificationHistory(userId: string): Promise<NotificationLog[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(query(collection(db, collections.notificationTemplates), where("userId", "==", userId), orderBy("sentAt", "desc"), limit(50)));
     return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<NotificationLog, "id">) }));

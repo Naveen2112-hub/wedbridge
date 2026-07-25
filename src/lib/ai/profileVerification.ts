@@ -115,7 +115,6 @@ async function checkDuplicatePhoto(
   photoURL: string,
   currentUserId: string,
 ): Promise<{ isDuplicate: boolean; matchedUid?: string }> {
-  if (!db) return { isDuplicate: false };
   try {
     const snap = await getDocs(query(collection(db, collections.profiles), where("photoURL", "==", photoURL), limit(5)));
     for (const doc of snap.docs) {
@@ -156,7 +155,6 @@ async function analyzeWithGemini(photoURL: string): Promise<{
 }
 
 async function checkMultipleAccounts(userId: string): Promise<boolean> {
-  if (!db) return false;
   try {
     const userDoc = await getDocs(query(collection(db, collections.users), where("uid", "==", userId), limit(1)));
     if (userDoc.empty) return false;
@@ -180,7 +178,6 @@ async function checkMultipleAccounts(userId: string): Promise<boolean> {
  * Batch verify all unverified profiles (for admin use).
  */
 export async function batchVerifyProfiles(): Promise<{ verified: number; flagged: number; errors: number }> {
-  if (!db) return { verified: 0, flagged: 0, errors: 0 };
   try {
     const snap = await getDocs(query(collection(db, collections.profiles), where("verificationStatus", "==", "unverified"), limit(50)));
     let verified = 0, flagged = 0, errors = 0;

@@ -128,7 +128,6 @@ export async function createWeddingPlan(uid: string): Promise<{ id: string }> {
  * Get a user's wedding plan.
  */
 export async function getWeddingPlan(uid: string): Promise<WeddingPlan | null> {
-  if (!db) return null;
   try {
     const snap = await getDocs(query(collection(db, collections.weddingPlanner), where("uid", "==", uid), limit(1)));
     if (snap.empty) return null;
@@ -146,7 +145,6 @@ export async function updateWeddingPlan(
   planId: string,
   updates: Partial<WeddingPlan>,
 ): Promise<void> {
-  if (!db) return;
   await updateDoc(doc(db, collections.weddingPlanner, planId), {
     ...updates,
     updatedAt: serverTimestamp(),
@@ -162,7 +160,6 @@ export async function updateBudgetCategory(
   allocated?: number,
   spent?: number,
 ): Promise<void> {
-  if (!db) return;
   const planRef = doc(db, collections.weddingPlanner, planId);
   const snap = await getDoc(planRef);
   if (!snap.exists()) return;
@@ -190,7 +187,6 @@ export async function toggleChecklistItem(
   itemId: string,
   completed: boolean,
 ): Promise<void> {
-  if (!db) return;
   const planRef = doc(db, collections.weddingPlanner, planId);
   const snap = await getDoc(planRef);
   if (!snap.exists()) return;
@@ -205,7 +201,6 @@ export async function toggleChecklistItem(
  * Add a guest.
  */
 export async function addGuest(planId: string, guest: GuestEntry): Promise<void> {
-  if (!db) return;
   const planRef = doc(db, collections.weddingPlanner, planId);
   const snap = await getDoc(planRef);
   if (!snap.exists()) return;
@@ -229,7 +224,6 @@ export async function addGuest(planId: string, guest: GuestEntry): Promise<void>
  * Add a timeline event.
  */
 export async function addTimelineEvent(planId: string, event: TimelineEvent): Promise<void> {
-  if (!db) return;
   const planRef = doc(db, collections.weddingPlanner, planId);
   const snap = await getDoc(planRef);
   if (!snap.exists()) return;

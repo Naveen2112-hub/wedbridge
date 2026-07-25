@@ -28,7 +28,6 @@ const BACKUP_COLLECTIONS = [
 ] as const;
 
 export async function createBackup(adminUid: string, adminEmail: string, onProgress?: (p: BackupProgress) => void): Promise<BackupResult> {
-  if (!db) return { success: false, collections: [], totalDocuments: 0, timestamp: new Date().toISOString(), error: "Database not configured" };
   const results: { name: string; count: number }[] = [];
   let totalDocuments = 0;
   const timestamp = new Date().toISOString();
@@ -51,7 +50,6 @@ export async function createBackup(adminUid: string, adminEmail: string, onProgr
 }
 
 export async function exportCollectionAsJSON(colName: string): Promise<string> {
-  if (!db) return "[]";
   try {
     const snap = await getDocs(query(collection(db, colName), limit(10000)));
     return JSON.stringify(snap.docs.map((d) => ({ id: d.id, ...d.data() })), null, 2);

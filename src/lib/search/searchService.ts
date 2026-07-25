@@ -107,7 +107,6 @@ function applyClientFilters(profiles: ProfileDocument[], filters: SearchFilters)
 }
 
 export async function searchProfiles(filters: SearchFilters, sort: SortOption = "newest", cursor?: QueryDocumentSnapshot<DocumentData> | null): Promise<SearchResult> {
-  if (!db) return { profiles: [], lastVisible: null, hasMore: false };
   try {
     const constraints = buildSearchQuery(filters, sort, cursor);
     const q = query(collection(db, collections.profiles), ...constraints);
@@ -147,7 +146,6 @@ export function calculateCompatibility(a: ProfileDocument, b: ProfileDocument): 
 }
 
 export async function getRelatedProfiles(profile: ProfileDocument, max = 4): Promise<ProfileDocument[]> {
-  if (!db) return [];
   try {
     const q = query(collection(db, collections.profiles), where("status", "==", "approved"), limit(20));
     const snap = await getDocs(q);
@@ -163,7 +161,6 @@ export async function getRelatedProfiles(profile: ProfileDocument, max = 4): Pro
 const viewedInSession = new Set<string>();
 
 export async function recordProfileView(viewerUid: string, profileUid: string): Promise<void> {
-  if (!db) return;
   if (viewerUid === profileUid) return;
   const key = `${viewerUid}:${profileUid}`;
   if (viewedInSession.has(key)) return;
@@ -183,7 +180,6 @@ export async function recordProfileView(viewerUid: string, profileUid: string): 
 }
 
 export async function addRecentlyViewed(uid: string, profileUid: string): Promise<void> {
-  if (!db) return;
   try {
     const existing = await getDocs(query(collection(db, collections.recentlyViewed), where("uid", "==", uid), where("profileUid", "==", profileUid), limit(1)));
     await Promise.all(existing.docs.map((d) => deleteDoc(d.ref)));
@@ -194,7 +190,6 @@ export async function addRecentlyViewed(uid: string, profileUid: string): Promis
 }
 
 export async function getRecentlyViewed(uid: string, max = 6): Promise<ProfileDocument[]> {
-  if (!db) return [];
   try {
     const rvSnap = await getDocs(query(collection(db, collections.recentlyViewed), where("uid", "==", uid), orderBy("viewedAt", "desc"), limit(max)));
     if (rvSnap.empty) return [];
@@ -212,7 +207,6 @@ export async function getRecentlyViewed(uid: string, max = 6): Promise<ProfileDo
 }
 
 export async function saveSearchHistory(uid: string, filters: SearchFilters): Promise<void> {
-  if (!db) return;
   try {
     const parts: string[] = [];
     const f = filters || {};
@@ -230,7 +224,6 @@ export async function saveSearchHistory(uid: string, filters: SearchFilters): Pr
 }
 
 export async function getSearchHistory(uid: string, max = 8): Promise<SearchHistoryDocument[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(query(collection(db, collections.searchHistory), where("uid", "==", uid), orderBy("searchedAt", "desc"), limit(max)));
     const items: SearchHistoryDocument[] = [];
@@ -242,7 +235,6 @@ export async function getSearchHistory(uid: string, max = 8): Promise<SearchHist
 }
 
 export async function clearSearchHistory(uid: string): Promise<void> {
-  if (!db) return;
   try {
     const snap = await getDocs(query(collection(db, collections.searchHistory), where("uid", "==", uid)));
     const deletes = snap.docs.map((d) => deleteDoc(d.ref));

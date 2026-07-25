@@ -4,19 +4,15 @@ import { collections, type VendorPackageDocument, type VendorGalleryDocument } f
 import { sanitizeText } from "@/lib/utils";
 
 export async function getPackages(vendorId: string): Promise<VendorPackageDocument[]> {
-  if (!db) return [];
   try { const snap = await getDocs(query(collection(db, collections.vendorPackages), where("vendorId", "==", vendorId), orderBy("createdAt", "desc"))); return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<VendorPackageDocument, "id">) })); } catch { return []; }
 }
 export async function addPackage(vendorId: string, data: { name: string; description: string; price: number; inclusions: string[] }): Promise<void> {
-  if (!db) return;
   try { await addDoc(collection(db, collections.vendorPackages), { vendorId, ...data, name: sanitizeText(data.name), description: sanitizeText(data.description), createdAt: serverTimestamp() } as Omit<VendorPackageDocument, "id">); } catch { /* ignore */ }
 }
 export async function getGallery(vendorId: string): Promise<VendorGalleryDocument[]> {
-  if (!db) return [];
   try { const snap = await getDocs(query(collection(db, collections.vendorGallery), where("vendorId", "==", vendorId), orderBy("createdAt", "desc"))); return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<VendorGalleryDocument, "id">) })); } catch { return []; }
 }
 export async function addGalleryImage(vendorId: string, imageURL: string, caption?: string): Promise<void> {
-  if (!db) return;
   try { await addDoc(collection(db, collections.vendorGallery), { vendorId, imageURL, caption: caption ? sanitizeText(caption) : "", createdAt: serverTimestamp() } as Omit<VendorGalleryDocument, "id">); } catch { /* ignore */ }
 }
 

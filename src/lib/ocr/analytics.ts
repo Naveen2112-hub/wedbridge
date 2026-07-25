@@ -25,7 +25,6 @@ export interface OcrAnalytics {
  * Calculate analytics from OCR imports.
  */
 export async function getOcrAnalytics(): Promise<OcrAnalytics> {
-  if (!db) return emptyAnalytics();
 
   try {
     const ref = collection(db, collections.ocrImports);

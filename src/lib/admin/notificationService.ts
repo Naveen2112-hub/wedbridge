@@ -5,7 +5,6 @@ import { sanitizeText } from "@/lib/utils";
 
 export interface BroadcastInput { title: string; message: string; target: "all" | "premium" | "free" | "vendors"; }
 export async function broadcastNotification(input: BroadcastInput): Promise<void> {
-  if (!db) return;
   try { await addDoc(collection(db, collections.notifications), { ...input, userId: input.target, title: sanitizeText(input.title), message: sanitizeText(input.message), read: false, sentBy: "admin", createdAt: serverTimestamp() } as Omit<NotificationDocument, "id">); } catch { /* ignore */ }
 }
 export function parseCSV(text: string): Record<string, string>[] {

@@ -163,7 +163,6 @@ export async function createUpiPayment(params: {
  * Get payment history for a user.
  */
 export async function getPaymentHistory(userId: string): Promise<PaymentDocument[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(query(collection(db, collections.payments), where("userId", "==", userId), orderBy("createdAt", "desc"), limit(50)));
     return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<PaymentDocument, "id">) }));
@@ -181,7 +180,6 @@ export async function confirmUpiPayment(
   paymentId: string,
   transactionId: string,
 ): Promise<void> {
-  if (!db) return;
   const { updateDoc } = await import("firebase/firestore");
   await updateDoc(doc(db, collections.payments, paymentId), {
     status: "pending_verification",

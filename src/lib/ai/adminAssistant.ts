@@ -63,7 +63,6 @@ export async function processAdminQuery(message: string): Promise<AdminChatRespo
 }
 
 async function handleRegistrationsQuery(): Promise<AdminChatResponse> {
-  if (!db) return { text: "Database unavailable" };
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -97,7 +96,6 @@ async function handleOcrQuery(): Promise<AdminChatResponse> {
 }
 
 async function handleRevenueQuery(): Promise<AdminChatResponse> {
-  if (!db) return { text: "Database unavailable" };
   try {
     const snap = await getDocs(query(collection(db, collections.payments), where("status", "==", "success"), limit(500)));
     const payments = snap.docs.map((d) => d.data() as { amount?: number });
@@ -113,7 +111,6 @@ async function handleRevenueQuery(): Promise<AdminChatResponse> {
 }
 
 async function handleMembershipQuery(): Promise<AdminChatResponse> {
-  if (!db) return { text: "Database unavailable" };
   try {
     const snap = await getDocs(query(collection(db, collections.payments), where("status", "==", "success"), limit(500)));
     const payments = snap.docs.map((d) => d.data() as { plan?: string; amount?: number });
@@ -149,7 +146,6 @@ async function handleDuplicateQuery(): Promise<AdminChatResponse> {
 }
 
 async function handleOverviewQuery(): Promise<AdminChatResponse> {
-  if (!db) return { text: "Database unavailable" };
   try {
     const [userSnap, profileSnap, paymentSnap] = await Promise.all([
       getDocs(query(collection(db, collections.users), limit(1))),

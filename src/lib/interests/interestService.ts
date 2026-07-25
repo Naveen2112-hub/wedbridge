@@ -26,7 +26,6 @@ function startOfDay(): number {
 }
 
 export async function getTodaySentCount(uid: string): Promise<number> {
-  if (!db) return 0;
   const database = db;
   try {
     const snap = await getDocs(query(collection(database, collections.interests), where("senderId", "==", uid), where("createdAt", ">=", new Date(startOfDay()))));
@@ -37,7 +36,6 @@ export async function getTodaySentCount(uid: string): Promise<number> {
 }
 
 export async function sendInterest(senderId: string, senderName: string, receiverId: string, membership: MembershipTier | undefined): Promise<void> {
-  if (!db) return;
   const database = db;
   if (senderId === receiverId) return;
   try {
@@ -72,7 +70,6 @@ export async function sendInterest(senderId: string, senderName: string, receive
 }
 
 export async function updateInterestStatus(interestId: string, status: InterestStatus, receiverName?: string, senderId?: string): Promise<void> {
-  if (!db) return;
   const database = db;
   try {
     await updateDoc(doc(database, collections.interests, interestId), { status, updatedAt: serverTimestamp() });
@@ -97,7 +94,6 @@ export async function rejectInterest(interestId: string, receiverName: string, s
 }
 
 export async function cancelInterest(interestId: string): Promise<void> {
-  if (!db) return;
   const database = db;
   try {
     await updateDoc(doc(database, collections.interests, interestId), { status: "cancelled" as InterestStatus, updatedAt: serverTimestamp() });
@@ -105,7 +101,6 @@ export async function cancelInterest(interestId: string): Promise<void> {
 }
 
 export async function withdrawInterest(interestId: string): Promise<void> {
-  if (!db) return;
   const database = db;
   try {
     await deleteDoc(doc(database, collections.interests, interestId));
@@ -113,7 +108,6 @@ export async function withdrawInterest(interestId: string): Promise<void> {
 }
 
 export async function getInterestBetween(senderId: string, receiverId: string): Promise<InterestDocument | null> {
-  if (!db) return null;
   const database = db;
   try {
     const snap = await getDocs(query(collection(database, collections.interests), where("senderId", "==", senderId), where("receiverId", "==", receiverId), limit(1)));
@@ -126,7 +120,6 @@ export async function getInterestBetween(senderId: string, receiverId: string): 
 }
 
 export async function listInterests(uid: string, direction: InterestDirection, max = 50): Promise<InterestWithProfile[]> {
-  if (!db) return [];
   const database = db;
   try {
     const field = direction === "sent" ? "senderId" : "receiverId";
@@ -152,7 +145,6 @@ export async function listInterests(uid: string, direction: InterestDirection, m
 }
 
 export function subscribeInterests(uid: string, direction: InterestDirection, cb: (items: InterestDocument[]) => void, max = 50): Unsubscribe {
-  if (!db) return () => {};
   const database = db;
   const field = direction === "sent" ? "senderId" : "receiverId";
   try {
@@ -168,7 +160,6 @@ export function subscribeInterests(uid: string, direction: InterestDirection, cb
 }
 
 export function subscribeUnreadInterestCount(uid: string, cb: (count: number) => void): Unsubscribe {
-  if (!db) return () => {};
   const database = db;
   try {
     const q = query(collection(database, collections.interests), where("receiverId", "==", uid), where("status", "==", "pending"));
@@ -179,7 +170,6 @@ export function subscribeUnreadInterestCount(uid: string, cb: (count: number) =>
 }
 
 export function expireOldInterests(): void {
-  if (!db) return;
   const database = db;
   const cutoff = new Date(Date.now() - EXPIRY_DAYS * 24 * 60 * 60 * 1000);
   getDocs(query(collection(database, collections.interests), where("status", "==", "pending"), where("createdAt", "<", cutoff)))

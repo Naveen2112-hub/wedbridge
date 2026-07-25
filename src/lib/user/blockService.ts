@@ -35,7 +35,6 @@ export async function blockUser(blockerUid: string, blockedUid: string, reason?:
 }
 
 export async function unblockUser(blockerUid: string, blockedUid: string): Promise<boolean> {
-  if (!db) return false;
   try {
     const snap = await getDocs(
       query(
@@ -53,7 +52,6 @@ export async function unblockUser(blockerUid: string, blockedUid: string): Promi
 }
 
 export async function isBlocked(blockerUid: string, blockedUid: string): Promise<boolean> {
-  if (!db) return false;
   try {
     const snap = await getDocs(
       query(
@@ -69,7 +67,6 @@ export async function isBlocked(blockerUid: string, blockedUid: string): Promise
 }
 
 export async function getBlockedUsers(uid: string): Promise<BlockRecord[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(
       query(collection(db, collections.blocks), where("blockerUid", "==", uid)),

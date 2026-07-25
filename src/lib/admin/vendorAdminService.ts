@@ -39,7 +39,6 @@ function toVendor(d: { id: string; data: () => Record<string, unknown> }): Vendo
 }
 
 export async function getAllVendors(max = 500): Promise<VendorDocument[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(query(collection(db, collections.vendors), orderBy("createdAt", "desc"), limit(max)));
     return snap.docs.map((d) => toVendor(d as unknown as { id: string; data: () => Record<string, unknown> }));
@@ -50,7 +49,6 @@ export async function getAllVendors(max = 500): Promise<VendorDocument[]> {
 }
 
 export async function getVendorById(id: string): Promise<VendorDocument | null> {
-  if (!db) return null;
   try {
     const snap = await getDoc(doc(db, collections.vendors, id));
     if (!snap.exists()) return null;
@@ -61,7 +59,6 @@ export async function getVendorById(id: string): Promise<VendorDocument | null> 
 }
 
 export async function createVendor(data: VendorFormData, adminUid: string): Promise<string | null> {
-  if (!db) return null;
   try {
     const ref = await addDoc(collection(db, collections.vendors), {
       ownerUid: adminUid,
@@ -111,7 +108,6 @@ export async function createVendor(data: VendorFormData, adminUid: string): Prom
 }
 
 export async function updateVendorAdmin(id: string, data: Partial<VendorFormData>, adminUid: string): Promise<boolean> {
-  if (!db) return false;
   try {
     const { ...updateData } = data;
     await updateDoc(doc(db, collections.vendors, id), {
@@ -128,7 +124,6 @@ export async function updateVendorAdmin(id: string, data: Partial<VendorFormData
 }
 
 export async function deleteVendor(id: string): Promise<boolean> {
-  if (!db) return false;
   try {
     await deleteDoc(doc(db, collections.vendors, id));
     logger.info("Vendor deleted", { id });
@@ -140,7 +135,6 @@ export async function deleteVendor(id: string): Promise<boolean> {
 }
 
 export async function approveVendor(id: string, adminUid: string): Promise<boolean> {
-  if (!db) return false;
   try {
     await updateDoc(doc(db, collections.vendors, id), {
       status: "approved" as VendorStatus,
@@ -160,7 +154,6 @@ export async function approveVendor(id: string, adminUid: string): Promise<boole
 }
 
 export async function rejectVendor(id: string, adminUid: string, reason: string): Promise<boolean> {
-  if (!db) return false;
   try {
     await updateDoc(doc(db, collections.vendors, id), {
       status: "rejected" as VendorStatus,

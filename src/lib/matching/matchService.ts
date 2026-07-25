@@ -12,7 +12,6 @@ export async function getAIMatches(userId: string, userProfile: ProfileDocument,
   const cached = matchCache.get(userId);
   if (cached && cached.date === todayKey) return cached.data.slice(0, max);
 
-  if (!db) return [];
   try {
     const lookingFor = userProfile.gender === "male" ? "female" : "male";
     const snap = await getDocs(query(collection(db, collections.profiles), where("status", "==", "approved"), where("gender", "==", lookingFor), limit(100)));
@@ -36,7 +35,6 @@ export async function getAIMatches(userId: string, userProfile: ProfileDocument,
 }
 
 export async function sendInterest(fromUserId: string, fromUserName: string, toUserId: string, toProfileId: string, message?: string): Promise<{ ok: boolean; error?: string }> {
-  if (!db) return { ok: false, error: "Database not configured." };
   try {
     const existing = await getDocs(query(collection(db, collections.interests), where("fromUserId", "==", fromUserId), where("toProfileId", "==", toProfileId), limit(1)));
     if (!existing.empty) return { ok: false, error: "Interest already sent." };
@@ -47,16 +45,13 @@ export async function sendInterest(fromUserId: string, fromUserName: string, toU
 }
 
 export async function getUserInterests(uid: string, max = 50): Promise<InterestDocument[]> {
-  if (!db) return [];
   try { const snap = await getDocs(query(collection(db, collections.interests), where("toUserId", "==", uid), orderBy("createdAt", "desc"), limit(max))); return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<InterestDocument, "id">) })); } catch { return []; }
 }
 
 export async function getSentInterests(uid: string, max = 50): Promise<InterestDocument[]> {
-  if (!db) return [];
   try { const snap = await getDocs(query(collection(db, collections.interests), where("fromUserId", "==", uid), orderBy("createdAt", "desc"), limit(max))); return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<InterestDocument, "id">) })); } catch { return []; }
 }
 
 export async function updateInterestStatus(id: string, status: "accepted" | "rejected"): Promise<void> {
-  if (!db) return;
   try { await updateDoc(doc(db, collections.interests, id), { status, updatedAt: serverTimestamp() }); } catch { /* ignore */ }
 }

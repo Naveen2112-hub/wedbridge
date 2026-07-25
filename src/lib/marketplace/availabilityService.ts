@@ -31,7 +31,6 @@ export const DEFAULT_AVAILABILITY: VendorAvailability = {
 };
 
 export async function getVendorAvailability(vendorId: string): Promise<VendorAvailability | null> {
-  if (!db) return null;
   try {
     const snap = await getDoc(doc(db, collections.vendorAvailability, vendorId));
     if (!snap.exists()) return null;
@@ -42,7 +41,6 @@ export async function getVendorAvailability(vendorId: string): Promise<VendorAva
 }
 
 export async function updateVendorAvailability(vendorId: string, availability: Partial<VendorAvailability>): Promise<boolean> {
-  if (!db) return false;
   try {
     const ref = doc(db, collections.vendorAvailability, vendorId);
     const snap = await getDoc(ref);
@@ -58,7 +56,6 @@ export async function updateVendorAvailability(vendorId: string, availability: P
 }
 
 export async function getAvailableSlots(vendorId: string, date: string): Promise<AvailabilitySlot[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(
       query(
@@ -87,7 +84,6 @@ export async function isDateAvailable(vendorId: string, date: string): Promise<b
 }
 
 export async function bookSlot(vendorId: string, date: string, startTime: string, endTime: string, bookingId: string): Promise<boolean> {
-  if (!db) return false;
   try {
     const ref = doc(collection(db, collections.vendorAvailability));
     await setDoc(ref, {
@@ -106,7 +102,6 @@ export async function bookSlot(vendorId: string, date: string, startTime: string
 }
 
 export async function releaseSlot(slotId: string): Promise<boolean> {
-  if (!db) return false;
   try {
     await deleteDoc(doc(db, collections.vendorAvailability, slotId));
     return true;

@@ -21,7 +21,6 @@ export interface ConversationSession {
 const MAX_HISTORY = 20;
 
 export async function getConversationHistory(uid: string, sessionId?: string): Promise<ConversationMessage[]> {
-  if (!db) return [];
   try {
     let session: ConversationSession | null = null;
 
@@ -57,7 +56,6 @@ export async function saveConversationMessage(
   message: ConversationMessage,
   sessionId?: string,
 ): Promise<string | null> {
-  if (!db) return null;
   try {
     let session: ConversationSession | null = null;
 
@@ -107,7 +105,6 @@ export async function saveConversationMessage(
 }
 
 export async function clearConversationHistory(uid: string, sessionId?: string): Promise<boolean> {
-  if (!db) return false;
   try {
     if (sessionId) {
       const snap = await getDoc(doc(db, collections.conversationHistory, sessionId));

@@ -9,19 +9,15 @@ export interface VendorListResult { vendors: VendorDocument[]; cursor: QueryDocu
 function toVendor(d: QueryDocumentSnapshot<DocumentData>): VendorDocument { return { id: d.id, ...(d.data() as Omit<VendorDocument, "id">) }; }
 
 export async function getApprovedVendors(max = 100): Promise<VendorDocument[]> {
-  if (!db) return [];
   try { const snap = await getDocs(query(collection(db, collections.vendors), where("status", "==", "approved" as VendorStatus), limit(max))); return snap.docs.map(toVendor).filter((v) => v.active !== false).sort((a, b) => Number(b.featured) - Number(a.featured) || b.rating - a.rating); } catch { return []; }
 }
 export async function getFeaturedVendors(max = 8): Promise<VendorDocument[]> {
-  if (!db) return [];
   try { const snap = await getDocs(query(collection(db, collections.vendors), where("status", "==", "approved" as VendorStatus), where("featured", "==", true), limit(max))); return snap.docs.map(toVendor); } catch { return []; }
 }
 export async function getVendor(id: string): Promise<VendorDocument | null> {
-  if (!db) return null;
   try { const snap = await getDoc(doc(db, collections.vendors, id)); return snap.exists() ? { id: snap.id, ...(snap.data() as Omit<VendorDocument, "id">) } : null; } catch { return null; }
 }
 export async function searchVendors(filters: VendorFilters, cursor?: QueryDocumentSnapshot<DocumentData> | null): Promise<VendorListResult> {
-  if (!db) return { vendors: [], cursor: null, hasMore: false };
   try {
     const constraints: ReturnType<typeof where>[] = [where("status", "==", "approved" as VendorStatus)];
     if (filters.category) constraints.push(where("category", "==", filters.category));
@@ -43,7 +39,6 @@ export async function searchVendors(filters: VendorFilters, cursor?: QueryDocume
   } catch { return { vendors: [], cursor: null, hasMore: false }; }
 }
 export async function getVendorByOwner(uid: string): Promise<VendorDocument | null> {
-  if (!db) return null;
   try { const snap = await getDocs(query(collection(db, collections.vendors), where("ownerUid", "==", uid), limit(1))); if (snap.empty) return null; const d = snap.docs[0]; return { id: d.id, ...(d.data() as Omit<VendorDocument, "id">) }; } catch { return null; }
 }
 export async function createVendor(data: Omit<VendorDocument, "id" | "createdAt" | "updatedAt" | "rating" | "reviewCount" | "featured" | "status" | "verificationStatus">): Promise<string> {
@@ -52,10 +47,8 @@ export async function createVendor(data: Omit<VendorDocument, "id" | "createdAt"
   return ref.id;
 }
 export async function updateVendor(id: string, data: Partial<VendorDocument>): Promise<void> {
-  if (!db) return;
   try { await updateDoc(doc(db, collections.vendors, id), { ...data, updatedAt: serverTimestamp() }); } catch { /* ignore */ }
 }
 export async function listAllVendors(max = 100): Promise<VendorDocument[]> {
-  if (!db) return [];
   try { const snap = await getDocs(query(collection(db, collections.vendors), orderBy("createdAt", "desc"), limit(max))); return snap.docs.map(toVendor); } catch { return []; }
 }

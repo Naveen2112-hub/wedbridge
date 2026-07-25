@@ -199,7 +199,6 @@ async function sendTelegramMessageWithToken(
  * Get Telegram settings for a user from Firestore.
  */
 export async function getTelegramSettings(userId: string): Promise<TelegramSettings | null> {
-  if (!db) return null;
   try {
     const snap = await getDoc(doc(db, collections.telegramSettings, userId));
     if (!snap.exists()) return null;
@@ -213,7 +212,6 @@ export async function getTelegramSettings(userId: string): Promise<TelegramSetti
  * Save Telegram settings to Firestore.
  */
 export async function saveTelegramSettings(userId: string, settings: TelegramSettings): Promise<{ ok: boolean; error?: string }> {
-  if (!db) return { ok: false, error: "Database unavailable." };
   try {
     await setDoc(doc(db, collections.telegramSettings, userId), {
       userId,
@@ -232,7 +230,6 @@ export async function saveTelegramSettings(userId: string, settings: TelegramSet
  * Log a Telegram notification to Firestore.
  */
 export async function logTelegramNotification(entry: TelegramLogEntry): Promise<void> {
-  if (!db) return;
   try {
     await addDoc(collection(db, collections.telegramLogs), {
       ...entry,
@@ -253,7 +250,6 @@ export async function enqueueRetry(
   payload: Record<string, unknown>,
   error: string
 ): Promise<void> {
-  if (!db) return;
   try {
     await addDoc(collection(db, collections.telegramQueue), {
       userId,
@@ -281,7 +277,6 @@ export async function sendUserNotification(
   text: string,
   inlineButtons?: TelegramInlineButton[][]
 ): Promise<{ ok: boolean; error?: string }> {
-  if (!db) return { ok: false, error: "Database unavailable." };
 
   const settings = await getTelegramSettings(userId);
   if (!settings || !settings.enabled || !settings.chatId) {
@@ -313,7 +308,6 @@ export async function broadcastMessage(
   text: string,
   inlineButtons?: TelegramInlineButton[][]
 ): Promise<BroadcastResult> {
-  if (!db) return { total: 0, success: 0, failed: 0, failedUserIds: [] };
   const database = db;
 
   let userIds: string[] = [];
@@ -425,7 +419,6 @@ export async function setBotCommands(): Promise<{ ok: boolean; error?: string }>
  * Get recent broadcasts from Firestore.
  */
 export async function getRecentBroadcasts(limitCount = 20): Promise<unknown[]> {
-  if (!db) return [];
   try {
     const q = query(collection(db, collections.broadcasts), orderBy("createdAt", "desc"), limit(limitCount));
     const snap = await getDocs(q);

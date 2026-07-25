@@ -103,7 +103,6 @@ export async function getRecommendations(
 }
 
 async function getNearbyProfiles(district: string, excludeUid: string): Promise<ProfileDocument[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(query(collection(db, collections.profiles), where("status", "==", "approved"), where("district", "==", district), limit(5)));
     return snap.docs.filter((d) => d.id !== excludeUid).map((d) => ({ uid: d.id, ...(d.data() as Omit<ProfileDocument, "uid">) }));
@@ -113,7 +112,6 @@ async function getNearbyProfiles(district: string, excludeUid: string): Promise<
 }
 
 async function getRecentlyActiveProfiles(excludeUid: string): Promise<ProfileDocument[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(query(collection(db, collections.profiles), where("status", "==", "approved"), limit(10)));
     return snap.docs.filter((d) => d.id !== excludeUid).map((d) => ({ uid: d.id, ...(d.data() as Omit<ProfileDocument, "uid">) }));
@@ -123,7 +121,6 @@ async function getRecentlyActiveProfiles(excludeUid: string): Promise<ProfileDoc
 }
 
 async function getPopularVendors(): Promise<(VendorDocument & { id: string })[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(query(collection(db, collections.vendors), orderBy("rating", "desc"), limit(10)));
     return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<VendorDocument, "id">) }));

@@ -120,7 +120,6 @@ export async function processChatQuery(
 }
 
 async function getReceivedInterests(uid: string): Promise<InterestDocument[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(query(collection(db, collections.interests), where("toUserId", "==", uid), orderBy("createdAt", "desc"), limit(50)));
     return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<InterestDocument, "id">) }));
@@ -130,7 +129,6 @@ async function getReceivedInterests(uid: string): Promise<InterestDocument[]> {
 }
 
 async function getSentInterests(uid: string): Promise<InterestDocument[]> {
-  if (!db) return [];
   try {
     const snap = await getDocs(query(collection(db, collections.interests), where("fromUserId", "==", uid), orderBy("createdAt", "desc"), limit(50)));
     return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<InterestDocument, "id">) }));

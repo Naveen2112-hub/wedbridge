@@ -7,7 +7,6 @@ export interface FavouriteWithProfile extends FavouriteDocument {
 }
 
 export async function addFavourite(userId: string, profileId: string): Promise<void> {
-  if (!db) return;
   const database = db;
   if (userId === profileId) return;
   try {
@@ -20,7 +19,6 @@ export async function addFavourite(userId: string, profileId: string): Promise<v
 }
 
 export async function removeFavourite(userId: string, profileId: string): Promise<void> {
-  if (!db) return;
   const database = db;
   try {
     const existing = await getDocs(query(collection(database, collections.favourites), where("userId", "==", userId), where("profileId", "==", profileId), limit(1)));
@@ -29,7 +27,6 @@ export async function removeFavourite(userId: string, profileId: string): Promis
 }
 
 export async function isFavourite(userId: string, profileId: string): Promise<boolean> {
-  if (!db) return false;
   const database = db;
   try {
     const snap = await getDocs(query(collection(database, collections.favourites), where("userId", "==", userId), where("profileId", "==", profileId), limit(1)));
@@ -40,7 +37,6 @@ export async function isFavourite(userId: string, profileId: string): Promise<bo
 }
 
 export async function getFavouriteIds(userId: string): Promise<Set<string>> {
-  if (!db) return new Set();
   const database = db;
   try {
     const snap = await getDocs(query(collection(database, collections.favourites), where("userId", "==", userId)));
@@ -53,7 +49,6 @@ export async function getFavouriteIds(userId: string): Promise<Set<string>> {
 }
 
 export async function getFavouriteCount(userId: string): Promise<number> {
-  if (!db) return 0;
   const database = db;
   try {
     const snap = await getDocs(query(collection(database, collections.favourites), where("userId", "==", userId)));
@@ -64,7 +59,6 @@ export async function getFavouriteCount(userId: string): Promise<number> {
 }
 
 export async function listFavourites(userId: string, max = 50): Promise<FavouriteWithProfile[]> {
-  if (!db) return [];
   const database = db;
   try {
     const snap = await getDocs(query(collection(database, collections.favourites), where("userId", "==", userId), orderBy("createdAt", "desc"), limit(max)));
@@ -87,7 +81,6 @@ export async function listRecentlyFavourited(userId: string, max = 6): Promise<F
 }
 
 export function subscribeFavourites(userId: string, cb: (items: FavouriteDocument[]) => void, max = 50): Unsubscribe {
-  if (!db) return () => {};
   const database = db;
   try {
     const q = query(collection(database, collections.favourites), where("userId", "==", userId), orderBy("createdAt", "desc"), limit(max));
@@ -102,7 +95,6 @@ export function subscribeFavourites(userId: string, cb: (items: FavouriteDocumen
 }
 
 export function subscribeFavouriteCount(userId: string, cb: (count: number) => void): Unsubscribe {
-  if (!db) return () => {};
   const database = db;
   try {
     const q = query(collection(database, collections.favourites), where("userId", "==", userId));

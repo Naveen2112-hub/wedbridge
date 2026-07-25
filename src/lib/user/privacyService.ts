@@ -33,7 +33,6 @@ export const DEFAULT_PRIVACY: PrivacySettings = {
 };
 
 export async function getPrivacySettings(uid: string): Promise<PrivacySettings> {
-  if (!db) return DEFAULT_PRIVACY;
   try {
     const snap = await getDoc(doc(db, collections.privacySettings, uid));
     if (!snap.exists()) return DEFAULT_PRIVACY;
@@ -44,7 +43,6 @@ export async function getPrivacySettings(uid: string): Promise<PrivacySettings> 
 }
 
 export async function updatePrivacySettings(uid: string, settings: Partial<PrivacySettings>): Promise<boolean> {
-  if (!db) return false;
   try {
     const ref = doc(db, collections.privacySettings, uid);
     const snap = await getDoc(ref);
