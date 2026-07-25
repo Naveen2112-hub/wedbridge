@@ -186,15 +186,18 @@ export async function PATCH(req: NextRequest) {
     const db = getDb();
     const now = new Date();
 
+    // Only admins can change payment status to refunded/cancelled/failed
+    const userDoc = await db.collection("users").doc(user.uid).get();
+    if (!userDoc.exists || userDoc.data()?.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden — admin access required" }, { status: 403 });
+    }
+
     const payRef = db.collection("payments").doc(body.paymentId);
     const snap = await payRef.get();
     if (!snap.exists) {
       return NextResponse.json({ error: "Payment not found" }, { status: 404 });
     }
     const payData = snap.data() as { uid?: string; status?: string };
-    if (payData.uid !== user.uid) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
 
     const updateData: Record<string, unknown> = { status: body.status, updatedAt: now };
 

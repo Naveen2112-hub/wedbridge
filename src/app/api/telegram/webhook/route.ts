@@ -12,6 +12,8 @@ export async function POST(req: NextRequest) {
     if (secret) {
       const provided = req.headers.get("x-telegram-bot-api-secret-token");
       if (provided !== secret) return NextResponse.json({ ok: true });
+    } else if (process.env.NODE_ENV === "production") {
+      return NextResponse.json({ error: "Webhook secret not configured" }, { status: 403 });
     }
 
     const update = await req.json();

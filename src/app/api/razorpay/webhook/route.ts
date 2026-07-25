@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createHmac } from "crypto";
+import { createHmac, timingSafeEqual } from "crypto";
 import { getDb } from "@/lib/firebase-admin";
 
 export const runtime = "nodejs";
@@ -47,7 +47,13 @@ export async function POST(req: NextRequest) {
   const rawBody = await req.text();
 
   const expectedSig = createHmac("sha256", webhookSecret).update(rawBody).digest("hex");
-  if (expectedSig !== signature) {
+  const expectedBuf = Buffer.from(expectedSig, "utf-8");
+  const receivedBuf = Buffer.from(signature.trim(), "utf-8");
+  let sigValid = false;
+  if (expectedBuf.length === receivedBuf.length) {
+    try { sigValid = timingSafeEqual(expectedBuf, receivedBuf); } catch { sigValid = false; }
+  }
+  if (!sigValid) {
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
