@@ -6,32 +6,38 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const status = getHealthStatus();
+  try {
+    const status = getHealthStatus();
 
-  const capabilities = {
-    firebase:     envFlags.isFirebaseConfigured,
-    firebaseAdmin: envFlags.isFirebaseAdminConfigured,
-    razorpay:     envFlags.isRazorpayConfigured,
-    telegram:     envFlags.isTelegramConfigured,
-    gemini:       envFlags.isGeminiConfigured,
-  };
+    const capabilities = {
+      firebase:     envFlags.isFirebaseConfigured,
+      firebaseAdmin: envFlags.isFirebaseAdminConfigured,
+      razorpay:     envFlags.isRazorpayConfigured,
+      telegram:     envFlags.isTelegramConfigured,
+      gemini:       envFlags.isGeminiConfigured,
+    };
 
-  const allCapabilitiesHealthy = Object.values(capabilities).every(Boolean);
-  const overallHealthy = status.healthy;
+    const overallHealthy = status.healthy;
 
-  return NextResponse.json(
-    {
-      status: overallHealthy ? "healthy" : "degraded",
-      version: process.env.NEXT_BUILD_ID ?? "dev",
-      environment: process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? "unknown",
-      uptime: status.uptime,
-      capabilities,
-      issues: {
-        errors:   status.errors,
-        warnings: status.warnings,
+    return NextResponse.json(
+      {
+        status: overallHealthy ? "healthy" : "degraded",
+        version: process.env.NEXT_BUILD_ID ?? "dev",
+        environment: process.env.VERCEL_ENV ?? process.env.NODE_ENV ?? "unknown",
+        uptime: status.uptime,
+        capabilities,
+        issues: {
+          errors:   status.errors,
+          warnings: status.warnings,
+        },
+        timestamp: new Date().toISOString(),
       },
-      timestamp: new Date().toISOString(),
-    },
-    { status: overallHealthy ? 200 : 503 },
-  );
+      { status: overallHealthy ? 200 : 503 },
+    );
+  } catch {
+    return NextResponse.json(
+      { status: "degraded", error: "Health check failed" },
+      { status: 503 },
+    );
+  }
 }

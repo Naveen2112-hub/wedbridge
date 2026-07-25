@@ -1,18 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "@/firebase/config";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { getDb } from "@/lib/firebase-admin";
 import { collections } from "@/firebase/schema";
 import { processBiodataImport } from "@/lib/ocr/biodataImport";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
-/**
- * Telegram webhook handler.
- * Handles: document, photo, image uploads + /start, /help commands.
- * Ignores all other text messages.
- * Set webhook to: https://yourdomain.com/api/telegram/webhook
- */
 export async function POST(req: NextRequest) {
   try {
     const secret = process.env.TELEGRAM_WEBHOOK_SECRET;
@@ -25,14 +18,13 @@ export async function POST(req: NextRequest) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
     if (!token) return NextResponse.json({ ok: true });
 
-    const message = update.message;
+    const message = update?.message;
     if (!message) return NextResponse.json({ ok: true });
 
-    const chatId = String(message.chat.id);
+    const chatId = String(message.chat?.id ?? "");
     const fromUser = message.from;
     const telegramUserId = fromUser?.id;
 
-    // Handle text commands
     if (message.text) {
       const text = message.text as string;
       if (text.startsWith("/start")) {
@@ -60,11 +52,9 @@ export async function POST(req: NextRequest) {
           "/help - Show this help",
         ].join("\n"));
       }
-      // Ignore all other text messages
       return NextResponse.json({ ok: true });
     }
 
-    // Handle document uploads (PDF, images sent as files)
     if (message.document) {
       const doc = message.document;
       const fileId = doc.file_id as string;
@@ -86,7 +76,6 @@ export async function POST(req: NextRequest) {
 
       await sendText(token, chatId, "📥 Received your biodata. Processing... This may take a moment.");
 
-      // Process asynchronously
       processBiodataImport(token, chatId, fileId, telegramUserId)
         .then(async (result) => {
           if (!result.success && result.status === "failed_ocr") {
@@ -100,9 +89,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    // Handle photo uploads (images sent as photos)
     if (message.photo && Array.isArray(message.photo) && message.photo.length > 0) {
-      // Get the largest photo size
       const largest = message.photo[message.photo.length - 1];
       const fileId = largest.file_id as string;
 
@@ -121,19 +108,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: true });
     }
 
-    // Log unhandled message types
-    if (db) {
-      try {
-        await addDoc(collection(db, collections.telegramLogs), {
-          userId: "bot",
-          chatId,
-          messageType: "unhandled",
-          status: "success",
-          createdAt: serverTimestamp(),
-        });
-      } catch {
-        // best-effort
-      }
+    try {
+      const db = getDb();
+      await db.collection(collections.telegramLogs).add({
+        userId: "bot",
+        chatId,
+        messageType: "unhandled",
+        status: "success",
+        createdAt: new Date(),
+      });
+    } catch {
+      // best-effort
     }
 
     return NextResponse.json({ ok: true });
