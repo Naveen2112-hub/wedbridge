@@ -27,11 +27,12 @@ async function ensureUserDoc(user: User, defaults: Partial<Record<string, unknow
   if (!snap.exists()) {
     const payload = { uid: user.uid, role: "user" as UserRole, name: user.displayName ?? (defaults.name as string) ?? "", email: user.email ?? "", phone: user.phoneNumber ?? "", gender: null, profileCompleted: false, photoURL: user.photoURL ?? "", contactVisibility: "after_accept" as ContactVisibility, language: readLanguage(), status: "active" as const, verified: false, membershipTier: "free" as const, createdAt: serverTimestamp(), updatedAt: serverTimestamp() };
     await setDoc(ref, payload, { merge: true });
-    const { uid: _u, email: _e, role: _r, ...restPayload } = payload;
-    return { role: "user", profileCompleted: false, appUser: { uid: user.uid, email: user.email ?? "", displayName: user.displayName ?? "", ...restPayload } as AppUser };
+    const { uid: _u, email: _e, role: _r, name, ...restPayload } = payload;
+    return { role: "user", profileCompleted: false, appUser: { uid: user.uid, email: user.email ?? "", role: "user" as UserRole, displayName: (user.displayName ?? name ?? "") as string, ...restPayload } as AppUser };
   }
   const data = snap.data();
-  return { role: (data.role as UserRole) ?? "user", profileCompleted: Boolean(data.profileCompleted), appUser: { uid: user.uid, ...(data as Omit<AppUser, "uid">) } };
+  const displayName = (data.displayName as string | undefined) ?? (data.name as string | undefined) ?? user.displayName ?? "";
+  return { role: (data.role as UserRole) ?? "user", profileCompleted: Boolean(data.profileCompleted), appUser: { uid: user.uid, ...(data as Omit<AppUser, "uid">), displayName } as AppUser };
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {

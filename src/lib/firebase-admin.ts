@@ -40,7 +40,7 @@ export function getFirebaseAdmin(): App {
     validated = true;
     import("@/lib/env/validate")
       .then(({ validateEnv }) => validateEnv())
-      .catch(() => {});
+      .catch((e) => console.error("[firebase-admin] Env validation failed:", e));
   }
 
   return app;
