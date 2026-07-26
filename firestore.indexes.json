@@ -346,13 +346,7 @@
         { "fieldPath": "importTime",     "order": "DESCENDING" }
       ]
     },
-    {
-      "collectionGroup": "broadcasts",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
-      ]
-    },
+    
     {
       "collectionGroup": "auditLog",
       "queryScope": "COLLECTION",
