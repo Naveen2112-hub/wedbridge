@@ -22,7 +22,7 @@ const stories = [
   {
     names: "Meena & Vignesh",
     image:
-      "https://images.pexels.com/photos/1456626/pexels-photo-1456626.jpeg",
+      "https://images.pexels.com/photos/1130626/pexels-photo-1130626.jpeg",
     quote: "Verified profiles gave our families peace of mind.",
   },
 ];
